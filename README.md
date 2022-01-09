@@ -1,2 +1,2 @@
 # 2022CompetitionCode
-The code for team 2199's competition robot.
+The code for FRC team 2199's competition robot.
