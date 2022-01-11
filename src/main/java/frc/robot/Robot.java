@@ -1,9 +1,8 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
+/**
+ * Imports
+ */
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,7 +14,18 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  /**
+   * Constructor
+   */
+  public Robot() {
+    //Nothing yet...
+  }
+
   @Override
+  /**
+   * robotInit()
+   * Runs once when the robot is started
+   */
   public void robotInit() {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
@@ -23,9 +33,19 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void robotPeriodic() {}
+  /**
+   * robotPeriodic()
+   * Always runs on the robot
+   */
+  public void robotPeriodic() {
+    //Nothing yet...
+  }
 
   @Override
+  /**
+   * autonomousInit()
+   * Runs once when Auto starts
+   */
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
@@ -33,6 +53,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  /**
+   * autonomousPeriodic()
+   * Runs constantly during Autonomous
+   */
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
       case kCustomAuto:
@@ -46,20 +70,58 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  /**
+   * teleopInit()
+   * Runs once at the start of TeleOp
+   */
+  public void teleopInit() {
+    //Nothing yet...
+  }
 
   @Override
-  public void teleopPeriodic() {}
+  /**
+   * teleopPeriodic()
+   * Runs constantly during TeleOp
+   */
+  public void teleopPeriodic() {
+    //Nothing yet...
+  }
 
   @Override
-  public void disabledInit() {}
+  /**
+   * disabledInit()
+   * Shouldn't ever do anything
+   */
+  public void disabledInit() {
+    //Nothing yet...
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  /**
+   * disabledPeriodic()
+   * Shouldn't ever do anything
+   */
+  public void disabledPeriodic() {
+    //Nothing yet...
+  }
 
   @Override
-  public void testInit() {}
+  /**
+   * testInit()
+   * Runs once at the start of Test
+   */
+  public void testInit() {
+    //Nothing yet...
+  }
 
   @Override
-  public void testPeriodic() {}
+  /**
+   * testPeriodic()
+   * Runs constantly during test
+   */
+  public void testPeriodic() {
+    //Nothing yet...
+  }
 }
+
+//End of the Robot class
