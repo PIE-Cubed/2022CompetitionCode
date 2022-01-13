@@ -9,6 +9,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Robot extends TimedRobot {
+
+  // ERROR CODES
+  public static final int FAIL = -1;
+  public static final int PASS =  1;
+  public static final int DONE =  2;
+  public static final int CONT =  3;
+
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
