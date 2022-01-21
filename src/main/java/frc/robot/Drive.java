@@ -90,26 +90,26 @@ public class Drive {
 
     // An enum containing each wheel's properties including: drive and rotate motor IDs, drive motor types, and rotate sensor IDs 
     public enum WheelProperties {
-        FRONT_RIGHT_WHEEL(15, // DRIVE MOTOR ID
-                          1, // ROTATE MOTOR ID
-                          1, // ROTATE SENSOR ID
+        FRONT_RIGHT_WHEEL(16, // DRIVE MOTOR ID
+                          17, // ROTATE MOTOR ID
+                          3, // ROTATE SENSOR ID
                           (-1 * rotateMotorAngleRad), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                          249.65), //Offset
-        FRONT_LEFT_WHEEL(12, // DRIVE MOTOR ID
-                         2, // ROTATE MOTOR ID
-                         2, // ROTATE SENSOR ID
-                         (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                         306.75), //Offset
-        REAR_RIGHT_WHEEL(14, // DRIVE MOTOR ID
-                         4, // ROTATE MOTOR ID
+                          248), //Offset
+        FRONT_LEFT_WHEEL(10, // DRIVE MOTOR ID
+                         11, // ROTATE MOTOR ID
                          0, // ROTATE SENSOR ID
+                         (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
+                         309.8), //Offset
+        REAR_RIGHT_WHEEL(14, // DRIVE MOTOR ID
+                         15, // ROTATE MOTOR ID
+                         2, // ROTATE SENSOR ID
                          (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                         114.6), //Offset
-        REAR_LEFT_WHEEL(13, // DRIVE MOTOR ID
-                        3, // ROTATE MOTOR ID
-                        3, // ROTATE SENSOR ID
+                         241.7), //Offset
+        REAR_LEFT_WHEEL(12, // DRIVE MOTOR ID
+                        13, // ROTATE MOTOR ID
+                        1, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad + (Math.PI)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                        257.9); //Offset
+                        165.7); //Offset
 
         private int driveMotorId;
         private int rotateMotorId;
@@ -769,7 +769,9 @@ public class Drive {
     }
 
     public void testWheelAngle(){
-        System.out.println("Angle: " + rearRightWheel.getRotateMotorPosition());
+        //Use this to calibrate wheel angle sensors
+        //Offset in wheel constructor should be the returned value * -1
+        System.out.println("Angle: " + rearLeftWheel.testWheelAngle());
     }
 
 

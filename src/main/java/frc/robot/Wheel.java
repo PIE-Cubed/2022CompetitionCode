@@ -48,6 +48,8 @@ public class Wheel {
         // Adds a current limit and sets the motor mode
         this.driveMotor.setSmartCurrentLimit(WHEEL_CURRENT_LIMIT);
         this.driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        this.rotateMotor.setSmartCurrentLimit(WHEEL_CURRENT_LIMIT);
+        this.rotateMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
         // Rotate Sensor Instantiation
         rotateMotorSensor = new AnalogPotentiometer(rotateMotorSensorID, -360, offsetDegrees);
@@ -183,6 +185,16 @@ public class Wheel {
             tempValue *= -1;
         } 
         return tempValue;
+    }
+
+    /****************************************************************************************** 
+    *
+    *    testWheelAngle()
+    *    Returns the direct reading of the rotate motor sensor
+    * 
+    ******************************************************************************************/
+    public double testWheelAngle() {
+        return rotateMotorSensor.get();
     }
 
 

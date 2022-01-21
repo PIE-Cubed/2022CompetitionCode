@@ -10,6 +10,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
+  //Object creation
+  Drive     drive;
+  Controls  controls;
+  Grabber   grabber;
+
+
   // ERROR CODES
   public static final int FAIL = -1;
   public static final int PASS =  1;
@@ -25,7 +31,9 @@ public class Robot extends TimedRobot {
    * Constructor
    */
   public Robot() {
-    //Nothing yet...
+    drive    = new Drive();
+    controls = Controls.getInstance();
+    grabber  = new Grabber();
   }
 
   @Override
@@ -91,6 +99,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during TeleOp
    */
   public void teleopPeriodic() {
+    wheelControl();
     //Nothing yet...
   }
 
@@ -127,8 +136,47 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    //Nothing yet...
+    drive.testWheelAngle();
   }
-}
 
+
+  private void wheelControl() {
+    drive.teleopCrabDrive(0, 0.2);
+
+    /*
+    double driveX      = controls.getDriveX();
+    double driveY      = controls.getDriveY();
+    double rotatePower = controls.getRotatePower();
+
+    if ((Math.sqrt(driveX*driveX + driveY*driveY) > 0.01) || (Math.abs(rotatePower) > 0.01)) {
+        drive.teleopSwerve(driveX, driveY, rotatePower, fieldDrive);
+      }
+      else {
+        //Robot is in dead zone
+        drive.stopWheels();
+      }
+    */
+
+
+  }
+
+  private void ballControl() {
+    boolean deployRetract = controls.deployRetract();
+    Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
+
+
+    if(deployRetract == true) {
+      grabber.deployRetract();
+    }
+
+
+    //Pair of pistons to retract and deploy
+    //One motor to take balls in and out
+  }
+
+
+
+
+
+}
 //End of the Robot class
