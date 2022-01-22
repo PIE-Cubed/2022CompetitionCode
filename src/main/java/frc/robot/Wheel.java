@@ -24,7 +24,7 @@ public class Wheel {
     private PIDController rotationPID;
 
     // PID Controller Values (static and final so that all wheels share the same values, and they will never change)
-    private static final double kP = 0.03;
+    private static final double kP = 0.005; //0.03
     private static final double kI = 0.00;
     private static final double kD = 0.00;
 
@@ -42,7 +42,7 @@ public class Wheel {
         // Motor Controllers Instantiation
         this.driveMotor   = new CANSparkMax(driveMotorID, MotorType.kBrushless);
         this.driveEncoder = driveMotor.getEncoder();
-        this.rotateMotor  = new CANSparkMax(rotateMotorID, MotorType.kBrushless);
+        this.rotateMotor  = new CANSparkMax(rotateMotorID, MotorType.kBrushed);
         this.name         = motorName;
 
         // Adds a current limit and sets the motor mode
@@ -57,6 +57,7 @@ public class Wheel {
         //PID Controller
         rotationPID = new PIDController(kP, kI, kD);
         rotationPID.enableContinuousInput(-180, 180);
+        rotationPID.setTolerance(2);
     }
 
 
@@ -101,6 +102,7 @@ public class Wheel {
     ******************************************************************************************/
     public void setRotateMotorPower(double power) {
         power = MathUtil.clamp(power, -1, 1);
+        System.out.println("Rotate Power is " + power + " for " + this.name);
         rotateMotor.set(power);
     }
 

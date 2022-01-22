@@ -13,7 +13,7 @@ public class Robot extends TimedRobot {
   //Object creation
   Drive     drive;
   Controls  controls;
-  Grabber   grabber;
+  //Grabber   grabber;
 
 
   // ERROR CODES
@@ -32,8 +32,8 @@ public class Robot extends TimedRobot {
    */
   public Robot() {
     drive    = new Drive();
+    //grabber  = new Grabber();
     controls = Controls.getInstance();
-    grabber  = new Grabber();
   }
 
   @Override
@@ -141,26 +141,26 @@ public class Robot extends TimedRobot {
 
 
   private void wheelControl() {
-    drive.teleopCrabDrive(0, 0.2);
+    drive.teleopRotate(0.2);
 
-    /*
-    double driveX      = controls.getDriveX();
+   /* double driveX      = controls.getDriveX();
     double driveY      = controls.getDriveY();
     double rotatePower = controls.getRotatePower();
 
     if ((Math.sqrt(driveX*driveX + driveY*driveY) > 0.01) || (Math.abs(rotatePower) > 0.01)) {
-        drive.teleopSwerve(driveX, driveY, rotatePower, fieldDrive);
-      }
-      else {
-        //Robot is in dead zone
-        drive.stopWheels();
-      }
-    */
-
-
+      drive.teleopSwerve(driveX, driveY, rotatePower, false);
+    }
+    else {
+      //Robot is in dead zone
+      drive.stopWheels();
+    }*/
   }
 
+/*
   private void ballControl() {
+    //Pair of pistons to retract and deploy
+    //One motor to take balls in and out
+  
     boolean deployRetract = controls.deployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
 
@@ -168,15 +168,8 @@ public class Robot extends TimedRobot {
     if(deployRetract == true) {
       grabber.deployRetract();
     }
-
-
-    //Pair of pistons to retract and deploy
-    //One motor to take balls in and out
   }
-
-
-
-
+*/
 
 }
 //End of the Robot class
