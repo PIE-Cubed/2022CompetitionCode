@@ -104,7 +104,7 @@ public class Drive {
                          15, // ROTATE MOTOR ID
                          2, // ROTATE SENSOR ID
                          (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                         241.7), //Offset
+                         -65.2), //Offset
         REAR_LEFT_WHEEL(12, // DRIVE MOTOR ID
                         13, // ROTATE MOTOR ID
                         1, // ROTATE SENSOR ID
@@ -771,7 +771,7 @@ public class Drive {
     public void testWheelAngle(){
         //Use this to calibrate wheel angle sensors
         //Offset in wheel constructor should be the returned value * -1
-        System.out.println("Angle: " + rearLeftWheel.testWheelAngle());
+        System.out.println("Angle: " + rearRightWheel.testWheelAngle());
     }
 
 

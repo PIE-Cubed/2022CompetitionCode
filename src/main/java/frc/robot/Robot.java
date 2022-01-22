@@ -136,14 +136,15 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+    //drive.testRotate();
     drive.testWheelAngle();
   }
 
 
   private void wheelControl() {
-    drive.teleopRotate(0.2);
+    //drive.teleopRotate(0.2);
 
-   /* double driveX      = controls.getDriveX();
+    double driveX      = controls.getDriveX();
     double driveY      = controls.getDriveY();
     double rotatePower = controls.getRotatePower();
 
@@ -153,7 +154,7 @@ public class Robot extends TimedRobot {
     else {
       //Robot is in dead zone
       drive.stopWheels();
-    }*/
+    }
   }
 
 /*

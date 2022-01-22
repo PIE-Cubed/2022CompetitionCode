@@ -24,7 +24,7 @@ public class Wheel {
     private PIDController rotationPID;
 
     // PID Controller Values (static and final so that all wheels share the same values, and they will never change)
-    private static final double kP = 0.005; //0.03
+    private static final double kP = 0.03; //0.03
     private static final double kI = 0.00;
     private static final double kD = 0.00;
 
@@ -75,12 +75,15 @@ public class Wheel {
         currWheelAngle = getRotateMotorPosition();
         rotatePower = rotationPID.calculate(currWheelAngle, targetWheelAngle);
 
-        /**
+        /** FOR OLD ROBOT (victor SP):
          * If PID output is positive you want to rotate the wheel clockwise
          * In order to rotate clockwise, a negative power is required
          * And vise-versa.
+         * 
+         * THE NEW ROBOT USES SPARKMAXES FOR ROTATE MOTORS
+         * Positive power --> clockwise
          */
-        setRotateMotorPower(-1 * rotatePower);
+        setRotateMotorPower(rotatePower);
         setDriveMotorPower(drivePower);
 
         //Are we within 2 degrees of target wheel angle? 
@@ -101,8 +104,7 @@ public class Wheel {
     * 
     ******************************************************************************************/
     public void setRotateMotorPower(double power) {
-        power = MathUtil.clamp(power, -1, 1);
-        System.out.println("Rotate Power is " + power + " for " + this.name);
+        power = MathUtil.clamp(power, -1, 1);    
         rotateMotor.set(power);
     }
 
@@ -196,7 +198,7 @@ public class Wheel {
     * 
     ******************************************************************************************/
     public double testWheelAngle() {
-        return rotateMotorSensor.get();
+        return this.getRotateMotorPosition();
     }
 
 
