@@ -45,9 +45,9 @@ public class Grabber {
     // SOLENOID CHANNELS
     private DoubleSolenoid grabberPiston;
 
-    private final int PCM_CAN_ID    = 0;
-    private final int DEPLOY_ID     = 2;
-    private final int RETRACT_ID    = 4;
+    private final int PCM_CAN_ID    = 1;
+    private final int DEPLOY_ID     = 0;
+    private final int RETRACT_ID    = 7;
 
     private CANSparkMax grabberMotor; 
 

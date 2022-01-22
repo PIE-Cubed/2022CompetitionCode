@@ -4,8 +4,12 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 /**
  * Start of class
@@ -16,6 +20,9 @@ public class Robot extends TimedRobot {
   Drive     drive;
   Controls  controls;
   //Grabber   grabber;
+
+  //DoubleSolenoid test = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 7);
+
 
 
   // ERROR CODES
@@ -101,7 +108,8 @@ public class Robot extends TimedRobot {
    * Runs constantly during TeleOp
    */
   public void teleopPeriodic() {
-    wheelControl();
+    //wheelControl();
+
     //Nothing yet...
   }
 
@@ -129,6 +137,12 @@ public class Robot extends TimedRobot {
    * Runs once at the start of Test
    */
   public void testInit() {
+    /*if (controls.getLeftBumper()) {
+      test.set(Value.kForward);
+    }
+    else if (controls.getRightBumper()) {
+      test.set(Value.kReverse);
+    }*/
     //Nothing yet...
   }
 
@@ -139,7 +153,7 @@ public class Robot extends TimedRobot {
    */
   public void testPeriodic() {
     //drive.testRotate();
-    drive.testWheelAngle();
+    //drive.testWheelAngle();
   }
 
 
