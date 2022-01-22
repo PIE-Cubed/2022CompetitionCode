@@ -1,5 +1,8 @@
 package frc.robot;
 
+/**
+ * Imports
+ */
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -8,7 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 /**
- * Add your docs here.
+ * Start of class
  */
 public class Grabber {
     //SPARK MAX ID's

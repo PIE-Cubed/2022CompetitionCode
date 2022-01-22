@@ -1,15 +1,20 @@
 package frc.robot;
 
+/**
+ * Imports
+ */
 import edu.wpi.first.math.MathUtil;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.math.controller.PIDController;
 
+/**
+ * Start of class
+ */
 public class Wheel {
 
     // Motor Controllers Declaration (instantiated in the constructor in order to dependency inject the IDs of each respective controller)
