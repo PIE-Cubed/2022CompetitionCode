@@ -1,5 +1,8 @@
 package frc.robot;
 
+/**
+ * Imports
+ */
 import edu.wpi.first.math.MathUtil;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -9,6 +12,9 @@ import edu.wpi.first.networktables.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.SPI;
 
+/**
+ * Start of class
+ */
 public class Drive {
     //Object creation
     NetworkTable limelightEntries = NetworkTableInstance.getDefault().getTable("limelight");

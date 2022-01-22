@@ -1,11 +1,16 @@
 package frc.robot;
 
+/**
+ * Imports
+ */
 import edu.wpi.first.math.MathUtil;
-
 import edu.wpi.first.wpilibj.Joystick;
 
 import edu.wpi.first.wpilibj.XboxController;
 
+/**
+ * Start of class
+ */
 public class Controls {
 
     private final boolean useJoystick = true;

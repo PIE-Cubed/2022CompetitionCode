@@ -7,14 +7,16 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
+/**
+ * Start of class
+ */
 public class Robot extends TimedRobot {
 
   //Object creation
   Drive     drive;
   Controls  controls;
   //Grabber   grabber;
-
+  CargoTracking cargo;
 
   // ERROR CODES
   public static final int FAIL = -1;
@@ -22,18 +24,41 @@ public class Robot extends TimedRobot {
   public static final int DONE =  2;
   public static final int CONT =  3;
 
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  /**
+   * Shuffleboard choices
+   */
+  //Auto Positions
+	private static final String kCustomAutoRight  = "Right";
+	private static final String kCustomAutoCenter = "Center";
+	private static final String kCustomAutoLeft   = "Left";
+	private static final String kCustomAutoLRC    = "L/R/C Simple";
+	private String m_positionSelected;
+  private final SendableChooser<String> m_pathChooser = new SendableChooser<>();
+
+  //Auto Delay
+  private static final String kCustomDelayZero  = "0";
+	private static final String kCustomDelayTwo   = "2";
+	private static final String kCustomDelayFour  = "4";
+	private static final String kCustomDelaySix   = "6";
+	private int m_delaySelected;
+  private final SendableChooser<String> m_delayChooser = new SendableChooser<>();
+
+  //Alliance
+  private static final String kDefaultAlliance = "Default";
+  private static final String kRedAlliance = "Red";
+  private static final String kBlueAlliance = "Blue";
+  private String m_allianceSelected;
+  private final SendableChooser<String> m_allianceChooser = new SendableChooser<>();
 
   /**
    * Constructor
    */
   public Robot() {
+    //Instance creation
     drive    = new Drive();
     //grabber  = new Grabber();
     controls = Controls.getInstance();
+    cargo    = new CargoTracking();
   }
 
   @Override
@@ -42,9 +67,36 @@ public class Robot extends TimedRobot {
    * Runs once when the robot is started
    */
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    /**
+     * Shuffleboard choices
+     */
+    //Auto Positions
+		m_pathChooser.addOption(kCustomAutoRight, kCustomAutoRight);
+		m_pathChooser.addOption(kCustomAutoCenter, kCustomAutoCenter);
+		m_pathChooser.addOption(kCustomAutoLeft, kCustomAutoLeft);
+		m_pathChooser.addOption(kCustomAutoLRC, kCustomAutoLRC);
+
+		//Default Auto Position
+		m_pathChooser.setDefaultOption(kCustomAutoLRC, kCustomAutoLRC);
+		SmartDashboard.putData("Auto Positions", m_pathChooser);
+
+    //Default Auto Delay
+    m_delayChooser.addOption(kCustomDelayZero, kCustomDelayZero);
+		m_delayChooser.addOption(kCustomDelayTwo , kCustomDelayTwo);
+		m_delayChooser.addOption(kCustomDelayFour, kCustomDelayFour);
+    m_delayChooser.addOption(kCustomDelaySix , kCustomDelaySix);
+    
+    //Default Auto Position
+		m_delayChooser.setDefaultOption(kCustomDelayZero, kCustomDelayZero);
+		SmartDashboard.putData("Auto Delay", m_delayChooser);
+
+    //Alliance Selection
+    m_allianceChooser.addOption(kRedAlliance , kRedAlliance);
+		m_allianceChooser.addOption(kBlueAlliance, kBlueAlliance);
+    
+    //Default Alliance
+		m_allianceChooser.setDefaultOption(kDefaultAlliance, kDefaultAlliance);
+		SmartDashboard.putData("Auto Delay", m_allianceChooser);
   }
 
   @Override
@@ -62,9 +114,25 @@ public class Robot extends TimedRobot {
    * Runs once when Auto starts
    */
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    //Set variables
+    //
+    
+    //Auto positions
+    m_positionSelected = m_pathChooser.getSelected();
+
+    //Auto Delay
+    m_delaySelected = Integer.parseInt(m_delayChooser.getSelected());
+
+    //Alliance
+    m_allianceSelected = m_allianceChooser.getSelected();
+
+    //Telemetry
+    System.out.println("Delay: "    + m_delaySelected);
+		System.out.println("Position: " + m_positionSelected);
+    System.out.println("Alliance: " + m_allianceSelected);
+
+    //Passes cargo and alliance color to the Pi for Object Tracking
+    cargo.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -73,15 +141,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during Autonomous
    */
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+    //
   }
 
   @Override
