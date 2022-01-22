@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
+/**
+ * Start of class
+ */
 public class Robot extends TimedRobot {
 
   //Object creation
