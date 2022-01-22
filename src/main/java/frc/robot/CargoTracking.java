@@ -142,7 +142,7 @@ public class CargoTracking {
    */
   public void setCargoColor(String color) {
     //Sets the NetworkTable variable color to alliance color
-    NetworkTableEntry targetColor = TrackingValues.getEntry("targetColor");
+    NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
     targetColor.setString(color);
   }
 
