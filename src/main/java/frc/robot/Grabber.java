@@ -20,12 +20,11 @@ public class Grabber {
     //SPARK MAX CURRENT LIMIT
     private int GRABBER_CURRENT_LIMIT = 60;
 
-    //Enumerator for Grabber States
-    public static enum GrabberState {
-        DEPLOY,
-        RETRACT;
-    }
-    private GrabberState grabberState;
+    //Spark Max Motors
+    private CANSparkMax grabberMotor;
+
+    //Pistons
+    private DoubleSolenoid grabberPiston;
 
     //Variables
     //
@@ -33,23 +32,30 @@ public class Grabber {
     //CONSTANTS
     private final double GRABBER_POWER = 1.0;  //-1.0
 
+    // SOLENOID CHANNELS
+    private final int PCM_CAN_ID    = 1;
+    private final int DEPLOY_ID     = 0;
+    private final int RETRACT_ID    = 7;
+
+    //PCM Type
+    private PneumaticsModuleType REV_PCM  = PneumaticsModuleType.REVPH;
+    //private PneumaticsModuleType CTRE_PCM = PneumaticsModuleType.CTREPCM;
+
+    //Enumerator for Grabber States
+    public static enum GrabberState {
+        DEPLOY,
+        RETRACT;
+    }
+    private GrabberState grabberState;
+
     /**
-     * Enumerater for Grabber State
+     * Enumerater for Grabber Direction
      */
     public static enum GrabberDirection {
         FORWARD,
         REVERSE,
         OFF;
     }
-
-    // SOLENOID CHANNELS
-    private DoubleSolenoid grabberPiston;
-
-    private final int PCM_CAN_ID    = 1;
-    private final int DEPLOY_ID     = 0;
-    private final int RETRACT_ID    = 7;
-
-    private CANSparkMax grabberMotor; 
 
     /**
      * CONSTRUCTOR
@@ -61,7 +67,7 @@ public class Grabber {
         grabberMotor.set(0.0);
 
         //Grabber Position Init
-        grabberPiston = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.REVPH, DEPLOY_ID, RETRACT_ID);
+        grabberPiston = new DoubleSolenoid(PCM_CAN_ID, REV_PCM, DEPLOY_ID, RETRACT_ID);
         grabberPiston.set(Value.kReverse);
         grabberState = GrabberState.RETRACT;
     }

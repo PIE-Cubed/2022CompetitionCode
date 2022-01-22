@@ -4,12 +4,8 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 /**
  * Start of class
@@ -108,9 +104,8 @@ public class Robot extends TimedRobot {
    * Runs constantly during TeleOp
    */
   public void teleopPeriodic() {
-    //wheelControl();
-
-    //Nothing yet...
+    //Controls the wheels while driving
+    wheelControl();
   }
 
   @Override
@@ -158,8 +153,6 @@ public class Robot extends TimedRobot {
 
 
   private void wheelControl() {
-    //drive.teleopRotate(0.2);
-
     double driveX      = controls.getDriveX();
     double driveY      = controls.getDriveY();
     double rotatePower = controls.getRotatePower();
