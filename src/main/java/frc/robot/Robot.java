@@ -6,6 +6,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.cameraserver.*;
 
 /**
  * Start of class
@@ -17,7 +21,7 @@ public class Robot extends TimedRobot {
   Controls  controls;
   //Grabber   grabber;
 
-  //DoubleSolenoid test = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 7);
+  DoubleSolenoid test = new DoubleSolenoid(1, PneumaticsModuleType.CTREPCM, 0, 7);
 
 
 
@@ -132,12 +136,6 @@ public class Robot extends TimedRobot {
    * Runs once at the start of Test
    */
   public void testInit() {
-    /*if (controls.getLeftBumper()) {
-      test.set(Value.kForward);
-    }
-    else if (controls.getRightBumper()) {
-      test.set(Value.kReverse);
-    }*/
     //Nothing yet...
   }
 
@@ -147,6 +145,12 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+    if (controls.getLeftBumper()) {
+      test.set(Value.kForward);
+    }
+    else if (controls.getRightBumper()) {
+      test.set(Value.kReverse);
+    }
     //drive.testRotate();
     //drive.testWheelAngle();
   }
