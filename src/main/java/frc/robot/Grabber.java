@@ -17,6 +17,11 @@ public class Grabber {
     //SPARK MAX ID's
     private static final int SPARK_ID  = 18;
 
+    //PNEUMATICS IDS
+    private final int PCM_CAN_ID    = 1;
+    private final int DEPLOY_ID     = 0;
+    private final int RETRACT_ID    = 7;
+
     //SPARK MAX CURRENT LIMIT
     private int GRABBER_CURRENT_LIMIT = 60;
 
@@ -26,27 +31,19 @@ public class Grabber {
     //Pistons
     private DoubleSolenoid grabberPiston;
 
-    //Variables
-    //
-
     //CONSTANTS
-    private final double GRABBER_POWER = 1.0;  //-1.0
+    private final double GRABBER_POWER = 1.0;
 
-    // SOLENOID CHANNELS
-    private final int PCM_CAN_ID    = 1;
-    private final int DEPLOY_ID     = 0;
-    private final int RETRACT_ID    = 7;
-
-    //PCM Type
-    private PneumaticsModuleType REV_PCM  = PneumaticsModuleType.REVPH;
-    //private PneumaticsModuleType CTRE_PCM = PneumaticsModuleType.CTREPCM;
-
-    //Enumerator for Grabber States
+    
+    /**
+     * Enumerator for Grabber States
+     */
     public static enum GrabberState {
         DEPLOY,
         RETRACT;
     }
     private GrabberState grabberState;
+
 
     /**
      * Enumerater for Grabber Direction
@@ -66,8 +63,8 @@ public class Grabber {
         grabberMotor.setSmartCurrentLimit(GRABBER_CURRENT_LIMIT);
         grabberMotor.set(0.0);
 
-        //Grabber Position Init
-        grabberPiston = new DoubleSolenoid(PCM_CAN_ID, REV_PCM, DEPLOY_ID, RETRACT_ID);
+        //Grabber Piston Init
+        grabberPiston = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, DEPLOY_ID, RETRACT_ID);
         grabberPiston.set(Value.kReverse);
         grabberState = GrabberState.RETRACT;
     }
@@ -77,7 +74,7 @@ public class Grabber {
      * EXTEND / RETRACT FORWARDING PISTON
      */
     public void deployRetract() {
-        // Change the State of the Piston
+        // Toggle the State of the Piston
         if (grabberState == GrabberState.DEPLOY) {
             grabberPiston.set(Value.kReverse);
             grabberState = GrabberState.RETRACT;
@@ -86,8 +83,6 @@ public class Grabber {
             grabberPiston.set(Value.kForward);
             grabberState = GrabberState.DEPLOY;
         }
-
-        //System.out.println("Forwarding State: " + grabberState);
     }
 
     public void deploy() {
@@ -97,7 +92,7 @@ public class Grabber {
     }
 
     public void retract() {
-        //Sets piston to deploy position
+        //Sets piston to retract position
         grabberPiston.set(Value.kReverse);
         grabberState = GrabberState.RETRACT;
     }
@@ -110,7 +105,7 @@ public class Grabber {
             return;
         }
         
-        // Grabber Intake (Negative Power Brings Ball In)
+        // Grabber Intake
         if (dir == GrabberDirection.FORWARD) {
             grabberMotor.set(GRABBER_POWER);
         }
@@ -118,20 +113,11 @@ public class Grabber {
         else if (dir == GrabberDirection.REVERSE) {
             grabberMotor.set(GRABBER_POWER * -1);
         }
+        // No direction
         else {
             grabberMotor.set(0.0);
         }    
     }
 
-    /**
-     * A method to allow the Grabber to move and let balls pass through it
-     * EXPERIMENTAL
-     */
-    public void autoGrabberControl() {
-        if (grabberState == GrabberState.RETRACT) {
-            // Gives it a very slow intake
-            grabberMotor.set(GRABBER_POWER * -0.6);
-        }
-    }
 
 } // End of the Grabber Class

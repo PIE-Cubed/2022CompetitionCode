@@ -6,10 +6,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.cameraserver.*;
 
 /**
  * Start of class
@@ -19,11 +15,7 @@ public class Robot extends TimedRobot {
   //Object creation
   Drive     drive;
   Controls  controls;
-  //Grabber   grabber;
-
-  DoubleSolenoid test = new DoubleSolenoid(1, PneumaticsModuleType.CTREPCM, 0, 7);
-
-
+  Grabber   grabber;
 
   // ERROR CODES
   public static final int FAIL = -1;
@@ -41,7 +33,7 @@ public class Robot extends TimedRobot {
    */
   public Robot() {
     drive    = new Drive();
-    //grabber  = new Grabber();
+    grabber  = new Grabber();
     controls = Controls.getInstance();
   }
 
@@ -103,13 +95,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  /**
-   * teleopPeriodic()
-   * Runs constantly during TeleOp
-   */
   public void teleopPeriodic() {
-    //Controls the wheels while driving
     wheelControl();
+    ballControl();
   }
 
   @Override
@@ -145,45 +133,40 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    if (controls.getLeftBumper()) {
-      test.set(Value.kForward);
-    }
-    else if (controls.getRightBumper()) {
-      test.set(Value.kReverse);
-    }
     //drive.testRotate();
     //drive.testWheelAngle();
   }
 
 
   private void wheelControl() {
+    //Get joystick values
     double driveX      = controls.getDriveX();
     double driveY      = controls.getDriveY();
     double rotatePower = controls.getRotatePower();
 
+    //Drives if we are out of dead zone
     if ((Math.sqrt(driveX*driveX + driveY*driveY) > 0.01) || (Math.abs(rotatePower) > 0.01)) {
       drive.teleopSwerve(driveX, driveY, rotatePower, false);
     }
     else {
-      //Robot is in dead zone
+      //Robot is in dead zone, doesn't drive
       drive.stopWheels();
     }
   }
 
-/*
+
   private void ballControl() {
-    //Pair of pistons to retract and deploy
+    //Connected pair of pistons to retract and deploy
     //One motor to take balls in and out
   
-    boolean deployRetract = controls.deployRetract();
+    boolean deployRetract = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
 
-
-    if(deployRetract == true) {
+    if (deployRetract == true) {
       grabber.deployRetract();
     }
-  }
-*/
 
+    grabber.setGrabberMotor(grabberDir);
+  }
 }
 //End of the Robot class
