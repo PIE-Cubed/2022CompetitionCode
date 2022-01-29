@@ -153,6 +153,10 @@ public class Controls {
     public boolean getClimberClaw2() { 
         return xboxController.getRightBumperPressed(); 
     }
+
+    public double getClimberPower() {
+        return xboxController.getLeftY();
+    }
      
     //Grabber Direction based off of D-Pad
     public Grabber.GrabberDirection getGrabberDirection() {

@@ -16,6 +16,7 @@ public class Robot extends TimedRobot {
   Drive     drive;
   Controls  controls;
   Grabber   grabber;
+  Climber   climber;
 
   // ERROR CODES
   public static final int FAIL = -1;
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
     drive    = new Drive();
     grabber  = new Grabber();
     controls = new Controls();
+    climber  = new Climber();
   }
 
   @Override
@@ -98,6 +100,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     wheelControl();
     ballControl();
+    climberControl();
   }
 
   @Override
@@ -167,6 +170,20 @@ public class Robot extends TimedRobot {
     }
 
     grabber.setGrabberMotor(grabberDir);
+  }
+
+  private void climberControl() {
+    boolean toggleClaw1  = controls.getClimberClaw1();
+    boolean toggleClaw2  = controls.getClimberClaw2();
+    double  climberPower = controls.getClimberPower();
+
+    if (toggleClaw1 == true) {
+      climber.claw1Toggle();
+    }
+    if (toggleClaw2 == true) {
+      climber.claw2Toggle();
+    }
+    climber.climberRotate(climberPower);
   }
 }
 //End of the Robot class
