@@ -20,7 +20,7 @@ public class Grabber {
     //PNEUMATICS IDS
     private final int PCM_CAN_ID    = 1;
     private final int DEPLOY_ID     = 0;
-    private final int RETRACT_ID    = 7;
+    private final int RETRACT_ID    = 4;
 
     //SPARK MAX CURRENT LIMIT
     private int GRABBER_CURRENT_LIMIT = 60;

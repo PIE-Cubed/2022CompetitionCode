@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     drive    = new Drive();
     grabber  = new Grabber();
-    controls = Controls.getInstance();
+    controls = new Controls();
   }
 
   @Override
