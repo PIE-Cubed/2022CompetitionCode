@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class Controls {
     
-    //Singleton Method to insure that there is ever only one instance of Controls (why...)
+    //Singleton Method to insure that there is ever only one instance of Controls
     private static Controls instance = null;
 
     public static synchronized Controls getInstance() {
@@ -55,15 +55,15 @@ public class Controls {
     /**
      * JOYSTICK DRIVE VALUES
      */
-    public double getX() {
+    private double getX() {
         return joystick.getX();
     }
 
-    public double getY() {
+    private double getY() {
         return joystick.getY();
     }
 
-    public double getZ() {
+    private double getZ() {
         return joystick.getZ();
     }
 
@@ -74,15 +74,17 @@ public class Controls {
     }
 
     
-     /**
+    /**
      * 0 degrees is forward on the Joystick
      * this method returns values from -180 to +180
      * @return driveAngle
      */
     public double getDriveAngle() {
+        //Gets X and Y positions
         double x = getX();
         double y = getY();
         
+        //Does math to figure out the drive angle
         double rad = Math.atan2(x, y);
         double deg = Math.toDegrees(rad);
 
@@ -110,11 +112,14 @@ public class Controls {
      * @return drivePower
      */
     public double getDrivePower() {
+        //Gets X and Y positions
         double x = getX();
         double y = getY() * -1;
 
+        //Does math to calculate the power we want if on an angle 
         double hyp = Math.sqrt(x*x + y*y);
         double hypClamp = MathUtil.clamp(hyp, -1, 1);
+
         return hypClamp;
     }
 
@@ -124,7 +129,7 @@ public class Controls {
      */
     public double getDriveX() {
         double power = getX();
-        //double deadZone = 0.1;
+
         return power;
     }
 
@@ -134,7 +139,7 @@ public class Controls {
      */
     public double getDriveY() {
         double power = getY() * -1;
-        //double deadZone = 0.1;
+
         return power;
     }
 
@@ -238,4 +243,6 @@ public class Controls {
             return Grabber.GrabberDirection.OFF;
         }
     }
-} // End of the Controls class
+}
+
+// End of the Controls class
