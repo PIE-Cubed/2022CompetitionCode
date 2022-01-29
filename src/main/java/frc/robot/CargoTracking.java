@@ -17,7 +17,7 @@ import edu.wpi.first.math.controller.PIDController;
 public class CargoTracking {
 	//Object creation
 	Drive drive;
-  Controls controls;
+	Controls controls;
 
 	//Network Tables
 	NetworkTable TrackingValues;
@@ -39,23 +39,23 @@ public class CargoTracking {
 	//Cargo Controller
 	private static final double cP = 0.02;
 	private static final double cI = 0.01;
-  private static final double cD = 0.01;
+	private static final double cD = 0.01;
 
 	/**
 	 * CONSTRUCTOR
 	 */
-	public CargoTracking() {
+	public CargoTracking(Drive drive) {
 		// Instance creation
-    controls = Controls.getInstance();
-		//drive = Drive.getInstance();
+		this.drive = drive;
+    	controls = Controls.getInstance();
 
 		// Creates Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
 
 		// Creates a PID controller
 		cargoController = new PIDController(cP, cI, cD);
-    cargoController.setTolerance(cargoToleranceDegrees);
-    cargoController.enableContinuousInput(-180.0, 180.0);
+		cargoController.setTolerance(cargoToleranceDegrees);
+		cargoController.enableContinuousInput(-180.0, 180.0);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class CargoTracking {
 
 		//Rotate with PID
 		m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
-    m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
+		m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
 		drive.teleopRotate(m_CargoCalculatedPower);
 	}
 
@@ -141,7 +141,7 @@ public class CargoTracking {
    * Sets the alliance and target cargo color
    */
   public void setCargoColor(String color) {
-    //Sets the NetworkTable variable color to alliance color
+    //Sets the NetworkTable variable color to the selected alliance color
     NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
     targetColor.setString(color);
   }

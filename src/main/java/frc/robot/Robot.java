@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
     drive    = new Drive();
     //grabber  = new Grabber();
     controls = Controls.getInstance();
-    cargo    = new CargoTracking();
+    cargo    = new CargoTracking(drive);
   }
 
   @Override

@@ -4,7 +4,6 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.math.MathUtil;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -12,8 +11,6 @@ import edu.wpi.first.wpilibj.XboxController;
  * Start of class
  */
 public class Controls {
-
-    private final boolean useJoystick = true;
     
     //Singleton Method to insure that there is ever only one instance of Controls
     private static Controls instance = null;
@@ -31,8 +28,7 @@ public class Controls {
      */
     private enum ControllerIDs {
         JOYSTICK(1),
-        XBOX_MANIP_CONTROLLER(0),
-        LOGITECH_DRIVE_CONTROLLER(1);
+        XBOX_MANIP_CONTROLLER(0);
         
         private int id;
 
@@ -46,92 +42,53 @@ public class Controls {
         }
     }
 
-    // Joystick Object Declaration
+    // Controller Object Declaration
     private Joystick joystick;
-    
-    // XboxController Object Declaration
     private XboxController xboxController;
-    private XboxController driveController;
 
     private Controls() {
         //Instance Creation
-        if (useJoystick) {
-            joystick = new Joystick(ControllerIDs.JOYSTICK.getId());
-
-        } else {
-            driveController = new XboxController(ControllerIDs.LOGITECH_DRIVE_CONTROLLER.getId());
-
-        }
+        joystick = new Joystick(ControllerIDs.JOYSTICK.getId());
         xboxController = new XboxController(ControllerIDs.XBOX_MANIP_CONTROLLER.getId());
     }
 
     /**
-     * JOYSTICK METHODS
+     * JOYSTICK DRIVE VALUES
      */
-    public double getX() {
-        if (useJoystick) {
-            return joystick.getX();
-        }
-        else {
-            return driveController.getRightX();
-        }
+    private double getX() {
+        return joystick.getX();
     }
 
-    public double getY() {
-        if (useJoystick) {
-            return joystick.getY();
-        }
-        else {
-            return driveController.getLeftY();
-        }
+    private double getY() {
+        return joystick.getY();
     }
 
-    public double getZ() {
-        if (useJoystick) {
-            return joystick.getZ();
-        }
-        else {
-            return driveController.getRightX();
-        }
+    private double getZ() {
+        return joystick.getZ();
     }
 
 
+    // SHOOTER ENABLED
     private boolean getShooterEnable() {
-        if (useJoystick) {
-            return joystick.getTrigger();
-        }
-        else {
-            return (driveController.getRightTriggerAxis() > 0.1);
-        }
+        return joystick.getTrigger();        
     }
 
     
-     /**
+    /**
      * 0 degrees is forward on the Joystick
      * this method returns values from -180 to +180
      * @return driveAngle
      */
     public double getDriveAngle() {
-        double deadZone = 0.1;
-
+        //Gets X and Y positions
         double x = getX();
         double y = getY();
         
+        //Does math to figure out the drive angle
         double rad = Math.atan2(x, y);
         double deg = Math.toDegrees(rad);
-        //double = MathUtil.clamp(deg, 0, 360);
 
-        // Drive Power is always positive
-        double drivePower = getDrivePower();
-
-        //System.out.println("Dr Pwr " + drivePower + " x " + x + " y " + y);
-        
-        if ((drivePower < deadZone) && (drivePower > -deadZone)) {
-            return 0;
-        }
-        else {
-            return deg;
-        }
+        return deg;
     }
 
     /**
@@ -140,20 +97,14 @@ public class Controls {
      * @return rotatePower
      */
     public double getRotatePower() {
-        double deadZone = 0.3;
+        //double deadZone = 0.3;
         double power = getZ();
 
-        if ((power < deadZone) && (power > (deadZone * -1))) {
-            //If within the deadzone, don't do anything
-            return 0;
-        }
-        else {
-            //Halves the power because the rotate is SUPER sensitive
-            power = Math.pow(power, 3.0); 
-            power = MathUtil.clamp(power, -.5, .5);
+        //Halves the power because the rotate is SUPER sensitive
+        power = Math.pow(power, 3.0); 
+        power = MathUtil.clamp(power, -.5, .5);
             
-            return power;
-        }        
+        return power;    
     }
 
     /**
@@ -161,21 +112,15 @@ public class Controls {
      * @return drivePower
      */
     public double getDrivePower() {
+        //Gets X and Y positions
         double x = getX();
         double y = getY() * -1;
-        //double powerMultiplier = powerMultiplier();
-        double drivePower;
+
+        //Does math to calculate the power we want if on an angle 
         double hyp = Math.sqrt(x*x + y*y);
-        double hypClamp;
+        double hypClamp = MathUtil.clamp(hyp, -1, 1);
 
-        //This will make it reach power 1 faster at a 45 degrees
-        hypClamp = MathUtil.clamp(hyp, -1, 1);
-        //hypClamp = hyp / Math.sqrt(2);
-
-        //This makes the throttle actually work, with all the way at the botom being zero throttle
-        drivePower = hypClamp; //* powerMultiplier;
-        
-        return drivePower;
+        return hypClamp;
     }
 
     /**
@@ -184,16 +129,8 @@ public class Controls {
      */
     public double getDriveX() {
         double power = getX();
-        double deadZone = 0.1;
 
-        if ((power < deadZone) && (power > (deadZone * -1))) {
-            return 0;
-        }
-        else {
-            //Returns the x-axis power that the robot should drive at
-            //return power * powerMultiplier();
-            return power;
-        }
+        return power;
     }
 
     /**
@@ -202,37 +139,9 @@ public class Controls {
      */
     public double getDriveY() {
         double power = getY() * -1;
-        double deadZone = 0.1;
 
-        if ((power < deadZone) && (power > (deadZone * -1))) {
-            return 0;
-        }
-        else {
-            //Returns the y-axis power that the robot should drive at
-            //return power * powerMultiplier();
-            return power;
-        }        
+        return power;
     }
-
-
-    /**
-     * Returns the decimal value of the throttle, with all the way at the bottom being 0
-     * @return throttleDecimal 0 to 2
-     */
-    /*
-    private double powerMultiplier() {
-        //Variables
-        double throttle = joystick.getThrottle() * -1; //Forward on the throttle is -1, but we want it to be +1
-        double posThrottle;
-        double throttleDecimal;
-
-        //Makes the throttle values 0 to 2 (this makes the math easier) 
-        posThrottle = throttle + 1;
-        //Divides the value by two, getting a decimal
-        throttleDecimal = posThrottle / 2;
-
-        return throttleDecimal;
-    }*/
 
 
     /**
@@ -251,7 +160,7 @@ public class Controls {
      * Button A
      * @return buttonAPressed
      */
-    public boolean deployRetract() {
+    public boolean grabberDeployRetract() {
         return xboxController.getAButtonPressed();
     }
     //
@@ -322,22 +231,18 @@ public class Controls {
         }
     }
 
-    //NOT FINAL
+    //Grabber Direction based off of D-Pad
     public Grabber.GrabberDirection getGrabberDirection() {
-        return Grabber.GrabberDirection.OFF;
+        if (xboxController.getPOV() == 0) {
+            return Grabber.GrabberDirection.FORWARD;
+        }
+        else if (xboxController.getPOV() == 180) {
+            return Grabber.GrabberDirection.REVERSE;
+        }
+        else {
+            return Grabber.GrabberDirection.OFF;
+        }
     }
-    
-   /*
-    public boolean getFieldDrive() {
-        if (joystick.getRawButtonPressed(7)) {
-            fieldDrive = false;
-            System.out.println("Field drive disabled");
-        }
-        if (joystick.getRawButtonPressed(8)) {
-            fieldDrive = true;
-            System.out.println("Field drive enabled");
-        }
-        return fieldDrive;
-    }*/
+}
 
-} // End of the Controls class
+// End of the Controls class
