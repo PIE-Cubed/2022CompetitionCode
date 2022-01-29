@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class Controls {
     
+
     /**
      * Enumerator for controller ID's
      */
@@ -37,18 +38,20 @@ public class Controls {
 
     public Controls() {
         //Instance Creation
+
         joystick       = new Joystick(ControllerIDs.JOYSTICK.getId());
         xboxController = new XboxController(ControllerIDs.XBOX_MANIP_CONTROLLER.getId());
     }
 
-    
-    // Is the shooter being enabled
-    public boolean getShooterEnabled() {
-        return joystick.getTrigger();        
+ 
+
+    // SHOOTER ENABLED
+    public boolean getShooterEnable() {        return joystick.getTrigger();        
     }
 
     
-    /**
+   
+     /**
      * 0 degrees is forward on the Joystick
      * this method returns values from -180 to +180
      * @return driveAngle
@@ -57,6 +60,7 @@ public class Controls {
         double x = joystick.getX();
         double y = joystick.getY();
         
+        //Does math to figure out the drive angle 
         double rad = Math.atan2(x, y);
         double deg = Math.toDegrees(rad);
 
@@ -70,7 +74,8 @@ public class Controls {
      */
     public double getRotatePower() {
         //double deadZone = 0.3;
-        double power = joystick.getZ();
+
+        double power = joystick.getZ(); 
 
         //Halves the power because the rotate is SUPER sensitive
         power = Math.pow(power, 3.0); 
@@ -84,11 +89,15 @@ public class Controls {
      * @return drivePower
      */
     public double getDrivePower() {
+
+
         double x = joystick.getX();
         double y = joystick.getY() * -1;
 
+        //Does math to calculate the power we want if on an angle  
         double hyp = Math.sqrt(x*x + y*y);
         double hypClamp = MathUtil.clamp(hyp, -1, 1);
+ 
         return hypClamp;
     }
 
@@ -97,6 +106,8 @@ public class Controls {
      * @return driveX
      */
     public double getDriveX() {
+
+
         double power = joystick.getX();
         return power;
     }
@@ -106,6 +117,8 @@ public class Controls {
      * @return driveY
      */
     public double getDriveY() {
+
+
         double power = joystick.getY() * -1;
         return power;
     }
@@ -132,24 +145,31 @@ public class Controls {
     }
     //
 
+
     
-    /**
+
+    /** 
      * Left Bumper Pressed
-     * @return leftBumperPressed
+
+     * @return leftBumperPressed 
      */
-    public boolean getClimberClaw1() {
-        return xboxController.getLeftBumperPressed();
+
+    public boolean getClimberClaw1() { 
+        return xboxController.getLeftBumperPressed(); 
     }
 
     /**
-     * Right Bumper Pressed
-     * @return rightBumperPressed
+
+     * Right Bumper Pressed 
+     * @return rightBumperPressed 
      */
-    public boolean getClimberClaw2() {
-        return xboxController.getRightBumperPressed();
+
+    public boolean getClimberClaw2() { 
+        return xboxController.getRightBumperPressed(); 
     }
 
-    
+ 
+     
     //Grabber Direction based off of D-Pad
     public Grabber.GrabberDirection getGrabberDirection() {
         if (xboxController.getPOV() == 0) {
@@ -162,4 +182,6 @@ public class Controls {
             return Grabber.GrabberDirection.OFF;
         }
     }
-} // End of the Controls class
+}
+
+// End of the Controls class
