@@ -230,19 +230,6 @@ public class Controls {
             return 0;
         }
     }
-
-    //Grabber Direction based off of D-Pad
-    public Grabber.GrabberDirection getGrabberDirection() {
-        if (xboxController.getPOV() == 0) {
-            return Grabber.GrabberDirection.FORWARD;
-        }
-        else if (xboxController.getPOV() == 180) {
-            return Grabber.GrabberDirection.REVERSE;
-        }
-        else {
-            return Grabber.GrabberDirection.OFF;
-        }
-    }
 }
 
 // End of the Controls class

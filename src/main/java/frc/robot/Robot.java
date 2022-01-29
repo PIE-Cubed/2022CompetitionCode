@@ -15,7 +15,6 @@ public class Robot extends TimedRobot {
   //Object creation
   Drive     drive;
   Controls  controls;
-  //Grabber   grabber;
   CargoTracking cargo;
 
   // ERROR CODES
@@ -56,7 +55,6 @@ public class Robot extends TimedRobot {
   public Robot() {
     //Instance creation
     drive    = new Drive();
-    //grabber  = new Grabber();
     controls = Controls.getInstance();
     cargo    = new CargoTracking(drive);
   }
@@ -96,13 +94,14 @@ public class Robot extends TimedRobot {
     
     //Default Alliance
 		m_allianceChooser.setDefaultOption(kDefaultAlliance, kDefaultAlliance);
-		SmartDashboard.putData("Auto Delay", m_allianceChooser);
+		SmartDashboard.putData("Alliance Color", m_allianceChooser);
   }
 
   @Override
   /**
    * robotPeriodic()
    * Always runs on the robot
+   * Don't put anything here. It causes a Null Pointer Error
    */
   public void robotPeriodic() {
     //Nothing yet...
@@ -159,7 +158,6 @@ public class Robot extends TimedRobot {
    * Runs constantly during TeleOp
    */
   public void teleopPeriodic() {
-    wheelControl();
     //Nothing yet...
   }
 
@@ -187,7 +185,14 @@ public class Robot extends TimedRobot {
    * Runs once at the start of Test
    */
   public void testInit() {
-    //Nothing yet...
+    //Alliance
+    m_allianceSelected = m_allianceChooser.getSelected();
+
+    //Telemetry
+    System.out.println("Alliance: " + m_allianceSelected);
+
+    //Passes cargo and alliance color to the Pi for Object Tracking
+    cargo.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -196,7 +201,8 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    drive.testWheelAngle();
+    //
+    cargo.faceCargo();
   }
 
 

@@ -21,6 +21,7 @@ public class CargoTracking {
 
 	//Network Tables
 	NetworkTable TrackingValues;
+	NetworkTableEntry targetColor;
 
 	//Variables
 	private double deadZoneCount = 0.00;
@@ -49,13 +50,17 @@ public class CargoTracking {
 		this.drive = drive;
     	controls = Controls.getInstance();
 
-		// Creates Network Tables instance
-		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
-
 		// Creates a PID controller
 		cargoController = new PIDController(cP, cI, cD);
 		cargoController.setTolerance(cargoToleranceDegrees);
 		cargoController.enableContinuousInput(-180.0, 180.0);
+
+		// Creates Network Tables instance
+		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
+
+		//
+		NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
+    	targetColor.setDefaultString("Default");
 	}
 
 	/**
@@ -142,7 +147,7 @@ public class CargoTracking {
    */
   public void setCargoColor(String color) {
     //Sets the NetworkTable variable color to the selected alliance color
-    NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
+    //NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
     targetColor.setString(color);
   }
 

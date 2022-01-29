@@ -107,7 +107,7 @@ public class Wheel {
     ******************************************************************************************/
     public void setRotateMotorPower(double power) {
         power = MathUtil.clamp(power, -1, 1);
-        System.out.println("Rotate Power is " + power + " for " + this.name);
+        //System.out.println("Rotate Power is " + power + " for " + this.name);
         rotateMotor.set(power);
     }
 
