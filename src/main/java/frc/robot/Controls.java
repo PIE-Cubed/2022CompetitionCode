@@ -133,6 +133,7 @@ public class Controls {
      * @return buttonAPressed
      */
     public boolean grabberDeployRetract() {
+
         return xboxController.getAButtonPressed();
     }
         
@@ -156,10 +157,10 @@ public class Controls {
     //Grabber Direction based off of D-Pad
     public Grabber.GrabberDirection getGrabberDirection() {
         if (xboxController.getPOV() == 0) {
-            return Grabber.GrabberDirection.FORWARD;
+            return Grabber.GrabberDirection.REVERSE;
         }
         else if (xboxController.getPOV() == 180) {
-            return Grabber.GrabberDirection.REVERSE;
+            return Grabber.GrabberDirection.FORWARD;
         }
         else {
             return Grabber.GrabberDirection.OFF;

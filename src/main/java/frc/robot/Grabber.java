@@ -32,7 +32,7 @@ public class Grabber {
     private DoubleSolenoid grabberPiston;
 
     //CONSTANTS
-    private final double GRABBER_POWER = 1.0;
+    private final double GRABBER_POWER = 0.6;
 
     
     /**
@@ -84,19 +84,6 @@ public class Grabber {
             grabberState = GrabberState.DEPLOY;
         }
     }
-
-    public void deploy() {
-        //Sets piston to deploy position
-        grabberPiston.set(Value.kForward);
-        grabberState = GrabberState.DEPLOY;
-    }
-
-    public void retract() {
-        //Sets piston to retract position
-        grabberPiston.set(Value.kReverse);
-        grabberState = GrabberState.RETRACT;
-    }
-
 
     public void setGrabberMotor(GrabberDirection dir) {
         //Don't allow grabber to turn manually if it's retracted
