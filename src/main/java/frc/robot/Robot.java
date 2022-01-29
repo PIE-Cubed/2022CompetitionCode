@@ -13,10 +13,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
 
   //Object creation
-  Drive     drive;
-  Controls  controls;
-  Grabber   grabber;
-  Climber   climber;
+  Drive         drive;
+  Controls      controls;
+  Grabber       grabber;
+  Climber       climber;
+  CargoTracking cargoTracking;
 
   // ERROR CODES
   public static final int FAIL = -1;
@@ -33,10 +34,11 @@ public class Robot extends TimedRobot {
    * Constructor
    */
   public Robot() {
-    drive    = new Drive();
-    grabber  = new Grabber();
-    controls = new Controls();
-    climber  = new Climber();
+    drive         = new Drive();
+    grabber       = new Grabber();
+    controls      = new Controls();
+    climber       = new Climber();
+    cargoTracking = new CargoTracking();
   }
 
   @Override
