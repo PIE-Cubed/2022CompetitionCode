@@ -17,7 +17,7 @@ public class Robot extends TimedRobot {
   Controls      controls;
   Grabber       grabber;
   Climber       climber;
-  CargoTracking cargoTracking;
+  //CargoTracking cargoTracking;
 
   // ERROR CODES
   public static final int FAIL = -1;
@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     grabber       = new Grabber();
     controls      = new Controls();
     climber       = new Climber();
-    cargoTracking = new CargoTracking();
+    //cargoTracking = new CargoTracking();
   }
 
   @Override
@@ -164,7 +164,7 @@ public class Robot extends TimedRobot {
     //Connected pair of pistons to retract and deploy
     //One motor to take balls in and out
   
-    boolean deployRetract = controls.grabberDeployRetract();
+    boolean deployRetract               = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
 
     if (deployRetract == true) {

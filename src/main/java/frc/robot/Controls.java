@@ -133,7 +133,6 @@ public class Controls {
      * @return buttonAPressed
      */
     public boolean grabberDeployRetract() {
-
         return xboxController.getAButtonPressed();
     }
         
@@ -155,7 +154,7 @@ public class Controls {
     }
 
     public double getClimberPower() {
-        return xboxController.getLeftY();
+        return -1 * xboxController.getLeftY();
     }
      
     //Grabber Direction based off of D-Pad

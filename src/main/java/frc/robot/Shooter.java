@@ -53,7 +53,7 @@ public class Shooter {
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
-	private static final int HOOD_CURRENT_LIMIT    = 30;
+	private static final int HOOD_CURRENT_LIMIT    = 50;
 
 	// FEED MOTOR CONSTANTS
 	public static final double   FEED_POWER = -0.25;
@@ -108,7 +108,7 @@ public class Shooter {
 		// Sets the current limtis for the motors
 		leftShooter .setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
 		rightShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
-		hoodMotor   .setSmartCurrentLimit(HOOD_CURRENT_LIMIT);
+		hoodMotor.   setSmartCurrentLimit(HOOD_CURRENT_LIMIT);
 
 		// Sets the mode of the motors (if this works in the code)
 		leftShooter. setIdleMode(CANSparkMax.IdleMode.kCoast);
@@ -127,12 +127,11 @@ public class Shooter {
 		hoodMotorEncoder    = hoodMotor.getEncoder();
 
 		// DIO Sensors
-		frontSwitch = new DigitalInput(FRONT_SWITCH_ID); //limitSwitch_1 = new DigitalInput(LIMITSWITCH_1_ID);
-		rearSwitch  = new DigitalInput(REAR_SWITCH_ID ); //limitSwitch_2 = new DigitalInput(LIMITSWITCH_2_ID);
+		frontSwitch = new DigitalInput(FRONT_SWITCH_ID); 
+		rearSwitch  = new DigitalInput(REAR_SWITCH_ID );
 
 		// PID Controller
 		shooterController = new PIDController(kP, kI, kD);
-		shooterController.setIntegratorRange(-0.1, 0.1);
 	}
 
 
