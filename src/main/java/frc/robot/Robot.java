@@ -129,6 +129,7 @@ public class Robot extends TimedRobot {
    * Runs once at the start of Test
    */
   public void testInit() {
+    drive.limelightEntries.getEntry("ledMode").setNumber(0);
     //Nothing yet...
   }
 
@@ -138,6 +139,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+    drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
   }

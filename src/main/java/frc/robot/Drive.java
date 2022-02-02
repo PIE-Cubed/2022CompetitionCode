@@ -780,5 +780,10 @@ public class Drive {
         System.out.println("Angle: " + rearRightWheel.testWheelAngle());
     }
 
+    public void testLimelightTargeting() {
+        System.out.print("tv: " + limelightEntries.getEntry("tv").getDouble(0) + "      |     ");
+        System.out.println("tx: " + limelightEntries.getEntry("tx").getDouble(0));
+    }
+
 
 } // End of the Drive Class
