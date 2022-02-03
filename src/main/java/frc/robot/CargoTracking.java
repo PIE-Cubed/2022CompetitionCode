@@ -15,6 +15,9 @@ import edu.wpi.first.math.controller.PIDController;
  * Start of class
  */
 public class CargoTracking {
+	//Object creation
+	Drive drive;
+
 	//Network Tables
 	NetworkTable TrackingValues;
 	NetworkTableEntry targetColor;
@@ -27,16 +30,55 @@ public class CargoTracking {
 	private static final int IMG_WIDTH = 640;
 	//private static final int IMG_HEIGHT = 480;
 
+	//PID controller
+	private PIDController cargoController;
+
+	//PID tolerance
+	double cargoToleranceDegrees = 2.0f;
+
+	//Cargo Controller
+	private static final double cP = 0.02;
+	private static final double cI = 0.01;
+	private static final double cD = 0.01;
+
 	/**
 	 * CONSTRUCTOR
 	 */
-	public CargoTracking() {
+	public CargoTracking(Drive drive) {
+		// Instance creation
+		this.drive = drive;
+
+		// Creates a PID controller
+		cargoController = new PIDController(cP, cI, cD);
+		cargoController.setTolerance(cargoToleranceDegrees);
+		cargoController.enableContinuousInput(-180.0, 180.0);
+
 		// Creates Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
 
 		//
 		NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
     	targetColor.setDefaultString("Default");
+	}
+
+	/**
+	 * Method to turn and face the cargo of selected color
+	 */
+	public void faceCargo() {
+		//Variables
+		double m_CargoCalculatedPower = 0;
+		double turnAngle;
+
+		//Calls the cargoDetection method
+		turnAngle = cargoDetection();
+
+		//Clamps turnAngle
+		turnAngle = MathUtil.clamp(turnAngle, -180.00, 180.00);
+
+		//Rotate with PID
+		m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
+		m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
+		drive.teleopRotate(m_CargoCalculatedPower);
 	}
 
 	/**

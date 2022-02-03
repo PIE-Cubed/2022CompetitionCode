@@ -17,7 +17,7 @@ public class Robot extends TimedRobot {
   Controls      controls;
   Grabber       grabber;
   Climber       climber;
-  //CargoTracking cargoTracking;
+  CargoTracking cargoTracking;
 
   // ERROR CODES
   public static final int FAIL = -1;
@@ -30,6 +30,13 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  //Alliance
+  private static final String kDefaultAlliance = "Default";
+  private static final String kRedAlliance = "Red";
+  private static final String kBlueAlliance = "Blue";
+  private String m_allianceSelected;
+  private final SendableChooser<String> m_allianceChooser = new SendableChooser<>();
+
   /**
    * Constructor
    */
@@ -38,7 +45,7 @@ public class Robot extends TimedRobot {
     grabber       = new Grabber();
     controls      = new Controls();
     climber       = new Climber();
-    //cargoTracking = new CargoTracking();
+    cargoTracking = new CargoTracking(drive);
   }
 
   @Override
@@ -50,6 +57,14 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    //Alliance Selection
+    m_allianceChooser.addOption(kRedAlliance , kRedAlliance);
+		m_allianceChooser.addOption(kBlueAlliance, kBlueAlliance);
+    
+    //Default Alliance
+		m_allianceChooser.setDefaultOption(kDefaultAlliance, kDefaultAlliance);
+		SmartDashboard.putData("Alliance Color", m_allianceChooser);
   }
 
   @Override
@@ -70,6 +85,15 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    //Get Alliance
+    m_allianceSelected = m_allianceChooser.getSelected();
+
+    //Telemetry
+    System.out.println("Alliance: " + m_allianceSelected);
+
+    //Passes cargo and alliance color to the Pi for Object Tracking
+    cargoTracking.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -95,7 +119,14 @@ public class Robot extends TimedRobot {
    * Runs once at the start of TeleOp
    */
   public void teleopInit() {
-    //Nothing yet...
+    //Get Alliance
+    m_allianceSelected = m_allianceChooser.getSelected();
+
+    //Telemetry
+    System.out.println("Alliance: " + m_allianceSelected);
+
+    //Passes cargo and alliance color to the Pi for Object Tracking
+    cargoTracking.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -129,8 +160,17 @@ public class Robot extends TimedRobot {
    * Runs once at the start of Test
    */
   public void testInit() {
+    //Get Alliance
+    m_allianceSelected = m_allianceChooser.getSelected();
+
+    //Telemetry
+    System.out.println("Alliance: " + m_allianceSelected);
+
+    //Passes cargo and alliance color to the Pi for Object Tracking
+    cargoTracking.setCargoColor(m_allianceSelected);
+
+    //Sets the limelight LED mode
     drive.limelightEntries.getEntry("ledMode").setNumber(0);
-    //Nothing yet...
   }
 
   @Override
