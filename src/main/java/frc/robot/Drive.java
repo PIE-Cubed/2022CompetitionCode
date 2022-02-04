@@ -20,7 +20,7 @@ public class Drive {
     NetworkTable limelightEntries = NetworkTableInstance.getDefault().getTable("limelight");
 
     //NAVX
-    private static AHRS ahrs;
+    public static AHRS ahrs;
 
     //PID controllers
     private PIDController rotateController;
@@ -399,7 +399,8 @@ public class Drive {
         //First time through initializes target values
         if (firstTime == true) {
             firstTime = false;
-            targetOrientation = ahrs.getYaw();
+            //Get yaw is flipped for some reason
+            targetOrientation = -1 * ahrs.getYaw();
             encoderTarget = encoderCurrent + (ticksPerFoot * distance);
         }
 
@@ -422,13 +423,14 @@ public class Drive {
         
 
         //Adjusts wheel angles
-        orientationError = autoCrabDriveController.calculate(ahrs.getYaw(), targetOrientation); 
+        orientationError = autoCrabDriveController.calculate(-1 * ahrs.getYaw(), targetOrientation); 
         teleopSwerve(x, y, orientationError, false);
 
         //Checks if target distance has been reached, then ends function if so
+        System.out.println("Encoder Current: " + encoderCurrent + "  Target: " + encoderTarget);
         if (encoderCurrent >= encoderTarget) {
             firstTime = true;
-            //stopWheels();
+            stopWheels();
             rotateController.reset();
             return Robot.DONE;
         } 
@@ -482,9 +484,9 @@ public class Drive {
 		}
 
 		// Rotate
-        rotateError = rotateController.calculate(ahrs.getYaw(), degrees);
+        rotateError = rotateController.calculate(-1 * ahrs.getYaw(), degrees);
         rotateError = MathUtil.clamp(rotateError, -0.5, 0.5);
-        System.out.println(rotateError + " " + ahrs.getYaw());
+        System.out.println(rotateError + " " + (-1* ahrs.getYaw()));
 		teleopRotate(rotateError);
 
 		// CHECK: Routine Complete

@@ -17,7 +17,8 @@ public class Robot extends TimedRobot {
   Controls      controls;
   Grabber       grabber;
   Climber       climber;
-  CargoTracking cargoTracking;
+  //CargoTracking cargoTracking;
+  Auto          auto;
 
   // ERROR CODES
   public static final int FAIL = -1;
@@ -25,8 +26,12 @@ public class Robot extends TimedRobot {
   public static final int DONE =  2;
   public static final int CONT =  3;
 
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private int status = CONT;
+
+  //Auto path
+  private static final String kCenterAuto = "Center";
+  private static final String kWallAuto   = "Wall";
+  private static final String kHangarAuto = "Hangar";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -45,7 +50,8 @@ public class Robot extends TimedRobot {
     grabber       = new Grabber();
     controls      = new Controls();
     climber       = new Climber();
-    cargoTracking = new CargoTracking(drive);
+    //cargoTracking = new CargoTracking(drive);
+    auto          = new Auto(drive, grabber);
   }
 
   @Override
@@ -54,8 +60,10 @@ public class Robot extends TimedRobot {
    * Runs once when the robot is started
    */
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    //Auto selection
+    m_chooser.setDefaultOption("Center Auto", kCenterAuto);
+    m_chooser.addOption("Wall Auto", kWallAuto);
+    m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
     //Alliance Selection
@@ -65,6 +73,9 @@ public class Robot extends TimedRobot {
     //Default Alliance
 		m_allianceChooser.setDefaultOption(kDefaultAlliance, kDefaultAlliance);
 		SmartDashboard.putData("Alliance Color", m_allianceChooser);
+
+    //Sets the limelight LED mode
+    drive.limelightEntries.getEntry("ledMode").setNumber(1);
   }
 
   @Override
@@ -93,7 +104,7 @@ public class Robot extends TimedRobot {
     System.out.println("Alliance: " + m_allianceSelected);
 
     //Passes cargo and alliance color to the Pi for Object Tracking
-    cargoTracking.setCargoColor(m_allianceSelected);
+    //cargoTracking.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -102,14 +113,24 @@ public class Robot extends TimedRobot {
    * Runs constantly during Autonomous
    */
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+    if (status == CONT) {
+      switch (m_autoSelected) {
+        case kCenterAuto:
+          status = auto.centerAuto();
+          break;
+        case kHangarAuto:
+          status = DONE;
+          break;
+        case kWallAuto:
+          status = DONE;
+          break;
+        default:
+          status = DONE;
+          break;
+      }
+    }
+    else if (status == DONE) {
+
     }
   }
 
@@ -126,7 +147,7 @@ public class Robot extends TimedRobot {
     System.out.println("Alliance: " + m_allianceSelected);
 
     //Passes cargo and alliance color to the Pi for Object Tracking
-    cargoTracking.setCargoColor(m_allianceSelected);
+    //cargoTracking.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -167,7 +188,7 @@ public class Robot extends TimedRobot {
     System.out.println("Alliance: " + m_allianceSelected);
 
     //Passes cargo and alliance color to the Pi for Object Tracking
-    cargoTracking.setCargoColor(m_allianceSelected);
+    //cargoTracking.setCargoColor(m_allianceSelected);
 
     //Sets the limelight LED mode
     drive.limelightEntries.getEntry("ledMode").setNumber(0);
@@ -179,7 +200,8 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    drive.testLimelightTargeting();
+    System.out.println(Drive.ahrs.getYaw());
+    //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
   }
