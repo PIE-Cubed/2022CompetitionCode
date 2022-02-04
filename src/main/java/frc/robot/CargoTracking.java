@@ -58,7 +58,7 @@ public class CargoTracking {
 		// Creates Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
 
-		//
+		// Gives targetColor a default value that cannot be acted upon
 		NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
     	targetColor.setDefaultString("Default");
 	}
@@ -149,6 +149,10 @@ public class CargoTracking {
     //Sets the NetworkTable variable color to the selected alliance color
     //NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
     targetColor.setString(color);
+  }
+
+  private void getNetworkTableValues() {
+	  //
   }
 
 }
