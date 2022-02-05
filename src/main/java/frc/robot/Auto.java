@@ -5,6 +5,7 @@ import frc.robot.Grabber.GrabberDirection;
 public class Auto {
     
     private int step = 1;
+    private int shootStep = 1;
 
     Drive   drive;
     Grabber grabber;
@@ -43,12 +44,13 @@ public class Auto {
             //121 degrees: shooter facing target at start
             //140 degrees: grabber facing ball
             case 1:
-                grabber.deployRetract();
-                status = Robot.DONE;
+                drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+                status = autoDelay(2500);
                 break;
             case 2:
-                //Placeholder for limelight targetting and shooting
-                status = autoDelay(5000);
+                System.out.println("Targeted");
+                grabber.deployRetract();
+                status = Robot.DONE;
                 break;
             case 3:
                 status = drive.autoRotate(152);
@@ -92,7 +94,7 @@ public class Auto {
 
         switch(step) {
             case 1:
-                //Placeholder for limelight targetting and shooting
+                //Placeholder for limelight targeting and shooting
                 status = autoDelay(5000);
                 break;
             case 2:
@@ -141,8 +143,7 @@ public class Auto {
 
         switch(step) {
             case 1:
-                //Placeholder for limelight targetting and shooting
-                status = autoDelay(5000);
+                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
                 break;
             case 2:
                 grabber.deployRetract();
@@ -179,36 +180,6 @@ public class Auto {
         return Robot.CONT;
     }
 
-    public int autoLimelight() {
-        int status = Robot.CONT;
-        
-        if (firstTime == true) {
-			firstTime = false;
-			step = 1;
-		}
-
-        switch (step) {
-            case 1:
-                status = autoDelay(5000);
-                break;
-            case 2:
-                status = drive.limelightPIDTargeting();
-                break;
-            default:
-                //
-                step = 1;
-                firstTime = true;
-                System.out.println("Finished Targetting");
-                return Robot.DONE;
-        }
-
-        if (status == Robot.DONE) {
-            step++;
-        }
-
-        return Robot.CONT;
-    }
-
     public int autoDelay(long ms) {
         long currentMs = System.currentTimeMillis();
 
@@ -221,6 +192,56 @@ public class Auto {
             delayFirstTime = true;
             return Robot.DONE;
         }
+        return Robot.CONT;
+    }
+
+    private int autoShoot() {
+        int status = Robot.CONT;
+
+		if (shootFirstTime == true) {
+			shootFirstTime = false;
+			shootStep = 1;
+		}
+
+        switch(shootStep) {
+            case 1:
+                drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+                //shooter.manualShooterControl(ShootLocation.HIGH_SHOT);
+                status = Robot.DONE;
+                break;
+            case 2:
+                //if (shooter.shooterReady()) {
+                //    status = Robot.DONE;
+                //}
+                //else {
+                //    status = Robot.CONT;
+                //}
+                //shooter.manualShooterControl(ShootLocation.HIGH_SHOT);
+                drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+                status = Robot.DONE;
+                break;
+            case 3:
+                //shooter.manualShooterControl(ShootLocation.HIGH_SHOT);
+                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+                break;
+            case 4:
+                status = autoDelay(1000);
+                //shooter.manualBallFeederControl(Shooter.BallFeederDirection.FORWARD);
+                break;
+            default:
+                //Finished routine
+                //shooter.disableBallFeeder();
+                //shooter.disableShooter();
+                shootStep = 1;
+                shootFirstTime = true;
+                return Robot.DONE;
+        }
+
+        //If we are done with a step, we go on to the next one and continue the routine
+        if (status == Robot.DONE) {
+            shootStep++;
+        }
+
         return Robot.CONT;
     }
 }

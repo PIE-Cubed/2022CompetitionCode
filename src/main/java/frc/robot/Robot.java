@@ -118,7 +118,7 @@ public class Robot extends TimedRobot {
           status = auto.centerAuto();
           break;
         case kHangarAuto:
-          status = auto.autoLimelight();
+          status = auto.hangerAuto();
           break;
         case kWallAuto:
           status = auto.wallAuto();

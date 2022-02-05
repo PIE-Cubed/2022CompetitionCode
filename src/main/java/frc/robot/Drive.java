@@ -28,7 +28,7 @@ public class Drive {
     private PIDController targetController;
 
     private static final double rotateToleranceDegrees = 2.0f;
-    private static final double kLimeLightToleranceDegrees = 1.0f;
+    private static final double kLimeLightToleranceDegrees = 3.0f;
     
     // Turn Controller
 	private static final double kP = 0.01; //0.02
@@ -41,7 +41,7 @@ public class Drive {
     private static final double acdD = 0;
 
 	//Target Controller
-	private static final double tP = 0.01; //0.033
+	private static final double tP = 0.015; //0.033
 	private static final double tI = 0.00;
     private static final double tD = 0.00;
 
@@ -89,9 +89,8 @@ public class Drive {
      * The enumerator for choosing a target location
      */
     public static enum TargetPipeline {
-		TEN_FOOT,
-        TRENCH,
-        HAIL_MARY;
+		ON_TARMAC,
+        OFF_TARMAC;
 	}
 
     // An enum containing each wheel's properties including: drive and rotate motor IDs, drive motor types, and rotate sensor IDs 
@@ -641,7 +640,8 @@ public class Drive {
      * Limelight targeting using PID
      * @return program status
      */
-	public int limelightPIDTargeting() {
+	public int limelightPIDTargeting(TargetPipeline pipeline) {
+        //Sets the required pipeline
 		double m_LimelightCalculatedPower = 0;
         long currentMs = System.currentTimeMillis();
         final long TIME_OUT = 5000;

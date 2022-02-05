@@ -183,8 +183,8 @@ public class Shooter {
     *   
     ******************************************************************************************/
 	public void manualShooterControl(ShootLocation location) {
-
-		if (location == ShootLocation.OFF) {
+											
+	if (location == ShootLocation.OFF) {
 			rightShooter.set(OFF_POWER);
 			feedMotor.set(OFF_POWER);
 			targetVelocity = OFF_TARGET_RPM;
