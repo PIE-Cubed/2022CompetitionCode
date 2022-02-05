@@ -6,6 +6,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Grabber.GrabberDirection;
 
 /**
  * Start of class
@@ -17,7 +18,7 @@ public class Robot extends TimedRobot {
   Controls      controls;
   Grabber       grabber;
   Climber       climber;
-  //CargoTracking cargoTracking;
+  CargoTracking cargoTracking;
   Auto          auto;
 
   // ERROR CODES
@@ -50,7 +51,7 @@ public class Robot extends TimedRobot {
     grabber       = new Grabber();
     controls      = new Controls();
     climber       = new Climber();
-    //cargoTracking = new CargoTracking(drive);
+    cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber);
   }
 
@@ -67,15 +68,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     //Alliance Selection
+    m_allianceChooser.setDefaultOption(kDefaultAlliance, kDefaultAlliance);
     m_allianceChooser.addOption(kRedAlliance , kRedAlliance);
 		m_allianceChooser.addOption(kBlueAlliance, kBlueAlliance);
+    SmartDashboard.putData("Alliance Color", m_allianceChooser);
     
-    //Default Alliance
-		m_allianceChooser.setDefaultOption(kDefaultAlliance, kDefaultAlliance);
-		SmartDashboard.putData("Alliance Color", m_allianceChooser);
-
     //Sets the limelight LED mode
-    drive.limelightEntries.getEntry("ledMode").setNumber(1);
+    drive.limelightEntries.getEntry("ledMode").setNumber(0);
   }
 
   @Override
@@ -104,7 +103,7 @@ public class Robot extends TimedRobot {
     System.out.println("Alliance: " + m_allianceSelected);
 
     //Passes cargo and alliance color to the Pi for Object Tracking
-    //cargoTracking.setCargoColor(m_allianceSelected);
+    cargoTracking.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -119,10 +118,10 @@ public class Robot extends TimedRobot {
           status = auto.centerAuto();
           break;
         case kHangarAuto:
-          status = DONE;
+          status = auto.autoLimelight();
           break;
         case kWallAuto:
-          status = DONE;
+          status = auto.wallAuto();
           break;
         default:
           status = DONE;
@@ -147,7 +146,7 @@ public class Robot extends TimedRobot {
     System.out.println("Alliance: " + m_allianceSelected);
 
     //Passes cargo and alliance color to the Pi for Object Tracking
-    //cargoTracking.setCargoColor(m_allianceSelected);
+    cargoTracking.setCargoColor(m_allianceSelected);
   }
 
   @Override
@@ -188,7 +187,7 @@ public class Robot extends TimedRobot {
     System.out.println("Alliance: " + m_allianceSelected);
 
     //Passes cargo and alliance color to the Pi for Object Tracking
-    //cargoTracking.setCargoColor(m_allianceSelected);
+    cargoTracking.setCargoColor(m_allianceSelected);
 
     //Sets the limelight LED mode
     drive.limelightEntries.getEntry("ledMode").setNumber(0);
@@ -200,7 +199,8 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    System.out.println(Drive.ahrs.getYaw());
+    grabber.setGrabberMotor(GrabberDirection.FORWARD);
+    //System.out.println(Drive.ahrs.getYaw());
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();

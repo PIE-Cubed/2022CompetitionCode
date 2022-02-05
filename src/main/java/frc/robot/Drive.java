@@ -261,13 +261,13 @@ public class Drive {
         /**
 		 * Limelight Modes
 		 */
-		//Force the LED's to off to start the match
-		limelightEntries.getEntry("ledMode").setNumber(1);
+		//Force the LED's to on to start the match
+		limelightEntries.getEntry("ledMode").setNumber(0);
 		//Set limelight mode to vision processor
 		limelightEntries.getEntry("camMode").setNumber(0);
 		//Sets limelight streaming mode to Standard (The primary camera and the secondary camera are displayed side by side)
 		limelightEntries.getEntry("stream").setNumber(0);
-		//Sets limelight pipeline to 0 (light off)
+		//Sets limelight pipeline to 0 (default)
 		limelightEntries.getEntry("pipeline").setNumber(0);
     }
 
@@ -399,8 +399,7 @@ public class Drive {
         //First time through initializes target values
         if (firstTime == true) {
             firstTime = false;
-            //Get yaw is flipped for some reason
-            targetOrientation = -1 * ahrs.getYaw();
+            targetOrientation = ahrs.getYaw();
             encoderTarget = encoderCurrent + (ticksPerFoot * distance);
         }
 
@@ -423,7 +422,7 @@ public class Drive {
         
 
         //Adjusts wheel angles
-        orientationError = autoCrabDriveController.calculate(-1 * ahrs.getYaw(), targetOrientation); 
+        orientationError = autoCrabDriveController.calculate(ahrs.getYaw(), targetOrientation); 
         teleopSwerve(x, y, orientationError, false);
 
         //Checks if target distance has been reached, then ends function if so
@@ -483,9 +482,9 @@ public class Drive {
 		}
 
 		// Rotate
-        rotateError = rotateController.calculate(-1 * ahrs.getYaw(), degrees);
+        rotateError = rotateController.calculate(ahrs.getYaw(), degrees);
         rotateError = MathUtil.clamp(rotateError, -0.5, 0.5);
-        System.out.println(rotateError + " " + (-1* ahrs.getYaw()));
+        System.out.println(rotateError + " " + ahrs.getYaw());
 		teleopRotate(rotateError);
 
 		// CHECK: Routine Complete
@@ -640,10 +639,9 @@ public class Drive {
     ******************************************************************************************/
     /**
      * Limelight targeting using PID
-     * @param pipeline
      * @return program status
      */
-	public int limelightPIDTargeting( TargetPipeline pipeline) {
+	public int limelightPIDTargeting() {
 		double m_LimelightCalculatedPower = 0;
         long currentMs = System.currentTimeMillis();
         final long TIME_OUT = 5000;

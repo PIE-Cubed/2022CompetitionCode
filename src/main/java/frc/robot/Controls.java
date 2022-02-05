@@ -75,7 +75,6 @@ public class Controls {
         if (Math.abs(power) < 0.3) {
             power = 0;
         }
-        System.out.println("Raw rotate power: " + power);
 
         //Cubes the power and clamps it because the rotate is SUPER sensitive
         power = Math.pow(power, 3.0); 
@@ -168,10 +167,10 @@ public class Controls {
     //Grabber Direction based off of D-Pad
     public Grabber.GrabberDirection getGrabberDirection() {
         if (xboxController.getPOV() == 0) {
-            return Grabber.GrabberDirection.REVERSE;
+            return Grabber.GrabberDirection.FORWARD;
         }
         else if (xboxController.getPOV() == 180) {
-            return Grabber.GrabberDirection.FORWARD;
+            return Grabber.GrabberDirection.REVERSE;
         }
         else {
             return Grabber.GrabberDirection.OFF;

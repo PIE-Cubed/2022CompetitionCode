@@ -19,8 +19,11 @@ public class CargoTracking {
 	Drive drive;
 
 	//Network Tables
-	NetworkTable TrackingValues;
-	NetworkTableEntry targetColor;
+	private NetworkTable TrackingValues;
+	private NetworkTableEntry targetColor;
+	private NetworkTableEntry isEmpty;
+	private NetworkTableEntry target;
+	private NetworkTableEntry empty;
 
 	//Variables
 	private double deadZoneCount = 0.00;
@@ -56,9 +59,14 @@ public class CargoTracking {
 		// Creates Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
 
-		//
-		NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
-    	targetColor.setDefaultString("Default");
+		// Creates the Networktable Entries
+		targetColor = TrackingValues.getEntry("TargetColor");
+		isEmpty     = TrackingValues.getEntry("IsEmpty");
+		target      = TrackingValues.getEntry("CenterX");
+		empty       = TrackingValues.getEntry("Empty");
+
+		// Sets to a useless value 
+		targetColor.setString("Default");
 	}
 
 	/**
@@ -94,9 +102,9 @@ public class CargoTracking {
 		double  turn;
 	
 		//Network Tables
-		NetworkTableEntry isEmpty = TrackingValues.getEntry("IsEmpty");
-		NetworkTableEntry target = TrackingValues.getEntry("CenterX");
-		NetworkTableEntry empty  = TrackingValues.getEntry("Empty");
+		isEmpty = TrackingValues.getEntry("IsEmpty");
+		target = TrackingValues.getEntry("CenterX");
+		empty  = TrackingValues.getEntry("Empty");
 	
 		//Sets the double variables
 		pipelineEmpty = isEmpty.getBoolean(false);
