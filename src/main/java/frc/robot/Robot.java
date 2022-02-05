@@ -214,7 +214,9 @@ public class Robot extends TimedRobot {
     double rotatePower = controls.getRotatePower();
 
     //Drives if we are out of dead zone
-    if ((Math.sqrt(driveX*driveX + driveY*driveY) > 0.01) || (Math.abs(rotatePower) > 0.01)) {
+    if ((Math.abs(driveX) > 0) ||
+        (Math.abs(driveY) > 0) || 
+        (Math.abs(rotatePower) > 0)) {
       drive.teleopSwerve(driveX, driveY, rotatePower, false);
     }
     else {

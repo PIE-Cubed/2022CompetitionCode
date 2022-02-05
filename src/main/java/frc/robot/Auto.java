@@ -12,6 +12,9 @@ public class Auto {
 	private boolean   shootFirstTime   = true;
 	private boolean   routineFirstTime = true;
 	private boolean   delayFirstTime   = true;
+    
+    private long autoDelayTargetMs = 0;
+
 
     public Auto(Drive drive, Grabber grabber){
         this.drive    = drive;
@@ -27,8 +30,12 @@ public class Auto {
 		}
 
         switch(step) {
+
+            //121 degrees: shooter facing target at start
+            //140 degrees: grabber facing ball
+
             case 1:
-                status = drive.autoCrabDrive(4, 0, 0.2);
+                status = autoDelay(5000);
                 break;
             default:
                 //Finished routine
@@ -44,4 +51,17 @@ public class Auto {
         return Robot.CONT;
     }
 
+    public int autoDelay(int ms) {
+        long currentMs = System.currentTimeMillis();
+
+        if (firstTime == true) {
+            autoDelayTargetMs = currentMs + ms;
+            firstTime = false;
+        }
+
+        if (currentMs > autoDelayTargetMs) {
+            return Robot.DONE;
+        }
+        return Robot.CONT;
+    }
 }

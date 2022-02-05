@@ -71,11 +71,13 @@ public class Controls {
      * @return rotatePower
      */
     public double getRotatePower() {
-        //double deadZone = 0.3;
-
         double power = joystick.getZ(); 
+        if (Math.abs(power) < 0.3) {
+            power = 0;
+        }
+        System.out.println("Raw rotate power: " + power);
 
-        //Halves the power because the rotate is SUPER sensitive
+        //Cubes the power and clamps it because the rotate is SUPER sensitive
         power = Math.pow(power, 3.0); 
         power = MathUtil.clamp(power, -.5, .5);
             
@@ -85,7 +87,7 @@ public class Controls {
     /**
      * Gets the drive power
      * @return drivePower
-     */
+     *
     public double getDrivePower() {
         double x = joystick.getX();
         double y = joystick.getY() * -1;
@@ -95,7 +97,7 @@ public class Controls {
         double hypClamp = MathUtil.clamp(hyp, -1, 1);
  
         return hypClamp;
-    }
+    }*/
 
     /**
      * Gets the drive X
@@ -103,6 +105,9 @@ public class Controls {
      */
     public double getDriveX() {
         double power = joystick.getX();
+        if (Math.abs(power) < 0.05) {
+            power = 0;
+        }
         return power;
     }
 
@@ -112,6 +117,9 @@ public class Controls {
      */
     public double getDriveY() {
         double power = joystick.getY() * -1;
+        if (Math.abs(power) < 0.05) {
+            power = 0;
+        }
         return power;
     }
 

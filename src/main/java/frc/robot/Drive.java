@@ -55,7 +55,7 @@ public class Drive {
     
     //CONSTANTS
     private final int    FAIL_DELAY   = 5;
-    private final double ticksPerFoot = 6; //5.75
+    private final double ticksPerFoot = 5.65;
 
 
 	//Limelight Variables
@@ -404,7 +404,7 @@ public class Drive {
             encoderTarget = encoderCurrent + (ticksPerFoot * distance);
         }
 
-        //Halfs speed within 3 feet of target, if total distance is at least 5 feet
+        //Halves speed within 3 feet of target, if total distance is at least 5 feet
         if ((encoderCurrent + (3 * ticksPerFoot) > encoderTarget) && distance > 5) {
             power *= 0.5;
         }
@@ -427,7 +427,6 @@ public class Drive {
         teleopSwerve(x, y, orientationError, false);
 
         //Checks if target distance has been reached, then ends function if so
-        System.out.println("Encoder Current: " + encoderCurrent + "  Target: " + encoderTarget);
         if (encoderCurrent >= encoderTarget) {
             firstTime = true;
             stopWheels();
@@ -555,16 +554,21 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    autoAdjustWheels()
-    *    Rotates wheels to desired angle
+    *    Rotates wheels to desired angle (between -180 and 180)
     * 
     ******************************************************************************************/
     public int autoAdjustWheels(double degrees) {
+        if (Math.abs(degrees) > 180) {
+            System.out.println("ERROR: Drive::autoAdjustWheels() domain exception. Expected domain from -180 to 180, got " + degrees);
+            return Robot.FAIL;
+        }
+
         long currentMs = System.currentTimeMillis();
 
         if (rotateFirstTime == true) {
             rotateFirstTime = false;
             count = 0;
-            timeOut = currentMs + 500; //Makes the time out 2.5 seconds
+            timeOut = currentMs + 2500; //Originally 500ms
         }
 
         if (currentMs > timeOut) {
@@ -584,6 +588,7 @@ public class Drive {
 
         //Checks if all wheels are at target angle
         if (FR == Robot.DONE && FL == Robot.DONE && BR == Robot.DONE && BL == Robot.DONE) {
+            stopWheels();
             return Robot.DONE;
         }
         else {
