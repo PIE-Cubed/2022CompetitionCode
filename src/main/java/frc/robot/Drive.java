@@ -905,8 +905,8 @@ public class Drive {
     }
 
     public void testLimelightTargeting() {
-        System.out.print("tv: " + targetValid.getDouble(0) + "      |     ");
-        System.out.println("tx: " + targetX.getDouble(0));
+        System.out.print("tv: " + get_tv() + "      |     ");
+        System.out.println("tx: " + get_tx());
     }
 
 }
