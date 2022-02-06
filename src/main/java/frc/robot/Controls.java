@@ -35,6 +35,7 @@ public class Controls {
     private Joystick joystick;
     private XboxController xboxController;
 
+    //Constructor
     public Controls() {
         //Instance Creation
         joystick       = new Joystick(ControllerIDs.JOYSTICK.getId());
@@ -48,22 +49,11 @@ public class Controls {
         return joystick.getTrigger();        
     }
 
-    
-    /**
-     * 0 degrees is forward on the Joystick
-     * this method returns values from -180 to +180
-     * @return driveAngle
-     */
-    public double getDriveAngle() {
-        double x = joystick.getX();
-        double y = joystick.getY();
-        
-        //Does math to figure out the drive angle 
-        double rad = Math.atan2(x, y);
-        double deg = Math.toDegrees(rad);
 
-        return deg;
-    }
+    
+    /*
+        DRIVE FUNCTIONS
+    */
 
     /**
      * Positive values are from clockwise rotation 
@@ -72,7 +62,9 @@ public class Controls {
      */
     public double getRotatePower() {
         double power = joystick.getZ(); 
-        if (Math.abs(power) < 0.3) {
+
+        //If we are in deadzone or strafelock is on, rotatepower is 0
+        if ((Math.abs(power) < 0.3) || (getStrafeLock() == true)) {
             power = 0;
         }
 
@@ -84,27 +76,18 @@ public class Controls {
     }
 
     /**
-     * Gets the drive power
-     * @return drivePower
-     *
-    public double getDrivePower() {
-        double x = joystick.getX();
-        double y = joystick.getY() * -1;
-
-        //Does math to calculate the power we want if on an angle  
-        double hyp = Math.sqrt(x*x + y*y);
-        double hypClamp = MathUtil.clamp(hyp, -1, 1);
- 
-        return hypClamp;
-    }*/
-
-    /**
      * Gets the drive X
      * @return driveX
      */
     public double getDriveX() {
         double power = joystick.getX();
-        if (Math.abs(power) < 0.05) {
+
+        //Strafe lock removes deadzone and cubes power for more precision
+        if (getStrafeLock() == true) {
+            power = Math.pow(power, 3);
+        }
+        //If we are in deadzone or rotatelock is on, x is 0
+        if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
             power = 0;
         }
         return power;
@@ -116,10 +99,32 @@ public class Controls {
      */
     public double getDriveY() {
         double power = joystick.getY() * -1;
-        if (Math.abs(power) < 0.05) {
+
+        //Strafe lock removes deadzone and cubes power for more precision
+        if (getStrafeLock() == true) {
+            power = Math.pow(power, 3);
+        }
+        //If we are in deadzone or rotatelock is on, y is 0
+        else if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
             power = 0;
         }
         return power;
+    }
+
+    /**
+     * Checks if we are in strafe lock mode
+     * @return joystick button 2
+     */
+    private boolean getStrafeLock() {
+        return joystick.getRawButton(2);
+    }
+
+    /**
+     * Checks if we are in rotate lock mode
+     * @return joystick button 3
+     */
+    private boolean getRotateLock() {
+        return joystick.getRawButton(3);
     }
 
 
