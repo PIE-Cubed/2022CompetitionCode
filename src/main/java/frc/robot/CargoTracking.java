@@ -5,9 +5,7 @@ package frc.robot;
  */
 import edu.wpi.first.math.MathUtil;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.math.controller.PIDController;
 
@@ -17,11 +15,15 @@ import edu.wpi.first.math.controller.PIDController;
 public class CargoTracking {
 	//Object creation
 	Drive drive;
-	Controls controls;
 
-	//Network Tables
-	NetworkTable TrackingValues;
-	NetworkTableEntry targetColor;
+	//Network Table: Tracking
+	private NetworkTable TrackingValues;
+
+	//Network Table Entries: Tracking
+	private NetworkTableEntry isRedAlliance;
+	private NetworkTableEntry isEmpty;
+	private NetworkTableEntry target;
+	private NetworkTableEntry empty;
 
 	//Variables
 	private double deadZoneCount = 0.00;
@@ -48,19 +50,20 @@ public class CargoTracking {
 	public CargoTracking(Drive drive) {
 		// Instance creation
 		this.drive = drive;
-    	controls = Controls.getInstance();
 
 		// Creates a PID controller
 		cargoController = new PIDController(cP, cI, cD);
 		cargoController.setTolerance(cargoToleranceDegrees);
 		cargoController.enableContinuousInput(-180.0, 180.0);
 
-		// Creates Network Tables instance
+		// Creates a Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
 
-		// Gives targetColor a default value that cannot be acted upon
-		NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
-    	targetColor.setDefaultString("Default");
+		// Creates the Networktable Entries
+		isRedAlliance = TrackingValues.getEntry("isRedAlliance"); // Boolean
+		isEmpty       = TrackingValues.getEntry("IsEmpty");       // Boolean
+		target        = TrackingValues.getEntry("CenterX");       // Double
+		empty         = TrackingValues.getEntry("Empty");         // Double
 	}
 
 	/**
@@ -68,8 +71,9 @@ public class CargoTracking {
 	 */
 	public void faceCargo() {
 		//Variables
-		double m_CargoCalculatedPower = 0;
-		double turnAngle;
+		double  turnAngle;
+		double  m_CargoCalculatedPower = 0;
+		boolean isFull = isEmpty.getBoolean(false);
 
 		//Calls the cargoDetection method
 		turnAngle = cargoDetection();
@@ -77,10 +81,19 @@ public class CargoTracking {
 		//Clamps turnAngle
 		turnAngle = MathUtil.clamp(turnAngle, -180.00, 180.00);
 
-		//Rotate with PID
-		m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
-		m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
-		drive.teleopRotate(m_CargoCalculatedPower);
+		if (isFull == true) {
+			//Rotate with PID
+			m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
+			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
+			drive.teleopRotate(m_CargoCalculatedPower);
+		}
+		else if (isFull == false) {
+			//Doesn't do anything to prevent constant occilation
+		}
+		else {
+			//Should never even occur
+			drive.teleopRotate(0.00);
+		}
 	}
 
 	/**
@@ -96,9 +109,9 @@ public class CargoTracking {
 		double  turn;
 	
 		//Network Tables
-		NetworkTableEntry isEmpty = TrackingValues.getEntry("IsEmpty");
-		NetworkTableEntry target = TrackingValues.getEntry("CenterX");
-		NetworkTableEntry empty  = TrackingValues.getEntry("Empty");
+		isEmpty = TrackingValues.getEntry("IsEmpty");
+		target = TrackingValues.getEntry("CenterX");
+		empty  = TrackingValues.getEntry("Empty");
 	
 		//Sets the double variables
 		pipelineEmpty = isEmpty.getBoolean(false);
@@ -143,16 +156,12 @@ public class CargoTracking {
 	}
 
   /**
-   * Sets the alliance and target cargo color
+   * Determines if the alliance color is red or not
+   * @param isRed
    */
-  public void setCargoColor(String color) {
+  public void setRedAlliance(boolean isRed) {
     //Sets the NetworkTable variable color to the selected alliance color
-    //NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
-    targetColor.setString(color);
-  }
-
-  private void getNetworkTableValues() {
-	  //
+	isRedAlliance.setBoolean(isRed);
   }
 
 }

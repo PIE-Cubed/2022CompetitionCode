@@ -12,17 +12,6 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class Controls {
     
-    //Singleton Method to insure that there is ever only one instance of Controls
-    private static Controls instance = null;
-
-    public static synchronized Controls getInstance() {
-        if (instance == null) {
-            instance = new Controls();
-        }
-
-        return instance;
-    }
-
     /**
      * Enumerator for controller ID's
      */
@@ -46,30 +35,16 @@ public class Controls {
     private Joystick joystick;
     private XboxController xboxController;
 
-    private Controls() {
+    public Controls() {
         //Instance Creation
-        joystick = new Joystick(ControllerIDs.JOYSTICK.getId());
+        joystick       = new Joystick(ControllerIDs.JOYSTICK.getId());
         xboxController = new XboxController(ControllerIDs.XBOX_MANIP_CONTROLLER.getId());
     }
 
-    /**
-     * JOYSTICK DRIVE VALUES
-     */
-    private double getX() {
-        return joystick.getX();
-    }
-
-    private double getY() {
-        return joystick.getY();
-    }
-
-    private double getZ() {
-        return joystick.getZ();
-    }
 
 
     // SHOOTER ENABLED
-    private boolean getShooterEnable() {
+    public boolean getShooterEnable() {        
         return joystick.getTrigger();        
     }
 
@@ -80,11 +55,10 @@ public class Controls {
      * @return driveAngle
      */
     public double getDriveAngle() {
-        //Gets X and Y positions
-        double x = getX();
-        double y = getY();
+        double x = joystick.getX();
+        double y = joystick.getY();
         
-        //Does math to figure out the drive angle
+        //Does math to figure out the drive angle 
         double rad = Math.atan2(x, y);
         double deg = Math.toDegrees(rad);
 
@@ -97,10 +71,12 @@ public class Controls {
      * @return rotatePower
      */
     public double getRotatePower() {
-        //double deadZone = 0.3;
-        double power = getZ();
+        double power = joystick.getZ(); 
+        if (Math.abs(power) < 0.3) {
+            power = 0;
+        }
 
-        //Halves the power because the rotate is SUPER sensitive
+        //Cubes the power and clamps it because the rotate is SUPER sensitive
         power = Math.pow(power, 3.0); 
         power = MathUtil.clamp(power, -.5, .5);
             
@@ -110,26 +86,27 @@ public class Controls {
     /**
      * Gets the drive power
      * @return drivePower
-     */
+     *
     public double getDrivePower() {
-        //Gets X and Y positions
-        double x = getX();
-        double y = getY() * -1;
+        double x = joystick.getX();
+        double y = joystick.getY() * -1;
 
-        //Does math to calculate the power we want if on an angle 
+        //Does math to calculate the power we want if on an angle  
         double hyp = Math.sqrt(x*x + y*y);
         double hypClamp = MathUtil.clamp(hyp, -1, 1);
-
+ 
         return hypClamp;
-    }
+    }*/
 
     /**
      * Gets the drive X
      * @return driveX
      */
     public double getDriveX() {
-        double power = getX();
-
+        double power = joystick.getX();
+        if (Math.abs(power) < 0.05) {
+            power = 0;
+        }
         return power;
     }
 
@@ -138,8 +115,10 @@ public class Controls {
      * @return driveY
      */
     public double getDriveY() {
-        double power = getY() * -1;
-
+        double power = joystick.getY() * -1;
+        if (Math.abs(power) < 0.05) {
+            power = 0;
+        }
         return power;
     }
 
@@ -163,71 +142,38 @@ public class Controls {
     public boolean grabberDeployRetract() {
         return xboxController.getAButtonPressed();
     }
-    //
+        
 
-    /**
-     * Button B
-     * @return buttonBPressed
-     */
-    //
-
-    /**
-     * Button X
-     * @return buttonXPressed
-     */
-    //
-
-    /**
-     * Button Y
-     * @return buttonYPressed
-     */
-    public boolean getXboxY() {
-        return xboxController.getYButtonPressed();
-    }
-
-    
-
-    /**
-     * Right Bumper Pressed
-     * @return rightBumperPresed
-     */
-    public boolean getRightBumper() {
-        return xboxController.getRightBumper();
-    }
-
-    /**
+    /** 
      * Left Bumper Pressed
-     * @return leftBumperPresed
+     * @return leftBumperPressed 
      */
-    public boolean getLeftBumper() {
-        return xboxController.getLeftBumper();
+    public boolean getClimberClaw1() { 
+        return xboxController.getLeftBumperPressed(); 
     }
 
     /**
-     * Right trigger
+     * Right Bumper Pressed 
+     * @return rightBumperPressed 
      */
-    public double getRightTrigger() {
-        double power;
-        power = xboxController.getRightTriggerAxis();
-
-        //trigger dead band
-        if (power > 0.1) {
-            return power;
-        }
-        else {
-            return 0;
-        }
+    public boolean getClimberClaw2() { 
+        return xboxController.getRightBumperPressed(); 
     }
 
-    //Left trigger
-    public double getLeftTrigger() {
-        double power = xboxController.getLeftTriggerAxis();
-
-        if (power > 0.1) {
-            return power;
+    public double getClimberPower() {
+        return -1 * xboxController.getLeftY();
+    }
+     
+    //Grabber Direction based off of D-Pad
+    public Grabber.GrabberDirection getGrabberDirection() {
+        if (xboxController.getPOV() == 0) {
+            return Grabber.GrabberDirection.FORWARD;
+        }
+        else if (xboxController.getPOV() == 180) {
+            return Grabber.GrabberDirection.REVERSE;
         }
         else {
-            return 0;
+            return Grabber.GrabberDirection.OFF;
         }
     }
 }
