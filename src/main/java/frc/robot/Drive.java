@@ -82,6 +82,13 @@ public class Drive {
 	public boolean limeControl   = false;
 	public int     limeStatus    = 0;
 
+    //Limelight distance
+    private static final double CameraMountingAngle = 22.0;	// 25.6 degrees, 22.0
+	private static final double CameraHeightFeet 	= 26.5 / 12;	        // 16.5 inches
+	private static final double VisionTapeHeightFt 	= 7 + (7.5 / 12.0) ;	// 8ft 2.25 inches
+	private static double mountingRadians = Math.toRadians(CameraMountingAngle); // a1, converted to radians
+	private static double differenceOfHeights = VisionTapeHeightFt - CameraHeightFeet; // Find result of h2 - h1
+
         
     /**
      * Enumerators
@@ -798,6 +805,59 @@ public class Drive {
         
 		return Robot.CONT;   
     }
+	
+	/** 
+	 * D = (h2 - h1) / tan(a1 + a2). This equation, along with known numbers, helps find the distance
+	 * from a target.
+	 */
+	public double getDistance() {
+	  // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
+	  double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+		
+	  // a2, converted to radians
+	  double radiansToTarget = Math.toRadians(ty); 
+
+	  // find result of a1 + a2
+	  double angleInRadians = mountingRadians + radiansToTarget;
+
+	  // find the tangent of a1 + a2
+	  double tangentOfAngle = Math.tan(angleInRadians); 
+
+	  // Divide the two results ((h2 - h1) / tan(a1 + a2)) for the distance to target
+	  double distance = differenceOfHeights / tangentOfAngle;
+
+	  // outputs the distance calculated
+	  return distance; 
+	}
+
+	/** 
+	 * a1 = arctan((h2 - h1) / d - tan(a2)). This equation, with a known distance input, helps find the 
+	 * mounted camera angle.
+	 */
+	public double getCameraMountingAngle(double measuredDistance) {
+	  // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
+	  double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+
+	  // convert a2 to radians
+	  double radiansToTarget = Math.toRadians(ty);
+
+	  // find result of (h2 - h1) / d
+	  double heightOverDistance = differenceOfHeights / measuredDistance;
+
+	  // find result of tan(a2)
+	  double tangentOfAngle = Math.tan(radiansToTarget);
+
+	  // (h2-h1)/d - tan(a2) subtract two results for the tangent of the two sides
+	  double TangentOfSides = heightOverDistance - tangentOfAngle; 
+
+	  // invert tangent operation to get the camera mounting angle in radians
+	  double newMountingRadians = Math.atan(TangentOfSides);
+
+	  // change result into degrees
+	  double cameraMountingAngle = Math.toDegrees(newMountingRadians);
+	  
+	  return cameraMountingAngle; // output result
+	}
 
     /**
      * Gets the value of tv
