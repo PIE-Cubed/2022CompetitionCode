@@ -75,3 +75,5 @@ public class Climber {
 
 
 }
+
+// End of the Climber Class

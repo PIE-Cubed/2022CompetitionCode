@@ -4,14 +4,19 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.wpilibj.TimedRobot;
+
+import edu.wpi.first.networktables.*;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Grabber.GrabberDirection;
 
 /**
  * Start of class
  */
 public class Robot extends TimedRobot {
+  //Networktables
+  private NetworkTable FMSInfo;
+  private NetworkTableEntry isRedAlliance;	
 
   //Object creation
   Drive         drive;
@@ -36,23 +41,23 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  //Alliance
-  private static final String kDefaultAlliance = "Default";
-  private static final String kRedAlliance = "Red";
-  private static final String kBlueAlliance = "Blue";
-  private String m_allianceSelected;
-  private final SendableChooser<String> m_allianceChooser = new SendableChooser<>();
-
   /**
    * Constructor
    */
   public Robot() {
+    //Instance Creation
     drive         = new Drive();
     grabber       = new Grabber();
     controls      = new Controls();
     climber       = new Climber();
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber);
+
+    //Creates a Network Tables instance
+    FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
+
+    //Creates the Networktable Entries
+    isRedAlliance = FMSInfo.getEntry("IsRedAlliance"); // Boolean
   }
 
   @Override
@@ -67,14 +72,11 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    //Alliance Selection
-    m_allianceChooser.setDefaultOption(kDefaultAlliance, kDefaultAlliance);
-    m_allianceChooser.addOption(kRedAlliance , kRedAlliance);
-		m_allianceChooser.addOption(kBlueAlliance, kBlueAlliance);
-    SmartDashboard.putData("Alliance Color", m_allianceChooser);
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance(setRedAlliance());
     
     //Sets the limelight LED mode
-    drive.limelightEntries.getEntry("ledMode").setNumber(0);
+    drive.changeledMode(Drive.LEDState.ON);
   }
 
   @Override
@@ -96,14 +98,11 @@ public class Robot extends TimedRobot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
 
-    //Get Alliance
-    m_allianceSelected = m_allianceChooser.getSelected();
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance(setRedAlliance());
 
-    //Telemetry
-    System.out.println("Alliance: " + m_allianceSelected);
-
-    //Passes cargo and alliance color to the Pi for Object Tracking
-    cargoTracking.setCargoColor(m_allianceSelected);
+    //Sets the limelight LED mode
+    drive.changeledMode(Drive.LEDState.ON);
   }
 
   @Override
@@ -112,7 +111,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during Autonomous
    */
   public void autonomousPeriodic() {
-    if (status == CONT) {
+    if (status == Robot.CONT) {
       switch (m_autoSelected) {
         case kCenterAuto:
           status = auto.centerAuto();
@@ -139,14 +138,11 @@ public class Robot extends TimedRobot {
    * Runs once at the start of TeleOp
    */
   public void teleopInit() {
-    //Get Alliance
-    m_allianceSelected = m_allianceChooser.getSelected();
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance(setRedAlliance());
 
-    //Telemetry
-    System.out.println("Alliance: " + m_allianceSelected);
-
-    //Passes cargo and alliance color to the Pi for Object Tracking
-    cargoTracking.setCargoColor(m_allianceSelected);
+    //Sets the limelight LED mode
+    drive.changeledMode(Drive.LEDState.ON);
   }
 
   @Override
@@ -180,17 +176,11 @@ public class Robot extends TimedRobot {
    * Runs once at the start of Test
    */
   public void testInit() {
-    //Get Alliance
-    m_allianceSelected = m_allianceChooser.getSelected();
-
-    //Telemetry
-    System.out.println("Alliance: " + m_allianceSelected);
-
-    //Passes cargo and alliance color to the Pi for Object Tracking
-    cargoTracking.setCargoColor(m_allianceSelected);
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance(setRedAlliance());
 
     //Sets the limelight LED mode
-    drive.limelightEntries.getEntry("ledMode").setNumber(0);
+    drive.changeledMode(Drive.LEDState.ON);
   }
 
   @Override
@@ -199,14 +189,16 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    grabber.setGrabberMotor(GrabberDirection.FORWARD);
-    //System.out.println(Drive.ahrs.getYaw());
+    grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
+    //cargoTracking.faceCargo();
   }
 
-
+  /**
+   * Controls the wheels in TeleOp
+   */
   private void wheelControl() {
     //Get joystick values
     double driveX      = controls.getDriveX();
@@ -225,7 +217,9 @@ public class Robot extends TimedRobot {
     }
   }
 
-
+  /**
+   * Controls the grabber in TeleOp
+   */
   private void ballControl() {
     //Connected pair of pistons to retract and deploy
     //One motor to take balls in and out
@@ -240,6 +234,9 @@ public class Robot extends TimedRobot {
     grabber.setGrabberMotor(grabberDir);
   }
 
+  /**
+   * Controls the climber in TeleOp
+   */
   private void climberControl() {
     boolean toggleClaw1  = controls.getClimberClaw1();
     boolean toggleClaw2  = controls.getClimberClaw2();
@@ -253,5 +250,17 @@ public class Robot extends TimedRobot {
     }
     climber.climberRotate(climberPower);
   }
+
+  /**
+   * Determines if we are on the red alliance
+   * @return isRed
+   */
+  private boolean setRedAlliance() {
+    //Gets and returns if we are red from the FMS
+    boolean isRed = isRedAlliance.getBoolean(false);
+    return isRed;
+  }
+
 }
+
 //End of the Robot class

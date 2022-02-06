@@ -13,7 +13,6 @@ public class Auto {
     // First Time variables 
 	private boolean   firstTime        = true;
 	private boolean   shootFirstTime   = true;
-	private boolean   routineFirstTime = true;
 	private boolean   delayFirstTime   = true;
     
     private long autoDelayTargetMs = 0;
@@ -180,21 +179,10 @@ public class Auto {
         return Robot.CONT;
     }
 
-    public int autoDelay(long ms) {
-        long currentMs = System.currentTimeMillis();
-
-        if (delayFirstTime == true) {
-            autoDelayTargetMs = currentMs + ms;
-            delayFirstTime = false;
-        }
-
-        if (currentMs > autoDelayTargetMs) {
-            delayFirstTime = true;
-            return Robot.DONE;
-        }
-        return Robot.CONT;
-    }
-
+    /**
+     * An auto program to shoot balls
+     * @return
+     */
     private int autoShoot() {
         int status = Robot.CONT;
 
@@ -244,4 +232,26 @@ public class Auto {
 
         return Robot.CONT;
     }
+
+    /**
+     * A program to return a value after a certain number of miliseconds has passed 
+     * @param miliseconds
+     * @return
+     */
+    public int autoDelay(long ms) {
+        long currentMs = System.currentTimeMillis();
+
+        if (delayFirstTime == true) {
+            autoDelayTargetMs = currentMs + ms;
+            delayFirstTime = false;
+        }
+
+        if (currentMs > autoDelayTargetMs) {
+            delayFirstTime = true;
+            return Robot.DONE;
+        }
+        return Robot.CONT;
+    }
 }
+
+// End of Auto Class

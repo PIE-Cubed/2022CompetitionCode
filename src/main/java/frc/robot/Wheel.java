@@ -10,7 +10,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import frc.robot.Drive.WheelProperties;
 import edu.wpi.first.math.controller.PIDController;
 
 /**
@@ -209,4 +208,6 @@ public class Wheel {
 
 
 
-} // End of the Wheel Class
+}
+
+// End of the Wheel Class

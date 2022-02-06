@@ -5,9 +5,7 @@ package frc.robot;
  */
 import edu.wpi.first.math.MathUtil;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.math.controller.PIDController;
 
@@ -18,9 +16,11 @@ public class CargoTracking {
 	//Object creation
 	Drive drive;
 
-	//Network Tables
+	//Network Table: Tracking
 	private NetworkTable TrackingValues;
-	private NetworkTableEntry targetColor;
+
+	//Network Table Entries: Tracking
+	private NetworkTableEntry isRedAlliance;
 	private NetworkTableEntry isEmpty;
 	private NetworkTableEntry target;
 	private NetworkTableEntry empty;
@@ -56,17 +56,14 @@ public class CargoTracking {
 		cargoController.setTolerance(cargoToleranceDegrees);
 		cargoController.enableContinuousInput(-180.0, 180.0);
 
-		// Creates Network Tables instance
+		// Creates a Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
 
 		// Creates the Networktable Entries
-		targetColor = TrackingValues.getEntry("TargetColor");
-		isEmpty     = TrackingValues.getEntry("IsEmpty");
-		target      = TrackingValues.getEntry("CenterX");
-		empty       = TrackingValues.getEntry("Empty");
-
-		// Sets to a useless value 
-		targetColor.setString("Default");
+		isRedAlliance = TrackingValues.getEntry("isRedAlliance"); // Boolean
+		isEmpty       = TrackingValues.getEntry("IsEmpty");       // Boolean
+		target        = TrackingValues.getEntry("CenterX");       // Double
+		empty         = TrackingValues.getEntry("Empty");         // Double
 	}
 
 	/**
@@ -74,8 +71,9 @@ public class CargoTracking {
 	 */
 	public void faceCargo() {
 		//Variables
-		double m_CargoCalculatedPower = 0;
-		double turnAngle;
+		double  turnAngle;
+		double  m_CargoCalculatedPower = 0;
+		boolean isFull = isEmpty.getBoolean(false);
 
 		//Calls the cargoDetection method
 		turnAngle = cargoDetection();
@@ -83,10 +81,19 @@ public class CargoTracking {
 		//Clamps turnAngle
 		turnAngle = MathUtil.clamp(turnAngle, -180.00, 180.00);
 
-		//Rotate with PID
-		m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
-		m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
-		drive.teleopRotate(m_CargoCalculatedPower);
+		if (isFull == true) {
+			//Rotate with PID
+			m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
+			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
+			drive.teleopRotate(m_CargoCalculatedPower);
+		}
+		else if (isFull == false) {
+			//Doesn't do anything to prevent constant occilation
+		}
+		else {
+			//Should never even occur
+			drive.teleopRotate(0.00);
+		}
 	}
 
 	/**
@@ -149,12 +156,12 @@ public class CargoTracking {
 	}
 
   /**
-   * Sets the alliance and target cargo color
+   * Determines if the alliance color is red or not
+   * @param isRed
    */
-  public void setCargoColor(String color) {
+  public void setRedAlliance(boolean isRed) {
     //Sets the NetworkTable variable color to the selected alliance color
-    //NetworkTableEntry targetColor = TrackingValues.getEntry("TargetColor");
-    targetColor.setString(color);
+	isRedAlliance.setBoolean(isRed);
   }
 
 }

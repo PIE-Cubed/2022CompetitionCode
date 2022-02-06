@@ -3,24 +3,36 @@ package frc.robot;
 /**
  * Imports
  */
-import edu.wpi.first.math.MathUtil;
+import java.util.stream.DoubleStream;
 
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 
 import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.SPI;
+
+import edu.wpi.first.math.MathUtil;
 
 /**
  * Start of class
  */
 public class Drive {
-    //Object creation
-    NetworkTable limelightEntries = NetworkTableInstance.getDefault().getTable("limelight");
+    //Network Table creation
+    private NetworkTable limelightEntries;
+
+    //Network Table Entries
+    private NetworkTableEntry targetValid;
+    private NetworkTableEntry targetX;
+    private NetworkTableEntry targetY;
+    private NetworkTableEntry targetArea;
+    private NetworkTableEntry ledMode;
+    private NetworkTableEntry cameraMode;
+    private NetworkTableEntry stream;
+    private NetworkTableEntry pipeline;
 
     //NAVX
-    public static AHRS ahrs;
+    private static AHRS ahrs;
 
     //PID controllers
     private PIDController rotateController;
@@ -37,8 +49,8 @@ public class Drive {
     
     //Auto crab drive controller
     private static final double acdP = 0.02; //0.03
-    private static final double acdI = 0;
-    private static final double acdD = 0;
+    private static final double acdI = 0.00;
+    private static final double acdD = 0.00;
 
 	//Target Controller
 	private static final double tP = 0.015; //0.033
@@ -67,10 +79,8 @@ public class Drive {
     private static final int ON_ANGLE_COUNT  = 10;
 
     //Limelight
-	public              boolean limeControl   = false;
-	public              int     limeStatus    = 0;
-	public static final int     LIMELIGHT_ON  = 3;
-    public static final int     LIMELIGHT_OFF = 1;
+	public boolean limeControl   = false;
+	public int     limeStatus    = 0;
 
         
     /**
@@ -93,7 +103,17 @@ public class Drive {
         OFF_TARMAC;
 	}
 
-    // An enum containing each wheel's properties including: drive and rotate motor IDs, drive motor types, and rotate sensor IDs 
+    /**
+     * The enumerator for LED state
+     */
+    public static enum LEDState {
+        ON,
+        OFF;
+    }
+
+    /**
+     * An enum containing each wheel's properties including: drive and rotate motor IDs, drive motor types, and rotate sensor IDs
+     */ 
     public enum WheelProperties {
         FRONT_RIGHT_WHEEL(16, // DRIVE MOTOR ID
                           17, // ROTATE MOTOR ID
@@ -129,7 +149,6 @@ public class Drive {
             this.offsetDegrees = offsetDegrees;
         }
 
-        //Ask Sanghyeok why these are private
         private int getDriveMotorId() {
             return this.driveMotorId;
         }
@@ -141,7 +160,6 @@ public class Drive {
         private int getRotateSensorId() {
             return this.rotateSensorId;
         }
-
 
         private double getOffsetDegrees(){
             return this.offsetDegrees;
@@ -256,26 +274,40 @@ public class Drive {
         targetController = new PIDController(tP, tI, tD);
         targetController.setTolerance(kLimeLightToleranceDegrees);
 
+        /**
+         * LIMELIGHT
+         */
+        //Network Table
+        limelightEntries = NetworkTableInstance.getDefault().getTable("limelight");
+
+        //Network Table Entires
+        targetValid = limelightEntries.getEntry("tv");
+        targetX     = limelightEntries.getEntry("tx");
+        targetY     = limelightEntries.getEntry("ty");
+        targetArea  = limelightEntries.getEntry("ta");
+        ledMode     = limelightEntries.getEntry("ledMode");
+        cameraMode  = limelightEntries.getEntry("camMode");
+        stream      = limelightEntries.getEntry("stream");
+        pipeline    = limelightEntries.getEntry("pipeline");
         
         /**
 		 * Limelight Modes
 		 */
 		//Force the LED's to on to start the match
-		limelightEntries.getEntry("ledMode").setNumber(0);
+		ledMode.setNumber(0);
 		//Set limelight mode to vision processor
-		limelightEntries.getEntry("camMode").setNumber(0);
+		cameraMode.setNumber(0);
 		//Sets limelight streaming mode to Standard (The primary camera and the secondary camera are displayed side by side)
-		limelightEntries.getEntry("stream").setNumber(0);
-		//Sets limelight pipeline to 0 (default)
-		limelightEntries.getEntry("pipeline").setNumber(0);
+		stream.setNumber(0);
+		//Sets limelight pipeline to 0 (ON_TARMAC)
+		pipeline.setNumber(0);
     }
-
 
 
     /****************************************************************************************** 
     *
     *    calcSwerve()
-    *    For each wheel, the inputted X, Y, Z, and individual angle for rotation are used to calculate the angle and power 
+    *    <p> For each wheel, the inputted X, Y, Z, and individual angle for rotation are used to calculate the angle and power 
     * 
     ******************************************************************************************/
     private PowerAndAngle calcSwerve(double crabX, double crabY, double rotatePower, double rotateAngle, boolean fieldDriveEnabled){
@@ -324,11 +356,10 @@ public class Drive {
     }
 
 
-
     /****************************************************************************************** 
     *
     *    teleopSwerve()
-    *    Takes X, Y, and Z and rotates each wheel to proper angle and sets correct power
+    *    <p> Takes X, Y, and Z and rotates each wheel to proper angle and sets correct power
     * 
     ******************************************************************************************/
     public void teleopSwerve(double driveX, double driveY, double rotatePower, boolean fieldDriveEnabled) {
@@ -348,11 +379,10 @@ public class Drive {
     }
 
 
-
     /****************************************************************************************** 
     *
     *    teleopCrabDrive()
-    *    Only uses X and Y to crab drive the robot
+    *    <p> Only uses X and Y to crab drive the robot
     * 
     ******************************************************************************************/
     public void teleopCrabDrive(double wheelAngle, double drivePower){
@@ -362,13 +392,12 @@ public class Drive {
         rearRightWheel.rotateAndDrive(wheelAngle, drivePower);
     }
 
-
    
     /****************************************************************************************** 
     *
     *    autoCrabDrive()
-    *    Drives robot for certain distance at a given heading and speed
-    *    Generic function for autoCrabDrive with default power of 0.6
+    *    <p> Drives robot for certain distance at a given heading and speed
+    *    <p> Generic function for autoCrabDrive with default power of 0.6
     *    @param distanceInFeet
     *    @param targetHeading
     *    @return Robot Status
@@ -382,9 +411,9 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    autoCrabDrive()
-    *    Drives robot for certain distance at a given heading and speed
-    *    Distance has to be positive
-    *    Initial orientation of robot is maintained throughout function
+    *    <p> Drives robot for certain distance at a given heading and speed
+    *    <p> Distance has to be positive
+    *    <p> Initial orientation of robot is maintained throughout function
     *    @param distanceInFeet
     *    @param targetHeading
     *    @param power
@@ -404,22 +433,18 @@ public class Drive {
 
         //Halves speed within 3 feet of target, if total distance is at least 5 feet
         if ((encoderCurrent + (3 * ticksPerFoot) > encoderTarget) && distance > 5) {
-            power *= 0.5;
+            power = power / 2;
         }
 
         double orientationError;
-
         double x = power * Math.sin(Math.toRadians(targetHeading));
         double y = power * Math.cos(Math.toRadians(targetHeading));
-
 
         if (distance < 0){
             System.out.println("Error from autoCrabDrive(), negative distance not allowed");
             return Robot.DONE;
         }
-
         
-
         //Adjusts wheel angles
         orientationError = autoCrabDriveController.calculate(ahrs.getYaw(), targetOrientation); 
         teleopSwerve(x, y, orientationError, false);
@@ -438,12 +463,11 @@ public class Drive {
     }
 
 
-
     /****************************************************************************************** 
     *
     *    teleopRotate()
-    *    Only uses Z to rotate robot
-    *    This function negates rotatePower in order to make positive inputs turn the robot clockwise
+    *    <p> Only uses Z to rotate robot
+    *    <p> This function negates rotatePower in order to make positive inputs turn the robot clockwise
     * 
     ******************************************************************************************/
     public void teleopRotate(double rotatePower) {
@@ -454,11 +478,10 @@ public class Drive {
     }
 
 
-
     /****************************************************************************************** 
     *
     *    autoRotate()
-    *    Rotates robot to inputted angle
+    *    <p> Rotates robot to inputted angle
     * 
     ******************************************************************************************/
     public int autoRotate(double degrees) {
@@ -511,11 +534,10 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    circle()
-    *    Moves robot around circle with given radius (radius is from center of circle to center of robot)
+    *    <p> Moves robot around circle with given radius (radius is from center of circle to center of robot)
     * 
     ******************************************************************************************/
     public void circle(double radiusFeet) {
-
         double radius = radiusFeet*12;
 
         //Finds angle of the radius to each wheel, used to find the angle the wheels need to go to
@@ -541,7 +563,7 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    spiral()
-    *    Robot moves forward while spinning around
+    *    <p> Robot moves forward while spinning around
     * 
     ******************************************************************************************/
     public void spiral() {
@@ -552,7 +574,7 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    autoAdjustWheels()
-    *    Rotates wheels to desired angle (between -180 and 180)
+    *    <p> Rotates wheels to desired angle (between -180 and 180)
     * 
     ******************************************************************************************/
     public int autoAdjustWheels(double degrees) {
@@ -598,22 +620,31 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    getAverageEncoder()
-    *    Returns average value of all 4 wheels' encoders
+    *    <p> Returns average value of all 4 wheels' encoders
     * 
     ******************************************************************************************/
     private double getAverageEncoder(){
-        double sum =    frontRightWheel.getEncoderValue() +
-                        frontLeftWheel.getEncoderValue()  +
-                        rearRightWheel.getEncoderValue()  +
-                        rearLeftWheel.getEncoderValue();
-        return sum / 4.0;
+        //Encoder value get statements
+        double frontRight = frontRightWheel.getEncoderValue();
+        double frontLeft  = frontLeftWheel.getEncoderValue();
+        double backRight  = rearRightWheel.getEncoderValue();
+        double backLeft   = rearLeftWheel.getEncoderValue();
+
+        //Creates a DoubleStream
+        DoubleStream stream = DoubleStream.of(frontRight, frontLeft, backRight, backLeft);
+
+        //Averages the DoubleStream and converts to a double
+        double average = stream.average().getAsDouble();
+        
+        //Returns the average
+        return average;
     }
 
 
     /****************************************************************************************** 
     *
     *    stopWheels()
-    *    Turns off all motors instead of turning wheels back to 0 degrees
+    *    <p> Turns off all motors instead of turning wheels back to 0 degrees
     * 
     ******************************************************************************************/
     public void stopWheels(){
@@ -626,9 +657,7 @@ public class Drive {
         frontRightWheel.setRotateMotorPower(0);
         rearLeftWheel.setRotateMotorPower(0);
         rearRightWheel.setRotateMotorPower(0);
-
     }
-
 
 
     /****************************************************************************************** 
@@ -641,10 +670,16 @@ public class Drive {
      * @return program status
      */
 	public int limelightPIDTargeting(TargetPipeline pipeline) {
-        //Sets the required pipeline
+        //Variables
 		double m_LimelightCalculatedPower = 0;
-        long currentMs = System.currentTimeMillis();
-        final long TIME_OUT = 5000;
+        long   currentMs = System.currentTimeMillis(); //Gets the current time
+
+        //Constants
+        final int  TIME_OUT_SEC   = 5;
+        final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
+
+        //Sets the required pipeline
+        changePipeline(pipeline);
 
 		if (limeLightFirstTime == true) {
             //Sets limeLightFirstTime to false
@@ -655,27 +690,26 @@ public class Drive {
             targetLockedCount = 0;
             
             //Sets and displays the forced time out
-			timeOut = currentMs + TIME_OUT;
-            System.out.println("Limelight timeOut " + timeOut / 1000 + " seconds");
+			timeOut = currentMs + TIME_OUT_MSEC;
+            System.out.println("Limelight timeOut " + TIME_OUT_SEC + " seconds");
             
             //Turns the limelight on
+            changeledMode(LEDState.ON);
 		}
 
 		// Whether the limelight has any valid targets (0 or 1)
-        double tv = limelightEntries.getEntry("tv").getDouble(0);
+        double tv = get_tv();
         //System.out.println("tv: " + tv);
 		// Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees) [54 degree tolerance]
-		double tx = limelightEntries.getEntry("tx").getDouble(0);
+		double tx = get_tx();
         //System.out.println("tx: " + tx);
 
-		/*// Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
-        double ty = limelightEntries.getEntry("ty").getDouble(0);
-        System.out.println("ty: " + ty);*/
+		// Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
+        //double ty = get_ty();
+        //System.out.println("ty: " + ty);
 		// Target Area (0% of image to 100% of image) [Basic way to determine distance]
-		// Use lidar for more acurate readings in future
-        //double ta = limelightEntries.getEntry("ta").getDouble(0);
+        //double ta = get_ta();
         //System.out.println("ta: " + ta);
-        //ta of 1.6% for the 10ft shot
 
 		if (tv < 1.0) {
             stopWheels();
@@ -694,20 +728,23 @@ public class Drive {
                 limeLightFirstTime = true;
                 targetController.reset();
 
+                //Stops the robot
                 stopWheels();
-                                
+                
+                //Turns LED's off
+                changeledMode(LEDState.OFF);
+
                 //Returns the error code for failure
 				return Robot.FAIL;
 			}
 		}
         else {
-            //Keeps the no target count at 0
+            //Keeps noTargetCount at 0
             noTargetCount = 0;
 		}
 
         // Rotate
-        // Need a -1 angle because limelight is slightly offset
-		m_LimelightCalculatedPower = targetController.calculate(tx, -1.0);
+		m_LimelightCalculatedPower = targetController.calculate(tx, 0.0);
         m_LimelightCalculatedPower = MathUtil.clamp(m_LimelightCalculatedPower, -0.50, 0.50);
 		teleopRotate(m_LimelightCalculatedPower * -1);
 		//System.out.println("Pid out: " + m_LimelightCalculatedPower);
@@ -726,7 +763,11 @@ public class Drive {
             limeLightFirstTime = true;
             targetController.reset();
             
+            //Stops the robot
 			stopWheels();
+
+            //Turns LED's off
+            changeledMode(LEDState.OFF);
 
             //System.out.println("On target or not moving");
 
@@ -736,20 +777,98 @@ public class Drive {
         
 		// limelight time out readjust
 		if (currentMs > timeOut) {
+            //Resets the variables
             targetLockedCount = 0;
             noTargetCount     = 0;
             limeLightFirstTime = true;
             targetController.reset();
             
+            //Stops the robot
             stopWheels();
-                        
+            
+            //Prints the timeout
             System.out.println("timeout " + tx + " Target Acquired " + tv);
+
+            //Turns LED's off
+            changeledMode(LEDState.OFF);
 
             //Returns the error code for failure
 			return Robot.FAIL;
         }
         
 		return Robot.CONT;   
+    }
+
+    /**
+     * Gets the value of tv
+     * @return validTarget
+     */
+    public double get_tv() {
+        return targetValid.getDouble(0.00);
+    }
+
+    /**
+     * Gets the value of tx
+     * @return xOffset
+     */
+    public double get_tx() {
+        return targetX.getDouble(0.00);
+    }
+
+    /**
+     * Gets the value of ty
+     * @return YOffset
+     */
+    public double get_ty() {
+        return targetY.getDouble(0.00);
+    }
+
+    /**
+     * Gets the value of ta
+     * @return area
+     */
+    public double get_ta() {
+        return targetArea.getDouble(0.00);
+    }
+
+    /**
+     * Chanegs the current pipeline on the Limelight
+     * @param pipelineName
+     */
+    public void changePipeline(TargetPipeline pipelineName) {
+        //Makes it a bit easier to change pipelines
+        if (pipelineName == TargetPipeline.ON_TARMAC) {
+            // Configures the limelight for on tarmac targeting
+            pipeline.setNumber(0);
+        }
+        else if (pipelineName == TargetPipeline.ON_TARMAC) {
+            // Configures the limelight for on tarmac targeting
+            pipeline.setNumber(1);
+        }
+        else {
+            // Configures the limelight to do nothing
+            pipeline.setNumber(2);
+        }
+    }
+
+    /**
+     * Changes the limelight LED mode
+     * @param state
+     */
+    public void changeledMode(LEDState mode) {
+        //Makes it easier to change the LED mode
+        if (mode == LEDState.ON) {
+            // Sets limelight to on
+            ledMode.setNumber(0);
+        }
+        else if (mode == LEDState.OFF) {
+            // Sets limelight to on
+            ledMode.setNumber(1);
+        }
+        else {
+            // Sets limelight to on
+            ledMode.setNumber(0);
+        }
     }
 
 
@@ -786,9 +905,10 @@ public class Drive {
     }
 
     public void testLimelightTargeting() {
-        System.out.print("tv: " + limelightEntries.getEntry("tv").getDouble(0) + "      |     ");
-        System.out.println("tx: " + limelightEntries.getEntry("tx").getDouble(0));
+        System.out.print("tv: " + targetValid.getDouble(0) + "      |     ");
+        System.out.println("tx: " + targetX.getDouble(0));
     }
 
+}
 
-} // End of the Drive Class
+// End of the Drive Class

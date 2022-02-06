@@ -11,11 +11,20 @@
       "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
-      "/SmartDashboard/Alliance Color": "String Chooser",
       "/SmartDashboard/Auto choices": "String Chooser"
+    },
+    "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
+    "FMSInfo": {
+      "open": true
+    },
     "TrackingValues": {
       "open": true
     },
