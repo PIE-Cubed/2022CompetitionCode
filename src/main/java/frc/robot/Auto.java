@@ -43,26 +43,39 @@ public class Auto {
             //121 degrees: shooter facing target at start
             //140 degrees: grabber facing ball
             case 1:
-                drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-                status = autoDelay(2500);
+                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
                 break;
             case 2:
+                status = autoDelay(3000);
+                break;
+            case 3:
                 System.out.println("Targeted");
                 grabber.deployRetract();
                 status = Robot.DONE;
                 break;
-            case 3:
+            case 4:
                 status = drive.autoRotate(152);
                 break;
-            case 4:
+            case 5:
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 5:
+            case 6:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 6:
+            case 7:
                 status = drive.autoCrabDrive(4, 0, 0.4);
+                break;
+            case 8:
+                status = autoDelay(1000);
+                break;
+            case 9:
+                grabber.deployRetract();
+                grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
+                status = Robot.DONE;
+                break;
+            case 10:
+                status = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
                 break;
             default:
                 //Finished routine
@@ -93,25 +106,38 @@ public class Auto {
 
         switch(step) {
             case 1:
-                //Placeholder for limelight targeting and shooting
-                status = autoDelay(5000);
+                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
                 break;
             case 2:
+                status = autoDelay(3000);
+                break;
+            case 3:
                 grabber.deployRetract();
                 status = Robot.DONE;
                 break;
-            case 3:
-                status = drive.autoRotate(152);
-                break;
             case 4:
+                status = drive.autoRotate(135);
+                break;
+            case 5:
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 5:
+            case 6:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 6:
+            case 7:
                 status = drive.autoCrabDrive(4, 0, 0.4);
+                break;
+            case 8:
+                status = autoDelay(1000);
+                break;
+            case 9:
+                grabber.deployRetract();
+                grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
+                status = Robot.DONE;
+                break;
+            case 10:
+                status = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
                 break;
             default:
                 //Finished routine
@@ -145,24 +171,35 @@ public class Auto {
                 status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
                 break;
             case 2:
+                status = autoDelay(3000);
+                break;
+            case 3:
                 grabber.deployRetract();
                 status = Robot.DONE;
                 break;
-            case 3:
+            case 4:
                 status = drive.autoRotate(90);
                 break;
-            case 4:
+            case 5:
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 5:
+            case 6:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 6:
+            case 7:
                 status = drive.autoCrabDrive(2.5, 0, 0.4);
                 break;
-            case 7:
+            case 8:
                 status = autoDelay(1000);
+                break;
+            case 9:
+                grabber.deployRetract();
+                grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
+                status = Robot.DONE;
+                break;
+            case 10:
+                status = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
                 break;
             default:
                 //Finished routine

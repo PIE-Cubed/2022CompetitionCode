@@ -731,11 +731,8 @@ public class Drive {
                 //Stops the robot
                 stopWheels();
                 
-                //Turns LED's off
-                changeledMode(LEDState.OFF);
-
                 //Returns the error code for failure
-				return Robot.FAIL;
+				return Robot.DONE;
 			}
 		}
         else {
@@ -765,11 +762,6 @@ public class Drive {
             
             //Stops the robot
 			stopWheels();
-
-            //Turns LED's off
-            changeledMode(LEDState.OFF);
-
-            //System.out.println("On target or not moving");
 
             //Returns the error code for success
 			return Robot.DONE;
@@ -841,7 +833,7 @@ public class Drive {
             // Configures the limelight for on tarmac targeting
             pipeline.setNumber(0);
         }
-        else if (pipelineName == TargetPipeline.ON_TARMAC) {
+        else if (pipelineName == TargetPipeline.OFF_TARMAC) {
             // Configures the limelight for on tarmac targeting
             pipeline.setNumber(1);
         }
