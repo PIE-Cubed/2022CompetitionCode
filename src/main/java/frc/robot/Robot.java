@@ -167,7 +167,8 @@ public class Robot extends TimedRobot {
    * Shouldn't ever do anything
    */
   public void disabledPeriodic() {
-    //Nothing yet...
+    //Turns off the limelight LEDs when the robot is disabled
+    drive.changeledMode(Drive.LEDState.OFF);
   }
 
   @Override
@@ -194,8 +195,6 @@ public class Robot extends TimedRobot {
     //drive.testRotate();
     //drive.testWheelAngle();
     cargoTracking.faceCargo();
-    
-    System.out.println("E: " + cargoTracking.checkPieplineEmpty() + " R: " + cargoTracking.checkRedAlliance() + " EC: " + cargoTracking.emptyCounter() + " CX: " + cargoTracking.targetPosition());
   }
 
   /**
