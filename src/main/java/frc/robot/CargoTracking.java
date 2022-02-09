@@ -85,6 +85,10 @@ public class CargoTracking {
 			//Rotate with PID
 			m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
 			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
+
+			// Negates power beacuse it's going the wrong way
+			m_CargoCalculatedPower = m_CargoCalculatedPower * -1;
+
 			drive.teleopRotate(m_CargoCalculatedPower);
 		}
 		else if (isFull == false) {
