@@ -159,14 +159,49 @@ public class CargoTracking {
 		return turn;
 	}
 
-  /**
-   * Determines if the alliance color is red or not
-   * @param isRed
-   */
-  public void setRedAlliance(boolean isRed) {
-    //Sets the NetworkTable variable color to the selected alliance color
-	isRedAlliance.setBoolean(isRed);
-  }
+	/**
+	 * Determines if the alliance color is red or not
+	 * @param isRed
+	 */
+	public void setRedAlliance(boolean isRed) {
+		//Sets the NetworkTable variable color to the selected alliance color
+		isRedAlliance.setBoolean(isRed);
+	}
+	
+	/**
+	 * TEST FUNCTIONS
+	 */
+	/**
+	 * Returns the isEmpty entry
+	 * @return isEmpty
+	 */
+	public boolean checkPieplineEmpty() {
+		return empty.getBoolean(true);
+	}
+
+	/**
+	 * Returns the isRedAlliance entry
+	 * @return
+	 */
+	public boolean checkRedAlliance() {
+		return isRedAlliance.getBoolean(false);
+	}
+
+	/**
+	 * Returns the emptyCount entry
+	 * @return
+	 */
+	public double emptyCounter() {
+		return empty.getDouble(0.00);
+	}
+
+	/**
+	 * Returns the centerX entry
+	 * @return
+	 */
+	public double targetPosition() {
+		return target.getDouble(0.00);
+	}
 
 }
 

@@ -189,12 +189,13 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    cargoTracking.faceCargo();
     //grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
-    //cargoTracking.faceCargo();
+    cargoTracking.faceCargo();
+    
+    System.out.println("E: " + cargoTracking.checkPieplineEmpty() + " R: " + cargoTracking.checkRedAlliance() + " EC: " + cargoTracking.emptyCounter() + " CX: " + cargoTracking.targetPosition());
   }
 
   /**
