@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -9,7 +10,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class Climber {
     //Spark Max ID for the climber
-    private final int CLIMBER_SPARKMAX_ID = 19; 
+    private final int CLIMBER_SPARKMAX_ID = 21; 
     private CANSparkMax climberMotor; 
 
     //Double Solenoid for the claws
@@ -34,6 +35,7 @@ public class Climber {
     public Climber() {
         //The Motor
         climberMotor = new CANSparkMax(CLIMBER_SPARKMAX_ID, MotorType.kBrushless);
+        climberMotor.setIdleMode(IdleMode.kBrake);
         climberMotor.setSmartCurrentLimit(60);
         climberMotor.set(0.0);
 

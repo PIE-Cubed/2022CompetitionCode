@@ -22,7 +22,8 @@ public class Robot extends TimedRobot {
   Drive         drive;
   Controls      controls;
   Grabber       grabber;
-  Climber       climber;
+  //Climber       climber;
+  Shooter       shooter;
   CargoTracking cargoTracking;
   Auto          auto;
 
@@ -49,7 +50,8 @@ public class Robot extends TimedRobot {
     drive         = new Drive();
     grabber       = new Grabber();
     controls      = new Controls();
-    climber       = new Climber();
+    //climber       = new Climber();
+    shooter       = new Shooter();
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber);
 
@@ -194,7 +196,8 @@ public class Robot extends TimedRobot {
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
-    cargoTracking.faceCargo();
+    //cargoTracking.faceCargo();
+    shooter.testShooter(.60);
   }
 
   /**
@@ -243,13 +246,14 @@ public class Robot extends TimedRobot {
     boolean toggleClaw2  = controls.getClimberClaw2();
     double  climberPower = controls.getClimberPower();
 
+    /*
     if (toggleClaw1 == true) {
       climber.claw1Toggle();
     }
     if (toggleClaw2 == true) {
       climber.claw2Toggle();
     }
-    climber.climberRotate(climberPower);
+    climber.climberRotate(climberPower);*/
   }
 
   /**

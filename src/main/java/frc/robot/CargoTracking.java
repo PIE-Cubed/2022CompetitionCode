@@ -78,7 +78,6 @@ public class CargoTracking {
 		double  turnAngle;
 		double  m_CargoCalculatedPower = 0.00;
 		boolean isNotFull = isEmpty.getBoolean(true);
-		isNotFull = false; //for simulation purposes
 
 		// Calls the cargoDetection method
 		turnAngle = cargoDetection();
@@ -125,9 +124,7 @@ public class CargoTracking {
 	
 		// Sets the double variables
 		pipelineEmpty = isEmpty.getBoolean(true);
-		pipelineEmpty = false; //for simulation purposes
 		centerX       = target.getDouble(0.00);
-		centerX = 120; //for simulation purposes
 		emptyCount    = empty.getDouble(0.00);
 	
 		// Ignores the 25 pixels on the edges
