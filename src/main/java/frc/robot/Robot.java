@@ -81,9 +81,6 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    SmartDashboard.putNumber("Front motor power", 0.2);
-    SmartDashboard.putNumber("Rear motor power", 0.2);
-
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
     

@@ -7,7 +7,6 @@ import java.util.stream.DoubleStream;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
-
 import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -70,6 +69,20 @@ public class Drive {
     private final double ticksPerFoot = 5.65;
 
 
+    //BLUE ROBOT
+    private static final double FR_OFFSET = 248;
+    private static final double FL_OFFSET = 309.8;
+    private static final double BR_OFFSET = -65.2;
+    private static final double BL_OFFSET = 165.7;
+
+    //Yellow ROBOT
+    /*
+    private static final double FR_OFFSET = 248;
+    private static final double FL_OFFSET = 309.8;
+    private static final double BR_OFFSET = -65.2;
+    private static final double BL_OFFSET = 165.7;
+    */
+
 	//Limelight Variables
     private int     noTargetCount      = 0;
     private int     targetLockedCount  = 0;
@@ -119,22 +132,22 @@ public class Drive {
                           17, // ROTATE MOTOR ID
                           3, // ROTATE SENSOR ID
                           (-1 * rotateMotorAngleRad), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                          248), //Offset
+                          FR_OFFSET), //Offset
         FRONT_LEFT_WHEEL(10, // DRIVE MOTOR ID
                          11, // ROTATE MOTOR ID
                          0, // ROTATE SENSOR ID
                          (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                         309.8), //Offset
+                         FL_OFFSET), //Offset
         REAR_RIGHT_WHEEL(14, // DRIVE MOTOR ID
                          15, // ROTATE MOTOR ID
                          2, // ROTATE SENSOR ID
                          (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                         -65.2), //Offset
+                         BR_OFFSET), //Offset
         REAR_LEFT_WHEEL(12, // DRIVE MOTOR ID
                         13, // ROTATE MOTOR ID
                         1, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad + (Math.PI)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                        165.7); //Offset
+                        BL_OFFSET); //Offset
 
         private int driveMotorId;
         private int rotateMotorId;
@@ -241,7 +254,6 @@ public class Drive {
     * 
     ******************************************************************************************/
     public Drive() {
-
         //NavX
         try {
             ahrs = new AHRS(SPI.Port.kMXP);
