@@ -135,6 +135,9 @@ public class Controls {
         if (joystick.getTrigger() && joystick.getRawButton(4)) {
             return Shooter.ShootLocation.LOW_SHOT;
         }
+        else if (joystick.getTrigger() && joystick.getRawButton(6)) {
+            return Shooter.ShootLocation.LAUNCH_PAD;
+        }
         else if (joystick.getTrigger()) {
             return Shooter.ShootLocation.HIGH_SHOT;
         }

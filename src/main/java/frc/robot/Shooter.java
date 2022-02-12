@@ -38,19 +38,33 @@ public class Shooter {
 
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
-	public final double HIGH_SHOT_REAR_POWER  = 0.525;
-	public final double HIGH_SHOT_FRONT_POWER = -0.525;
-	public final double LOW_SHOT_REAR_POWER   = 0.25;
-	public final double LOW_SHOT_FRONT_POWER  = -0.25;
+
+	public final double HIGH_SHOT_REAR_POWER   = 0.525;
+	public final double HIGH_SHOT_FRONT_POWER  = -0.525;
+
+	public final double LOW_SHOT_REAR_POWER    = 0.25;
+	public final double LOW_SHOT_FRONT_POWER   = -0.25;
+
+	public final double LAUNCH_PAD_REAR_POWER  = 0.65;
+	public final double LAUNCH_PAD_FRONT_POWER = -0.65;
+
+	public final double AUTO_RING_REAR_POWER   = 0.5;
+	public final double AUTO_RING_FRONT_POWER  = -0.5;
 
 	// RPM CONSTANTS
-	public final double OFF_TARGET_RPM             = 0;
-	public final double HIGH_SHOT_REAR_TARGET_RPM  = 2980;
-	public final double HIGH_SHOT_FRONT_TARGET_RPM = 2980;
-	public final double LOW_SHOT_REAR_TARGET_RPM   = 1650;
-	public final double LOW_SHOT_FRONT_TARGET_RPM  = 1650;
+	public final double OFF_TARGET_RPM              = 0;
 
-	//Add auto exclusive values and a long shot
+	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2980;
+	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2980;
+
+	public final double LOW_SHOT_REAR_TARGET_RPM    = 1650;
+	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1650;
+
+	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3500;
+	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3500;
+
+	public final double AUTO_RING_REAR_TARGET_RPM   = 2750;
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 2750;
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
@@ -67,6 +81,8 @@ public class Shooter {
 	public static enum ShootLocation {
 		HIGH_SHOT,
 		LOW_SHOT,
+		LAUNCH_PAD,
+		AUTO_RING,
 		OFF;
 	}
 
@@ -144,6 +160,22 @@ public class Shooter {
 			frontPower          = LOW_SHOT_FRONT_POWER;
 			rearPower           = LOW_SHOT_REAR_POWER;
 		}
+		else if (location == ShootLocation.LAUNCH_PAD) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LAUNCH_PAD_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LAUNCH_PAD_REAR_TARGET_RPM);
+			frontTargetVelocity = LAUNCH_PAD_FRONT_TARGET_RPM;
+			rearTargetVelocity  = LAUNCH_PAD_REAR_TARGET_RPM;
+			frontPower          = LAUNCH_PAD_FRONT_POWER;
+			rearPower           = LAUNCH_PAD_REAR_POWER;
+		}
+		else if (location == ShootLocation.AUTO_RING) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), AUTO_RING_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , AUTO_RING_REAR_TARGET_RPM);
+			frontTargetVelocity = AUTO_RING_FRONT_TARGET_RPM;
+			rearTargetVelocity  = AUTO_RING_REAR_TARGET_RPM;
+			frontPower          = AUTO_RING_FRONT_POWER;
+			rearPower           = AUTO_RING_REAR_POWER;
+		}
 		else {
 			frontPowerError     = OFF_POWER;
 			rearPowerError      = OFF_POWER;
@@ -154,8 +186,8 @@ public class Shooter {
 		}
 
 		//Increments shooter powers by PID-calculated error
-		frontPower = frontPower + frontPowerError;
-		frontPower = MathUtil.clamp(frontPower, 0.0, 1.0);
+		frontPower = frontPower - frontPowerError;
+		frontPower = MathUtil.clamp(frontPower, -1.0, 0.0);
 		rearPower  = rearPower + rearPowerError;
 		rearPower  = MathUtil.clamp(rearPower, 0.0, 1.0);
 
@@ -195,6 +227,18 @@ public class Shooter {
 			frontShooter.set(LOW_SHOT_FRONT_POWER);
 			rearTargetVelocity  = LOW_SHOT_REAR_TARGET_RPM;
 			frontTargetVelocity = LOW_SHOT_FRONT_TARGET_RPM;
+		}
+		else if (location == ShootLocation.LAUNCH_PAD) {
+			rearShooter .set(LAUNCH_PAD_REAR_POWER);
+			frontShooter.set(LAUNCH_PAD_FRONT_POWER);
+			rearTargetVelocity  = LAUNCH_PAD_REAR_TARGET_RPM;
+			frontTargetVelocity = LAUNCH_PAD_FRONT_TARGET_RPM;
+		}
+		else if (location == ShootLocation.AUTO_RING) {
+			rearShooter .set(AUTO_RING_REAR_POWER);
+			frontShooter.set(AUTO_RING_FRONT_POWER);
+			rearTargetVelocity  = AUTO_RING_REAR_TARGET_RPM;
+			frontTargetVelocity = AUTO_RING_FRONT_TARGET_RPM;
 		}
 		else {
 			rearShooter.set(OFF_POWER);

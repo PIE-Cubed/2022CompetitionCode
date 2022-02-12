@@ -266,10 +266,10 @@ public class Robot extends TimedRobot {
       driveMode = DriveMode.MANUAL;
     }
     else {
-      shooter.manualShooterControl(shootLocation);
+      shooter.autoShooterControl(shootLocation);
 
       //Only does limelight targetting at far away shots
-      if (shootLocation == Shooter.ShootLocation.HIGH_SHOT) {
+      if ((shootLocation == Shooter.ShootLocation.HIGH_SHOT) || (shootLocation == Shooter.ShootLocation.LAUNCH_PAD)) {
         driveMode = DriveMode.LIMELIGHT;
       }
 

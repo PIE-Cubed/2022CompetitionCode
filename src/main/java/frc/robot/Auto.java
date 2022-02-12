@@ -232,8 +232,8 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
+                shooter.manualShooterControl(Shooter.ShootLocation.AUTO_RING);
                 drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-                shooter.manualShooterControl(Shooter.ShootLocation.HIGH_SHOT);
                 status = Robot.DONE;
                 break;
             case 2:
@@ -243,11 +243,11 @@ public class Auto {
                 else {
                     status = Robot.CONT;
                 }
-                shooter.manualShooterControl(Shooter.ShootLocation.HIGH_SHOT);
+                shooter.manualShooterControl(Shooter.ShootLocation.AUTO_RING);
                 drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
                 break;
             case 3:
-                shooter.manualShooterControl(Shooter.ShootLocation.HIGH_SHOT);
+                shooter.manualShooterControl(Shooter.ShootLocation.AUTO_RING);
                 status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
                 break;
             case 4:
