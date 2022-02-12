@@ -3,44 +3,66 @@ package frc.robot;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
+	//2 holes above marked one
+	//Low shot against hub- 0.25 speed, 1380-1500 rpm
+	//High shot from edge of tarmac- 0.5 speed, 3800-4000 rpm
+
+	//3 holes above marked one
+	//Low against hub- 0.3 speed, 1650-1750 rpm
+	//High from edge of tarmac- 0.525 speed, 2980-3100 rpm
+
 	
 	// SPARK MAX
-	private CANSparkMax leftShooter;
-	private CANSparkMax rightShooter;
+	private CANSparkMax frontShooter;
+	private CANSparkMax rearShooter;
 
 	// SPARK MAX ID's
-	private int LEFT_SHOOTER_ID  = 19;
-	private int RIGHT_SHOOTER_ID = 21;
+	private int FRONT_SHOOTER_ID  = 19; //front
+	private int REAR_SHOOTER_ID = 20; //right-->rear
+
+	//Double solenoid
+	private DoubleSolenoid feeder;
+	private int FEEDER_DEPLOY_ID  = 3;
+	private int FEEDER_RETRACT_ID = 7;
 
 	// Encoders
-	private RelativeEncoder leftShooterEncoder;
-	private RelativeEncoder rightShooterEncoder;
+	private RelativeEncoder frontShooterEncoder;
+	private RelativeEncoder rearShooterEncoder;
 
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
-	public final double HIGH_SHOT_RIGHT_POWER = -0.70;
-	public final double HIGH_SHOT_LEFT_POWER = -0.70;
-	public final double LOW_SHOT_RIGHT_POWER  = -0.40;
-	public final double LOW_SHOT_LEFT_POWER  = -0.40;
+	public final double HIGH_SHOT_REAR_POWER  = 0.525;
+	public final double HIGH_SHOT_FRONT_POWER = -0.525;
+	public final double LOW_SHOT_REAR_POWER   = 0.25;
+	public final double LOW_SHOT_FRONT_POWER  = -0.25;
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM             = 0;
-	public final double HIGH_SHOT_RIGHT_TARGET_RPM = 4000;
-	public final double HIGH_SHOT_LEFT_TARGET_RPM  = 4000;
-	public final double LOW_SHOT_RIGHT_TARGET_RPM  = 2000;
-	public final double LOW_SHOT_LEFT_TARGET_RPM   = 2000;
+	public final double HIGH_SHOT_REAR_TARGET_RPM  = 2980;
+	public final double HIGH_SHOT_FRONT_TARGET_RPM = 2980;
+	public final double LOW_SHOT_REAR_TARGET_RPM   = 1650;
+	public final double LOW_SHOT_FRONT_TARGET_RPM  = 1650;
+
+	//Add auto exclusive values and a long shot
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
 
 	// Variables
-	public  double                leftTargetVelocity;
-	public  double                rightTargetVelocity;
+	public  double                frontTargetVelocity;
+	public  double                rearTargetVelocity;
 	private int                   targetCount        = 0;
-	Shooter.ShootLocation         startPosition      = Shooter.ShootLocation.OFF;
+	private int                   noTargetCount      = 0;
+	private double                frontPower         = 0;
+	private double                rearPower          = 0;
+	private boolean               feederDeployed     = false;
 
 	public static enum ShootLocation {
 		HIGH_SHOT,
@@ -70,24 +92,26 @@ public class Shooter {
     ******************************************************************************************/
 	public Shooter() {
 		// SPARK Max
-		leftShooter    = new CANSparkMax(LEFT_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
-		rightShooter   = new CANSparkMax(RIGHT_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
+		frontShooter  = new CANSparkMax(FRONT_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
+		rearShooter   = new CANSparkMax(REAR_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
+
+		//Create double solenoid and retract it
 
 		// Sets the current limtis for the motors
-		leftShooter .setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
-		rightShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
+		frontShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
+		rearShooter .setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
 
 		// Sets the mode of the motors (if this works in the code)
-		leftShooter. setIdleMode(CANSparkMax.IdleMode.kCoast);
-		rightShooter.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		frontShooter.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		rearShooter .setIdleMode(CANSparkMax.IdleMode.kCoast);
 		
 		// Set Shooter related motors to off to Start the Match
-		leftShooter .set(0.0);
-		rightShooter.set(0.0);
+		frontShooter.set(0.0);
+		rearShooter .set(0.0);
 
 		// Encoders
-		leftShooterEncoder  = leftShooter.getEncoder();
-		rightShooterEncoder = rightShooter.getEncoder();
+		frontShooterEncoder = frontShooter.getEncoder();
+		rearShooterEncoder  = rearShooter.getEncoder();
 
 		// PID Controller
 		shooterController = new PIDController(kP, kI, kD);
@@ -100,39 +124,50 @@ public class Shooter {
 	*    Uses PID to get shooter to appropriate speed for given shot
     *   
 	******************************************************************************************/
-	/*
 	public void autoShooterControl(ShootLocation location) {
-		shotLocation = location;
-		double  powerError;
-		double  power;
-
-		if (location == ShootLocation.OFF) {
-			powerError     = OFF_POWER;
-			targetVelocity = OFF_TARGET_RPM;
-			targetPower    = OFF_POWER;
+		double frontPowerError;
+		double rearPowerError;
+		
+		if (location == ShootLocation.HIGH_SHOT) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), HIGH_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , HIGH_SHOT_REAR_TARGET_RPM);
+			frontTargetVelocity = HIGH_SHOT_FRONT_TARGET_RPM;
+			rearTargetVelocity  = HIGH_SHOT_REAR_TARGET_RPM;
+			frontPower          = HIGH_SHOT_FRONT_POWER;
+			rearPower           = HIGH_SHOT_REAR_POWER;
 		}
-		else if ( ((location == ShootLocation.TEN_FOOT) || (location == ShootLocation.TRENCH)) || (location == ShootLocation.HAIL_MARY) ) {
-			powerError     = shooterController.calculate( getabsRPM(LEFT_SHOOTER_ID), SHOOT_TARGET_RPM);
-			targetVelocity = SHOOT_TARGET_RPM;
-			targetPower    = SHOOT_POWER;
+		else if (location == ShootLocation.LOW_SHOT) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LOW_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LOW_SHOT_REAR_TARGET_RPM);
+			frontTargetVelocity = LOW_SHOT_FRONT_TARGET_RPM;
+			rearTargetVelocity  = LOW_SHOT_REAR_TARGET_RPM;
+			frontPower          = LOW_SHOT_FRONT_POWER;
+			rearPower           = LOW_SHOT_REAR_POWER;
 		}
 		else {
-			powerError     = OFF_POWER;
-			targetVelocity = OFF_TARGET_RPM;
-			targetPower    = OFF_POWER;
+			frontPowerError     = OFF_POWER;
+			rearPowerError      = OFF_POWER;
+			frontTargetVelocity = OFF_TARGET_RPM;
+			rearTargetVelocity  = OFF_TARGET_RPM;
+			frontPower          = OFF_POWER;
+			rearPower           = OFF_POWER;
 		}
 
-		power = targetPower + powerError;
-		power = MathUtil.clamp(power, 0.0, 1.0);
-		
-		System.out.println("power:" + power);
-		System.out.println("rpm:" + getabsRPM(LEFT_SHOOTER_ID));
-		
-		SmartDashboard.putNumber("power", power);
-		SmartDashboard.putNumber("rpm", getabsRPM(LEFT_SHOOTER_ID));
+		//Increments shooter powers by PID-calculated error
+		frontPower = frontPower + frontPowerError;
+		frontPower = MathUtil.clamp(frontPower, 0.0, 1.0);
+		rearPower  = rearPower + rearPowerError;
+		rearPower  = MathUtil.clamp(rearPower, 0.0, 1.0);
 
-		rightShooter.set(power);
-	}*/
+		//Displays powers and rpms to smartdashboard
+		SmartDashboard.putNumber("Front power", frontPower);
+		SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
+		SmartDashboard.putNumber("Rear power", rearPower);
+		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+
+		frontShooter.set(frontPower);
+		rearShooter.set(rearPower);
+	}
 
 
 	/****************************************************************************************** 
@@ -144,28 +179,28 @@ public class Shooter {
 	public void manualShooterControl(ShootLocation location) {
 											
 	if (location == ShootLocation.OFF) {
-			rightShooter.set(OFF_POWER);
-			leftShooter.set(OFF_POWER);
-			rightTargetVelocity = OFF_TARGET_RPM;
-			leftTargetVelocity  = OFF_TARGET_RPM;
+			rearShooter .set(OFF_POWER);
+			frontShooter.set(OFF_POWER);
+			rearTargetVelocity  = OFF_TARGET_RPM;
+			frontTargetVelocity = OFF_TARGET_RPM;
 		}
 		else if (location == ShootLocation.HIGH_SHOT) {
-			rightShooter.set(HIGH_SHOT_RIGHT_POWER);
-			leftShooter.set(HIGH_SHOT_LEFT_POWER);
-			rightTargetVelocity = HIGH_SHOT_RIGHT_TARGET_RPM;
-			leftTargetVelocity  = HIGH_SHOT_LEFT_TARGET_RPM;
+			rearShooter .set(HIGH_SHOT_REAR_POWER);
+			frontShooter.set(HIGH_SHOT_FRONT_POWER);
+			rearTargetVelocity  = HIGH_SHOT_REAR_TARGET_RPM;
+			frontTargetVelocity = HIGH_SHOT_FRONT_TARGET_RPM;
 		}
 		else if (location == ShootLocation.LOW_SHOT) {
-			rightShooter.set(LOW_SHOT_RIGHT_POWER);
-			leftShooter.set(LOW_SHOT_LEFT_POWER);
-			rightTargetVelocity = LOW_SHOT_RIGHT_TARGET_RPM;
-			leftTargetVelocity  = LOW_SHOT_LEFT_TARGET_RPM;
+			rearShooter .set(LOW_SHOT_REAR_POWER);
+			frontShooter.set(LOW_SHOT_FRONT_POWER);
+			rearTargetVelocity  = LOW_SHOT_REAR_TARGET_RPM;
+			frontTargetVelocity = LOW_SHOT_FRONT_TARGET_RPM;
 		}
 		else {
-			rightShooter.set(OFF_POWER);
-			leftShooter.set(OFF_POWER);
-			rightTargetVelocity = OFF_TARGET_RPM;
-			leftTargetVelocity  = OFF_TARGET_RPM;
+			rearShooter.set(OFF_POWER);
+			frontShooter.set(OFF_POWER);
+			rearTargetVelocity  = OFF_TARGET_RPM;
+			frontTargetVelocity = OFF_TARGET_RPM;
 		}
 	}
 
@@ -177,13 +212,20 @@ public class Shooter {
     *   
     ******************************************************************************************/
 	public boolean shooterReady() {
-		double rightRpm;
-		double leftRpm;
-		rightRpm = getabsRPM(RIGHT_SHOOTER_ID);
-		leftRpm  = getabsRPM(LEFT_SHOOTER_ID);
-				
-		if ( (rightRpm > rightTargetVelocity) && (leftRpm > leftTargetVelocity))  {
+		double rearRpm;
+		double frontRpm;
+		rearRpm  = getabsRPM(REAR_SHOOTER_ID);
+		frontRpm = getabsRPM(FRONT_SHOOTER_ID);
+
+		double rearLowerLimit  = rearTargetVelocity  - 100;
+		double rearUpperLimit  = rearTargetVelocity  + 100;
+		double frontLowerLimit = frontTargetVelocity - 100;
+		double frontUpperLimit = frontTargetVelocity + 100;
+
+		if ((rearRpm  > rearLowerLimit  && rearRpm < rearUpperLimit) && 
+			(frontRpm > frontLowerLimit && frontRpm < frontUpperLimit))  {
 			targetCount ++;
+			noTargetCount = 0;
 			
 			if(targetCount >= 5) { 
 				return true;
@@ -193,12 +235,47 @@ public class Shooter {
 			}
 		}
 		else {
+			noTargetCount ++;
 			targetCount = 0;
-			return false;
+
+			//Timeout, shoots to clear system, better than holding ball
+			if (noTargetCount >= 300) {
+				System.out.println("Not up to speed. Check battery or PID");
+				System.out.println("Front rpm: " + frontRpm + "front target rpm: " + frontTargetVelocity);
+				System.out.println("Rear rpm: " + rearRpm + "rear target rpm: " + rearTargetVelocity);
+
+				//Resets noTargetCount once it has been shooting for 150 iterations
+				if (noTargetCount >= 450) {
+					noTargetCount = 0;
+					return false;
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 
+	/****************************************************************************************** 
+    *
+    *    deployFeeder()
+	*    Deploys feeder
+    *   
+    ******************************************************************************************/
+	public void deployFeeder() {
+		//deploy feeder if not already deployed
+	}
 
+	/****************************************************************************************** 
+    *
+    *    retractFeeder()
+	*    Retracts feeder
+    *   
+    ******************************************************************************************/
+	public void retractFeeder() {
+		//retract feeder if not already retracted
+	}
 
 	/**
 	 * DEBUG / TEST FUNCTIONS
@@ -209,63 +286,31 @@ public class Shooter {
 	 * @param power
 	 */
 	public void testShoooter(double power) {
-		leftShooter.set(power);
-		rightShooter.set(power);
-
-		System.out.println("Power: " + power + " RPM: " + getabsRPM(LEFT_SHOOTER_ID));
-	}
-
-	/**
-	 * Prints the speed of the wheel
-	 */
-	public void printSpeed() {
-		double π = Math.PI;
-		double wheel_size = 6;                                                 // Wheel diameter Inches 
-
-		double RPM = (getabsRPM(LEFT_SHOOTER_ID) + getabsRPM(RIGHT_SHOOTER_ID) ) / 2; // Rotations per minute average
-		double RPH = RPM / 60;                                                 // Rotations per hour
-		
-		double circumferenceInches = wheel_size * π;                           // Circumference in Inches
-		double circumferenceFeet = circumferenceInches / 12;                   // Circumference in Feet
-		double circumferenceMiles = circumferenceFeet / 5280;                  // Circumference in Miles
-
-		double MPH = RPH * circumferenceMiles;                                 // Miles Per Hour
-
-		if (RPM > 0) { 
-			//System.out.println("MPH: " + MPH);
-			if (MPH != 0) {
-				System.out.println("RPM 1: " + getabsRPM(LEFT_SHOOTER_ID));
-				System.out.println("RPM 2: " + getabsRPM(RIGHT_SHOOTER_ID));
-			}
-		}
+		frontShooter.set(power);
+		rearShooter .set(power);
+		System.out.println("Power: " + power + " RPM: " + getabsRPM(FRONT_SHOOTER_ID));
 	}
 
 	public void enableShooterFullPower() {
-		leftShooter.set(1.00);
-		rightShooter.set(1.00);
+		frontShooter.set(1.00);
+		rearShooter.set(1.00);
 
-		System.out.println("RPM 1: " + getabsRPM(LEFT_SHOOTER_ID));
-		System.out.println("RPM 2: " + getabsRPM(RIGHT_SHOOTER_ID));
-	}
-
-	/**
-	 * Debug function to enable shooting motors 
-	 */
-	public void testShooter(double power) {
-		rightShooter.set(-1 * .25);
-		leftShooter.set(1.00);
+		System.out.println("RPM 1: " + getabsRPM(FRONT_SHOOTER_ID));
+		System.out.println("RPM 2: " + getabsRPM(REAR_SHOOTER_ID));
 	}
 
 	/**
 	 * Debug function to disable all motors that are controlled by this class
 	 */
 	public void disableShooter(){
-		disableRightShooterMotor();
+		frontShooter.set(0);
+		rearShooter.set(0);
+		retractFeeder();
 	}
 
-	public void disableRightShooterMotor() { //Was disableShooterMotor2
-		rightShooter.set(0.00);
-		leftShooter.set(0.00);
+	public void disableRearShooterMotor() { //Was disableShooterMotor2
+		rearShooter .set(0.00);
+		frontShooter.set(0.00);
 	}
 
 	/**
@@ -279,15 +324,13 @@ public class Shooter {
 
 	private double shooter1RPM() {
 		double rpm;
-		rpm = getabsRPM(LEFT_SHOOTER_ID);
-		
+		rpm = getabsRPM(FRONT_SHOOTER_ID);
 		return rpm;
 	}
 
 	private double shooter2RPM() {
 		double rpm;
-		rpm = getabsRPM(RIGHT_SHOOTER_ID);
-		
+		rpm = getabsRPM(REAR_SHOOTER_ID);
 		return rpm;
 	}
 
@@ -299,11 +342,11 @@ public class Shooter {
 		double rpm;
 		double absRPM;
 
-		if (MOTOR_CAN_ID == LEFT_SHOOTER_ID) {
-			rpm = leftShooterEncoder.getVelocity();
+		if (MOTOR_CAN_ID == FRONT_SHOOTER_ID) {
+			rpm = frontShooterEncoder.getVelocity();
 		}
-		else if (MOTOR_CAN_ID == RIGHT_SHOOTER_ID) {
-			rpm = rightShooterEncoder.getVelocity();
+		else if (MOTOR_CAN_ID == REAR_SHOOTER_ID) {
+			rpm = rearShooterEncoder.getVelocity();
 		}
 		else {
 			//It should never come to this case
@@ -311,7 +354,6 @@ public class Shooter {
 		}
 
 		absRPM = Math.abs(rpm);
-
 		return absRPM;
 	}
 
@@ -320,12 +362,11 @@ public class Shooter {
    *    Test functions for shooter 
    * 
    ******************************************************************************************/
-	public void testShootMotors(double power) {
-		//Shooter motor 1 (left motor) needs to be negative to shoot a ball
-		//Shooter motor 2 (right motor) needs to be positive to shoot a ball
-		//leftShooter.set(-power);
-		leftShooter.follow(rightShooter, true); //put in the constructor
-		rightShooter.set(power);
-		System.out.println("Shooter motor power: " + rightShooter.getOutputCurrent());
+	public void testShootMotors(double powerF, double powerR) {
+		//Shooter motor 1 (front motor) needs to be negative to shoot a ball
+		//Shooter motor 2 (rear motor) needs to be positive to shoot a ball
+		frontShooter.set(-powerF);
+		rearShooter.set(powerR);
+		System.out.println("Front RPM: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear RPM: " + getabsRPM(REAR_SHOOTER_ID));
 	}
 } //End of the Shooter Class

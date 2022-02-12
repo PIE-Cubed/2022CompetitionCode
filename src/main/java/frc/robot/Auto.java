@@ -9,6 +9,7 @@ public class Auto {
 
     Drive   drive;
     Grabber grabber;
+    Shooter shooter;
 
     // First Time variables 
 	private boolean   firstTime        = true;
@@ -22,9 +23,10 @@ public class Auto {
      * @param drive
      * @param grabber
      */
-    public Auto(Drive drive, Grabber grabber){
-        this.drive    = drive;
-		this.grabber  = grabber;
+    public Auto(Drive drive, Grabber grabber, Shooter shooter){
+        this.drive   = drive;
+		this.grabber = grabber;
+        this.shooter = shooter;
     }
 
     /**
@@ -231,32 +233,30 @@ public class Auto {
         switch(shootStep) {
             case 1:
                 drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-                //shooter.manualShooterControl(ShootLocation.HIGH_SHOT);
+                shooter.manualShooterControl(Shooter.ShootLocation.HIGH_SHOT);
                 status = Robot.DONE;
                 break;
             case 2:
-                //if (shooter.shooterReady()) {
-                //    status = Robot.DONE;
-                //}
-                //else {
-                //    status = Robot.CONT;
-                //}
-                //shooter.manualShooterControl(ShootLocation.HIGH_SHOT);
+                if (shooter.shooterReady()) {
+                    status = Robot.DONE;
+                }
+                else {
+                    status = Robot.CONT;
+                }
+                shooter.manualShooterControl(Shooter.ShootLocation.HIGH_SHOT);
                 drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-                status = Robot.DONE;
                 break;
             case 3:
-                //shooter.manualShooterControl(ShootLocation.HIGH_SHOT);
+                shooter.manualShooterControl(Shooter.ShootLocation.HIGH_SHOT);
                 status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
                 break;
             case 4:
+                shooter.deployFeeder();
                 status = autoDelay(1000);
-                //shooter.manualBallFeederControl(Shooter.BallFeederDirection.FORWARD);
                 break;
             default:
                 //Finished routine
-                //shooter.disableBallFeeder();
-                //shooter.disableShooter();
+                shooter.disableShooter();
                 shootStep = 1;
                 shootFirstTime = true;
                 return Robot.DONE;

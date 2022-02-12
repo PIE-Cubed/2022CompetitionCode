@@ -35,6 +35,13 @@ public class Robot extends TimedRobot {
 
   private int status = CONT;
 
+  //Enumeration for manual or limelight control
+  private static enum DriveMode {
+    MANUAL,
+    LIMELIGHT;
+  }
+  private DriveMode driveMode = DriveMode.MANUAL;
+
   //Auto path
   private static final String kCenterAuto = "Center";
   private static final String kWallAuto   = "Wall";
@@ -53,7 +60,7 @@ public class Robot extends TimedRobot {
     //climber       = new Climber();
     shooter       = new Shooter();
     cargoTracking = new CargoTracking(drive);
-    auto          = new Auto(drive, grabber);
+    auto          = new Auto(drive, grabber, shooter);
 
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -73,6 +80,9 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("Wall Auto", kWallAuto);
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    SmartDashboard.putNumber("Front motor power", 0.2);
+    SmartDashboard.putNumber("Rear motor power", 0.2);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
@@ -192,7 +202,8 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    cargoTracking.faceCargo();
+    shooter.testShootMotors(SmartDashboard.getNumber("Front motor power", 0.5), SmartDashboard.getNumber("Rear motor power", 0.5));
+    //cargoTracking.faceCargo();
     //grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
     //drive.testLimelightTargeting();
     //drive.testRotate();
@@ -209,33 +220,66 @@ public class Robot extends TimedRobot {
     double driveY      = controls.getDriveY();
     double rotatePower = controls.getRotatePower();
 
-    //Drives if we are out of dead zone
-    if ((Math.abs(driveX) > 0) ||
-        (Math.abs(driveY) > 0) || 
-        (Math.abs(rotatePower) > 0)) {
-      drive.teleopSwerve(driveX, driveY, rotatePower, false);
+    //Manual driving
+    if (driveMode == DriveMode.MANUAL) {
+      //Drives if we are out of dead zone
+      if ((Math.abs(driveX) > 0) ||
+          (Math.abs(driveY) > 0) || 
+          (Math.abs(rotatePower) > 0)) {
+        drive.teleopSwerve(driveX, driveY, rotatePower, false);
+      }
+      else {
+        //Robot is in dead zone, doesn't drive
+        drive.stopWheels();
+      }
+    //Limelight targetting
+    } else if (driveMode == DriveMode.LIMELIGHT) {
+      drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
+
+      if (controls.autoKill()) {
+        driveMode = DriveMode.MANUAL;
+      }
     }
-    else {
-      //Robot is in dead zone, doesn't drive
-      drive.stopWheels();
-    }
+    
   }
 
   /**
-   * Controls the grabber in TeleOp
+   * Controls the ball in TeleOp
    */
   private void ballControl() {
-    //Connected pair of pistons to retract and deploy
-    //One motor to take balls in and out
-  
+    /*
+      Grabber control
+    */
     boolean deployRetract               = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
 
     if (deployRetract == true) {
       grabber.deployRetract();
     }
-
     grabber.setGrabberMotor(grabberDir);
+
+
+    /*
+      Shooter control
+    */
+    Shooter.ShootLocation shootLocation = controls.getShootLocation();
+
+    if (shootLocation == Shooter.ShootLocation.OFF) {
+      shooter.disableShooter();
+      driveMode = DriveMode.MANUAL;
+    }
+    else {
+      shooter.manualShooterControl(shootLocation);
+
+      //Only does limelight targetting at far away shots
+      if (shootLocation == Shooter.ShootLocation.HIGH_SHOT) {
+        driveMode = DriveMode.LIMELIGHT;
+      }
+
+      if (shooter.shooterReady() == true) {
+        shooter.deployFeeder();
+      }
+    }
   }
 
   /**

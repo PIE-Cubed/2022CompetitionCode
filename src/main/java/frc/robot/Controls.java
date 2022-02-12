@@ -127,6 +127,21 @@ public class Controls {
         return joystick.getRawButton(3);
     }
 
+    /**
+     * Returns shoot location based off of trigger and button 4
+     * @return shoot location
+     */
+    public Shooter.ShootLocation getShootLocation() {
+        if (joystick.getTrigger() && joystick.getRawButton(4)) {
+            return Shooter.ShootLocation.LOW_SHOT;
+        }
+        else if (joystick.getTrigger()) {
+            return Shooter.ShootLocation.HIGH_SHOT;
+        }
+        else {
+            return Shooter.ShootLocation.OFF;
+        }
+    }
 
     /**
      * These are all Functions of the Xbox controller
