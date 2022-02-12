@@ -135,7 +135,7 @@ public class CargoTracking {
 	
 		if (pipelineEmpty == true) {
 		  // Prints the emptyCount
-		  //System.out.println("Empty Count: " + emptyCount + " Dead Zone " + deadZoneCount);
+		  System.out.println("IsEmpty: " + pipelineEmpty + " Empty Count: " + emptyCount + " Dead Zone " + deadZoneCount);
 
 		  // Sets turn to 0.00
 		  turn = 0.00;
@@ -145,7 +145,7 @@ public class CargoTracking {
 		  turn = centerX - (IMG_WIDTH_SCALED / 2);
 
 		  // Prints the values
-		  //System.out.println("CenterX: " + centerX + " TurnPower: " + turn);
+		  System.out.println("IsEmpty: " + pipelineEmpty + " CenterX: " + centerX + " TurnPower: " + turn);
 	
 		  // Resets empty counters
 		  emptyCount    = 0;

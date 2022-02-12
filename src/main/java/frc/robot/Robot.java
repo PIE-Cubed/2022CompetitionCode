@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance(setRedAlliance());
+    cargoTracking.setRedAlliance( setRedAlliance() );
     
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
     System.out.println("Auto selected: " + m_autoSelected);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance(setRedAlliance());
+    cargoTracking.setRedAlliance( setRedAlliance() );
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
    */
   public void teleopInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance(setRedAlliance());
+    cargoTracking.setRedAlliance( setRedAlliance() );
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -180,7 +180,7 @@ public class Robot extends TimedRobot {
    */
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance(setRedAlliance());
+    cargoTracking.setRedAlliance( setRedAlliance() );
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -192,11 +192,11 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+    cargoTracking.faceCargo();
     //grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
-    cargoTracking.faceCargo();
     //shooter.testShooter(.60);
   }
 
