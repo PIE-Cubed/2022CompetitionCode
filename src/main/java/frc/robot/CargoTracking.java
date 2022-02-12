@@ -33,8 +33,6 @@ public class CargoTracking {
 	private static final int IMG_WIDTH_RAW    = 160;
 	private static final int IMG_SCALE_FACTOR = 3; //Can be derived from the Raspberry Pi Code
 	private static final int IMG_WIDTH_SCALED = IMG_WIDTH_RAW * IMG_SCALE_FACTOR;
-	private static final int DIST_IMG_LEFT    = (IMG_WIDTH_SCALED / 2) * -1; //Distance to the right of the screen
-	private static final int DIST_IMG_RIGHT   = (IMG_WIDTH_SCALED / 2);      //Distance to the left of the screen
 	//private static final int IMG_HEIGHT = 480;
 
 	// PID controller
@@ -44,9 +42,9 @@ public class CargoTracking {
 	double cargoToleranceDegrees = 1.5f;
 
 	// Cargo Controller
-	private static final double cP = 0.02;
-	private static final double cI = 0.01;
-	private static final double cD = 0.01;
+	private static final double cP = 0.003; //0.0025
+	private static final double cI = 0.00;
+	private static final double cD = 0.00;
 
 	/**
 	 * CONSTRUCTOR
@@ -98,6 +96,8 @@ public class CargoTracking {
 			m_CargoCalculatedPower = m_CargoCalculatedPower / IMG_SCALE_FACTOR;
 			// Clamps the power so the robot doesn't go flying
 			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
+			// Negates the powwer to make it go in the right direction
+			m_CargoCalculatedPower = -1 * m_CargoCalculatedPower;
 
 			// Prints calculated power
 			System.out.println("Rotate Power: " + m_CargoCalculatedPower);
@@ -127,15 +127,15 @@ public class CargoTracking {
 		centerX       = target.getDouble(0.00);
 		emptyCount    = empty.getDouble(0.00);
 	
-		// Ignores the 25 pixels on the edges
-		if ( (centerX < (DIST_IMG_LEFT + DEAD_ZONE)) || (centerX > (DIST_IMG_RIGHT - DEAD_ZONE)) )  {
+		// Ignores the 20 pixels on the edges
+		if ( (centerX < (0 + DEAD_ZONE)) || (centerX > (IMG_WIDTH_SCALED - DEAD_ZONE)) )  {
 		  pipelineEmpty = true;
 		  deadZoneCount++;
 		}
 	
 		if (pipelineEmpty == true) {
 		  // Prints the emptyCount
-		  System.out.println("Empty Count: " + emptyCount + " Dead Zone " + deadZoneCount);
+		  //System.out.println("Empty Count: " + emptyCount + " Dead Zone " + deadZoneCount);
 
 		  // Sets turn to 0.00
 		  turn = 0.00;

@@ -196,8 +196,8 @@ public class Robot extends TimedRobot {
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
-    //cargoTracking.faceCargo();
-    shooter.testShooter(.60);
+    cargoTracking.faceCargo();
+    //shooter.testShooter(.60);
   }
 
   /**
