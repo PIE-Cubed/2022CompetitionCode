@@ -3,10 +3,11 @@ package frc.robot;
 import frc.robot.Grabber.GrabberDirection;
 
 public class Auto {
-    
+    // Step Variables
     private int step = 1;
     private int shootStep = 1;
 
+    // Object creation
     Drive   drive;
     Grabber grabber;
     Shooter shooter;
@@ -19,7 +20,7 @@ public class Auto {
     private long autoDelayTargetMs = 0;
 
     /**
-     * Constructor
+     * CONSTRUCTOR
      * @param drive
      * @param grabber
      */

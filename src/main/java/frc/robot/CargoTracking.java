@@ -36,18 +36,23 @@ public class CargoTracking {
 	//private static final int IMG_HEIGHT = 480;
 
 	// PID controller
-	private PIDController cargoController;
+	private static PIDController cargoController;
 
 	// PID tolerance
-	double cargoToleranceDegrees = 1.5f;
+	private double cargoToleranceDegrees = 1.0f;
 
 	// Cargo Controller
 	private static final double cP = 0.003; //0.0025
 	private static final double cI = 0.00;
 	private static final double cD = 0.00;
 
+	// Integrator limits
+	private static final double MIN_INTEGRATOR = -0.075; //0.1
+	private static final double MAX_INTEGRATOR =  0.075; //0.1
+
 	/**
 	 * CONSTRUCTOR
+	 * @param drive
 	 */
 	public CargoTracking(Drive drive) {
 		// Instance creation
@@ -57,6 +62,9 @@ public class CargoTracking {
 		cargoController = new PIDController(cP, cI, cD);
 		cargoController.setTolerance(cargoToleranceDegrees);
 		cargoController.enableContinuousInput(-180.0, 180.0);
+
+		//Restricts the PID's integrator range
+		cargoController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
 
 		// Creates a Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
@@ -128,6 +136,7 @@ public class CargoTracking {
 		emptyCount    = empty.getDouble(0.00);
 	
 		// Ignores the 20 pixels on the edges
+		// CenterX is a misleading name beacuse it actually measures from left to right, not from the center
 		if ( (centerX < (0 + DEAD_ZONE)) || (centerX > (IMG_WIDTH_SCALED - DEAD_ZONE)) )  {
 		  pipelineEmpty = true;
 		  deadZoneCount++;
