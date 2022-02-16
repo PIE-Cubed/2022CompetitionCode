@@ -6,6 +6,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Shooter.ShootLocation;
 
 /**
  * Start of class

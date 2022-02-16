@@ -1,6 +1,8 @@
 package frc.robot;
 
 import frc.robot.Grabber.GrabberDirection;
+import frc.robot.Shooter.ShootLocation;
+import frc.robot.Drive.TargetPipeline;
 
 public class Auto {
     // Step Variables
@@ -43,42 +45,30 @@ public class Auto {
 		}
 
         switch(step) {
-            //121 degrees: shooter facing target at start
-            //140 degrees: grabber facing ball
             case 1:
-                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-                break;
-            case 2:
-                status = autoDelay(3000);
-                break;
-            case 3:
-                System.out.println("Targeted");
-                grabber.deployRetract();
-                status = Robot.DONE;
-                break;
-            case 4:
                 status = drive.autoRotate(152);
                 break;
-            case 5:
+            case 2:
+                grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 6:
+            case 3:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 7:
+            case 4:
                 status = drive.autoCrabDrive(4, 0, 0.4);
                 break;
-            case 8:
+            case 5:
                 status = autoDelay(1000);
                 break;
-            case 9:
+            case 6:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
                 status = Robot.DONE;
                 break;
-            case 10:
-                status = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
+            case 7:
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
             default:
                 //Finished routine
@@ -109,38 +99,29 @@ public class Auto {
 
         switch(step) {
             case 1:
-                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-                break;
-            case 2:
-                status = autoDelay(3000);
-                break;
-            case 3:
-                grabber.deployRetract();
-                status = Robot.DONE;
-                break;
-            case 4:
                 status = drive.autoRotate(135);
                 break;
-            case 5:
+            case 2:
+                grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 6:
+            case 3:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 7:
+            case 4:
                 status = drive.autoCrabDrive(4, 0, 0.4);
                 break;
-            case 8:
+            case 5:
                 status = autoDelay(1000);
                 break;
-            case 9:
+            case 6:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
                 status = Robot.DONE;
                 break;
-            case 10:
-                status = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
+            case 7:
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
             default:
                 //Finished routine
@@ -171,38 +152,29 @@ public class Auto {
 
         switch(step) {
             case 1:
-                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-                break;
-            case 2:
-                status = autoDelay(3000);
-                break;
-            case 3:
-                grabber.deployRetract();
-                status = Robot.DONE;
-                break;
-            case 4:
                 status = drive.autoRotate(90);
                 break;
-            case 5:
+            case 2:
+                grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 6:
+            case 3:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 7:
+            case 4:
                 status = drive.autoCrabDrive(2.5, 0, 0.4);
                 break;
-            case 8:
+            case 5:
                 status = autoDelay(1000);
                 break;
-            case 9:
+            case 6:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
                 status = Robot.DONE;
                 break;
-            case 10:
-                status = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
+            case 7:
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
             default:
                 //Finished routine
@@ -219,12 +191,32 @@ public class Auto {
         return Robot.CONT;
     }
 
+
+
     /**
      * An auto program to shoot balls
-     * @return
+     * @param location
+     * @return status
      */
-    private int autoShoot() {
+    private int autoShoot(ShootLocation location) {
+        return autoShoot(location, 1);
+    }
+
+    /**
+     * An auto program to shoot balls
+     * @param location
+     * @return status
+     */
+    private int autoShoot(ShootLocation location, int numBalls) {
         int status = Robot.CONT;
+        TargetPipeline targettingLocation;
+
+        if ( (location == ShootLocation.HIGH_SHOT) || (location == ShootLocation.AUTO_RING) ) {
+            targettingLocation = TargetPipeline.ON_TARMAC;
+        }
+        else {
+            targettingLocation = TargetPipeline.OFF_TARMAC;
+        }
 
 		if (shootFirstTime == true) {
 			shootFirstTime = false;
@@ -233,8 +225,8 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
-                shooter.manualShooterControl(Shooter.ShootLocation.AUTO_RING);
-                drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+                shooter.manualShooterControl(location);
+                drive.limelightPIDTargeting(targettingLocation);
                 status = Robot.DONE;
                 break;
             case 2:
@@ -244,17 +236,35 @@ public class Auto {
                 else {
                     status = Robot.CONT;
                 }
-                shooter.manualShooterControl(Shooter.ShootLocation.AUTO_RING);
-                drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+                shooter.manualShooterControl(location);
+                drive.limelightPIDTargeting(targettingLocation);
                 break;
             case 3:
-                shooter.manualShooterControl(Shooter.ShootLocation.AUTO_RING);
-                status = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+                shooter.manualShooterControl(location);
+                status = drive.limelightPIDTargeting(targettingLocation);
                 break;
             case 4:
                 shooter.deployFeeder();
                 status = autoDelay(1000);
                 break;
+            case 5:
+                if (numBalls == 2) {
+                    shooter.retractFeeder();
+                    status = autoDelay(500);
+                }
+                else {
+                    status = Robot.DONE;
+                }
+                break;
+            case 6:
+                if (numBalls == 2) {
+                    shooter.deployFeeder();
+                    status = autoDelay(1000);
+                }
+                else {
+                    status = Robot.DONE;
+                }
+                break;                 
             default:
                 //Finished routine
                 shooter.disableShooter();

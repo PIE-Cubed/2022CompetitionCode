@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Shooter.ShootLocation;
 
 /**
  * Start of class
@@ -36,9 +37,10 @@ public class Robot extends TimedRobot {
   private int status = CONT;
 
   //Enumeration for manual or limelight control
-  private static enum DriveMode {
+  public static enum DriveMode {
     MANUAL,
-    LIMELIGHT;
+    TARGETTING,
+    TARGETTED;
   }
   private DriveMode driveMode = DriveMode.MANUAL;
 
@@ -213,9 +215,16 @@ public class Robot extends TimedRobot {
    */
   private void wheelControl() {
     //Get joystick values
-    double driveX      = controls.getDriveX();
-    double driveY      = controls.getDriveY();
-    double rotatePower = controls.getRotatePower();
+    double driveX               = controls.getDriveX();
+    double driveY               = controls.getDriveY();
+    double rotatePower          = controls.getRotatePower();
+    ShootLocation shootLocation = controls.getShootLocation();
+    boolean autokill            = controls.autoKill();
+
+    //General state changes
+    if (autokill == true) {
+      driveMode = DriveMode.MANUAL;
+    } 
 
     //Manual driving
     if (driveMode == DriveMode.MANUAL) {
@@ -229,15 +238,31 @@ public class Robot extends TimedRobot {
         //Robot is in dead zone, doesn't drive
         drive.stopWheels();
       }
-    //Limelight targetting
-    } else if (driveMode == DriveMode.LIMELIGHT) {
-      drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
 
-      if (controls.autoKill()) {
+      //Exit conditions
+      if ((shootLocation == ShootLocation.HIGH_SHOT) || (shootLocation == ShootLocation.LAUNCH_PAD)) {
+        driveMode = DriveMode.TARGETTING;
+      }
+
+    } 
+    //Limelight targetting
+    else if (driveMode == DriveMode.TARGETTING) {
+      int targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);  
+
+      if (targetStatus == Robot.DONE) {
+        driveMode = DriveMode.TARGETTED;
+      }
+      else if (shootLocation == ShootLocation.OFF) {
         driveMode = DriveMode.MANUAL;
       }
     }
-    
+    //Limelight targetted
+    else if (driveMode == DriveMode.TARGETTED) {
+      //Does nothing until trigger is released
+      if (shootLocation == ShootLocation.OFF) {
+        driveMode = DriveMode.MANUAL;
+      }
+    }
   }
 
   /**
@@ -249,6 +274,7 @@ public class Robot extends TimedRobot {
     */
     boolean deployRetract               = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
+    Shooter.ShootLocation shootLocation = controls.getShootLocation();
 
     if (deployRetract == true) {
       grabber.deployRetract();
@@ -259,19 +285,12 @@ public class Robot extends TimedRobot {
     /*
       Shooter control
     */
-    Shooter.ShootLocation shootLocation = controls.getShootLocation();
-
     if (shootLocation == Shooter.ShootLocation.OFF) {
       shooter.disableShooter();
       driveMode = DriveMode.MANUAL;
     }
     else {
       shooter.autoShooterControl(shootLocation);
-
-      //Only does limelight targetting at far away shots
-      if ((shootLocation == Shooter.ShootLocation.HIGH_SHOT) || (shootLocation == Shooter.ShootLocation.LAUNCH_PAD)) {
-        driveMode = DriveMode.LIMELIGHT;
-      }
 
       if (shooter.shooterReady() == true) {
         shooter.deployFeeder();

@@ -48,8 +48,8 @@ public class Shooter {
 	public final double LAUNCH_PAD_REAR_POWER  = 0.65;
 	public final double LAUNCH_PAD_FRONT_POWER = -0.65;
 
-	public final double AUTO_RING_REAR_POWER   = 0.5;
-	public final double AUTO_RING_FRONT_POWER  = -0.5;
+	public final double AUTO_RING_REAR_POWER   = 0.6;
+	public final double AUTO_RING_FRONT_POWER  = -0.6;
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
@@ -63,8 +63,8 @@ public class Shooter {
 	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3500;
 	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3500;
 
-	public final double AUTO_RING_REAR_TARGET_RPM   = 2750;
-	public final double AUTO_RING_FRONT_TARGET_RPM  = 2750;
+	public final double AUTO_RING_REAR_TARGET_RPM   = 3300;
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 3300;
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
