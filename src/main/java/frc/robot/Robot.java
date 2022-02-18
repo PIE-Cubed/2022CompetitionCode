@@ -39,8 +39,8 @@ public class Robot extends TimedRobot {
   //Enumeration for manual or limelight control
   public static enum DriveMode {
     MANUAL,
-    TARGETTING,
-    TARGETTED;
+    TARGETING,
+    TARGETED;
   }
   private DriveMode driveMode = DriveMode.MANUAL;
 
@@ -241,25 +241,25 @@ public class Robot extends TimedRobot {
 
       //Exit conditions
       if ((shootLocation == ShootLocation.HIGH_SHOT) || (shootLocation == ShootLocation.LAUNCH_PAD)) {
-        driveMode = DriveMode.TARGETTING;
+        driveMode = DriveMode.TARGETING;
       }
 
     } 
     //Limelight targetting
-    else if (driveMode == DriveMode.TARGETTING) {
+    else if (driveMode == DriveMode.TARGETING) {
       int targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);  
 
       if (targetStatus == Robot.DONE) {
-        driveMode = DriveMode.TARGETTED;
+        driveMode = DriveMode.TARGETED;
       }
-      else if (shootLocation == ShootLocation.OFF) {
+      else if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
         driveMode = DriveMode.MANUAL;
       }
     }
     //Limelight targetted
-    else if (driveMode == DriveMode.TARGETTED) {
+    else if (driveMode == DriveMode.TARGETED) {
       //Does nothing until trigger is released
-      if (shootLocation == ShootLocation.OFF) {
+      if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
         driveMode = DriveMode.MANUAL;
       }
     }
@@ -287,7 +287,6 @@ public class Robot extends TimedRobot {
     */
     if (shootLocation == Shooter.ShootLocation.OFF) {
       shooter.disableShooter();
-      driveMode = DriveMode.MANUAL;
     }
     else {
       shooter.autoShooterControl(shootLocation);
