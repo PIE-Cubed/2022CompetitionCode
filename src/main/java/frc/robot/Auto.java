@@ -192,16 +192,6 @@ public class Auto {
     }
 
 
-
-    /**
-     * An auto program to shoot balls
-     * @param location
-     * @return status
-     */
-    private int autoShoot(ShootLocation location) {
-        return autoShoot(location, 1);
-    }
-
     /**
      * An auto program to shoot balls
      * @param location
@@ -250,7 +240,7 @@ public class Auto {
             case 5:
                 if (numBalls == 2) {
                     shooter.retractFeeder();
-                    status = autoDelay(500);
+                    status = autoDelay(1000);
                 }
                 else {
                     status = Robot.DONE;

@@ -206,8 +206,6 @@ public class Wheel {
         return this.getRotateMotorPosition();
     }
 
-
-
 }
 
 // End of the Wheel Class

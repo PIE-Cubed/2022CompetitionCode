@@ -3,7 +3,6 @@ package frc.robot;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -22,19 +21,17 @@ public class Shooter {
 	// SPARK MAX
 	private CANSparkMax frontShooter;
 	private CANSparkMax rearShooter;
+	private CANSparkMax feeder;
 
 	// SPARK MAX ID's
 	private int FRONT_SHOOTER_ID  = 19; //front
-	private int REAR_SHOOTER_ID = 20; //right-->rear
-
-	//Double solenoid
-	private DoubleSolenoid feeder;
-	private int FEEDER_DEPLOY_ID  = 3;
-	private int FEEDER_RETRACT_ID = 7;
+	private int REAR_SHOOTER_ID   = 20; //right-->rear
+	private int FEEDER_ID         = 21; //starts at bottom
 
 	// Encoders
 	private RelativeEncoder frontShooterEncoder;
 	private RelativeEncoder rearShooterEncoder;
+	private RelativeEncoder feederEncoder;
 
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
@@ -51,6 +48,8 @@ public class Shooter {
 	public final double AUTO_RING_REAR_POWER   = 0.6;
 	public final double AUTO_RING_FRONT_POWER  = -0.6;
 
+	private final double FEEDER_POWER          = -0.08;
+
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
 
@@ -66,6 +65,9 @@ public class Shooter {
 	public final double AUTO_RING_REAR_TARGET_RPM   = 3300;
 	public final double AUTO_RING_FRONT_TARGET_RPM  = 3300;
 
+	private final double FEEDER_UP_ENCODER          = -0.24;
+	private final double FEEDER_DOWN_ENCODER        = 0;
+
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
 
@@ -76,7 +78,6 @@ public class Shooter {
 	private int                   noTargetCount      = 0;
 	private double                frontPower         = 0;
 	private double                rearPower          = 0;
-	private boolean               feederDeployed     = false;
 
 	public static enum ShootLocation {
 		HIGH_SHOT,
@@ -110,8 +111,7 @@ public class Shooter {
 		// SPARK Max
 		frontShooter  = new CANSparkMax(FRONT_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
 		rearShooter   = new CANSparkMax(REAR_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
-
-		//Create double solenoid and retract it
+		feeder        = new CANSparkMax(FEEDER_ID, MotorType.kBrushless);
 
 		// Sets the current limtis for the motors
 		frontShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
@@ -120,14 +120,18 @@ public class Shooter {
 		// Sets the mode of the motors (if this works in the code)
 		frontShooter.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		rearShooter .setIdleMode(CANSparkMax.IdleMode.kCoast);
+		feeder.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		
 		// Set Shooter related motors to off to Start the Match
 		frontShooter.set(0.0);
 		rearShooter .set(0.0);
+		feeder.set(0.0);
 
 		// Encoders
 		frontShooterEncoder = frontShooter.getEncoder();
 		rearShooterEncoder  = rearShooter.getEncoder();
+		feederEncoder       = feeder.getEncoder();
+		feederEncoder.setPosition(0);
 
 		// PID Controller
 		shooterController = new PIDController(kP, kI, kD);
@@ -304,21 +308,38 @@ public class Shooter {
 	/****************************************************************************************** 
     *
     *    deployFeeder()
-	*    Deploys feeder
+	*    Moves feeder to up position
+	*    Returns status, but it is usually uneeded because this function automatically stops motor
     *   
     ******************************************************************************************/
-	public void deployFeeder() {
-		//deploy feeder if not already deployed
+	public int deployFeeder() {
+		System.out.println(feederEncoder.getPosition());
+		if (feederEncoder.getPosition() <= FEEDER_UP_ENCODER) {
+			feeder.set(0.0);
+			return Robot.DONE;
+		}
+		else {
+			feeder.set(FEEDER_POWER);
+			return Robot.CONT;
+		}
 	}
 
 	/****************************************************************************************** 
     *
     *    retractFeeder()
-	*    Retracts feeder
+	*    Moves feeder to down position
+	*    Returns status, but it is usually uneeded because this function automatically stops motor
     *   
     ******************************************************************************************/
-	public void retractFeeder() {
-		//retract feeder if not already retracted
+	public int retractFeeder() {
+		if (feederEncoder.getPosition() >= FEEDER_DOWN_ENCODER) {
+			feeder.set(0.0);
+			return Robot.DONE;
+		}
+		else {
+			feeder.set(-1 * FEEDER_POWER);
+			return Robot.CONT;
+		}
 	}
 
 	/**
@@ -412,5 +433,13 @@ public class Shooter {
 		frontShooter.set(-powerF);
 		rearShooter.set(powerR);
 		System.out.println("Front RPM: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear RPM: " + getabsRPM(REAR_SHOOTER_ID));
+	}
+
+	public void testFeeder() {
+		System.out.println(feederEncoder.getPosition());
+	}
+
+	public void powerFeeder(double pow) {
+		feeder.set(pow);
 	}
 } //End of the Shooter Class

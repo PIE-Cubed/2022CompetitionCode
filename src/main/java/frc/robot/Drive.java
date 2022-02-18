@@ -70,17 +70,17 @@ public class Drive {
 
 
     //BLUE ROBOT
-    private static final double FR_OFFSET = 248;
     private static final double FL_OFFSET = 309.8;
-    private static final double BR_OFFSET = -65.2;
+    private static final double FR_OFFSET = 248;
     private static final double BL_OFFSET = 165.7;
+    private static final double BR_OFFSET = -65.2;
 
     //Yellow ROBOT
     /*
-    private static final double FR_OFFSET = 248;
-    private static final double FL_OFFSET = 309.8;
-    private static final double BR_OFFSET = -65.2;
-    private static final double BL_OFFSET = 165.7;
+    private static final double FL_OFFSET = -151.21;
+    private static final double FR_OFFSET = -150.36;
+    private static final double BL_OFFSET = -103.64;
+    private static final double BR_OFFSET =  146.41;
     */
 
 	//Limelight Variables
@@ -905,7 +905,10 @@ public class Drive {
     public void testWheelAngle(){
         //Use this to calibrate wheel angle sensors
         //Offset in wheel constructor should be the returned value * -1
-        System.out.println("Angle: " + rearRightWheel.testWheelAngle());
+        System.out.println("FL Angle: " + frontLeftWheel.testWheelAngle());
+        System.out.println("FR Angle: " + frontRightWheel.testWheelAngle());
+        System.out.println("RL Angle: " + rearLeftWheel.testWheelAngle());
+        System.out.println("RR Angle: " + rearRightWheel.testWheelAngle());
     }
 
     public void testLimelightTargeting() {

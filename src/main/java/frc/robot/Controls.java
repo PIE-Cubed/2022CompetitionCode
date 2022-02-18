@@ -6,6 +6,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
 
 /**
@@ -132,18 +133,18 @@ public class Controls {
      * Returns shoot location based off of trigger and button 4
      * @return shoot location
      */
-    public Shooter.ShootLocation getShootLocation() {
+    public ShootLocation getShootLocation() {
         if (joystick.getTrigger() && joystick.getRawButton(4)) {
-            return Shooter.ShootLocation.LOW_SHOT;
+            return ShootLocation.LOW_SHOT;
         }
         else if (joystick.getTrigger() && joystick.getRawButton(6)) {
-            return Shooter.ShootLocation.LAUNCH_PAD;
+            return ShootLocation.LAUNCH_PAD;
         }
         else if (joystick.getTrigger()) {
-            return Shooter.ShootLocation.HIGH_SHOT;
+            return ShootLocation.HIGH_SHOT;
         }
         else {
-            return Shooter.ShootLocation.OFF;
+            return ShootLocation.OFF;
         }
     }
 
@@ -189,15 +190,29 @@ public class Controls {
     }
      
     //Grabber Direction based off of D-Pad
-    public Grabber.GrabberDirection getGrabberDirection() {
+    public GrabberDirection getGrabberDirection() {
         if (xboxController.getPOV() == 0) {
-            return Grabber.GrabberDirection.FORWARD;
+            return GrabberDirection.FORWARD;
         }
         else if (xboxController.getPOV() == 180) {
-            return Grabber.GrabberDirection.REVERSE;
+            return GrabberDirection.REVERSE;
         }
         else {
-            return Grabber.GrabberDirection.OFF;
+            return GrabberDirection.OFF;
+        }
+    }
+
+
+    //Test controls
+    public double getFeedPower() {
+        if (xboxController.getLeftTriggerAxis() > 0) {
+            return -0.2 * xboxController.getLeftTriggerAxis();
+        }
+        else if (xboxController.getRightTriggerAxis() > 0) {
+            return 0.2 * xboxController.getRightTriggerAxis();
+        }
+        else {
+            return 0;
         }
     }
 }

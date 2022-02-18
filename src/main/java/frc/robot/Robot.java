@@ -201,7 +201,8 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    shooter.testShootMotors(SmartDashboard.getNumber("Front motor power", 0.5), SmartDashboard.getNumber("Rear motor power", 0.5));
+    //shooter.powerFeeder(controls.getFeedPower());
+    shooter.testFeeder();
     //cargoTracking.faceCargo();
     //grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
     //drive.testLimelightTargeting();
@@ -293,6 +294,7 @@ public class Robot extends TimedRobot {
 
       if (shooter.shooterReady() == true) {
         shooter.deployFeeder();
+        System.out.println("Deploying feeder");
       }
     }
   }
@@ -301,10 +303,11 @@ public class Robot extends TimedRobot {
    * Controls the climber in TeleOp
    */
   private void climberControl() {
+    /*
     boolean toggleClaw1  = controls.getClimberClaw1();
     boolean toggleClaw2  = controls.getClimberClaw2();
     double  climberPower = controls.getClimberPower();
-
+    */
     /*
     if (toggleClaw1 == true) {
       climber.claw1Toggle();
