@@ -7,6 +7,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
+
 
 public class Shooter {
 	//2 holes above marked one
@@ -32,6 +34,9 @@ public class Shooter {
 	private RelativeEncoder frontShooterEncoder;
 	private RelativeEncoder rearShooterEncoder;
 	private RelativeEncoder feederEncoder;
+
+	// Shooter Flipper Switch
+	DigitalInput  flipperSwitch;
 
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
@@ -70,6 +75,10 @@ public class Shooter {
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
+
+	// Flipper Switch Constants
+	private final int DIGITAL_INPUT_FLIPPER        = 0;
+
 
 	// Variables
 	public  double                frontTargetVelocity;
@@ -135,6 +144,9 @@ public class Shooter {
 
 		// PID Controller
 		shooterController = new PIDController(kP, kI, kD);
+
+		// Flipper Switch
+		flipperSwitch = new DigitalInput(DIGITAL_INPUT_FLIPPER);
 	}
 
 
@@ -332,6 +344,13 @@ public class Shooter {
     *   
     ******************************************************************************************/
 	public int retractFeeder() {
+		/*
+		if (flipperSwitch.get() == true)  {
+			feederEncoder.setPosition(0);
+            feeder.set(0.0);
+			return Robot.DONE;
+		}
+		*/
 		if (feederEncoder.getPosition() >= FEEDER_DOWN_ENCODER) {
 			feeder.set(0.0);
 			return Robot.DONE;
@@ -441,5 +460,9 @@ public class Shooter {
 
 	public void powerFeeder(double pow) {
 		feeder.set(pow);
+	}
+
+	public boolean testFlipperSwitch()  {
+		return flipperSwitch.get();
 	}
 } //End of the Shooter Class

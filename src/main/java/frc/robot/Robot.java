@@ -35,6 +35,7 @@ public class Robot extends TimedRobot {
   public static final int CONT =  3;
 
   private int status = CONT;
+  private int statusTest = CONT;
 
   //Enumeration for manual or limelight control
   public static enum DriveMode {
@@ -201,8 +202,13 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+    /*
+      while (statusTest == Robot.CONT)  {
+          statusTest = shooter.deployFeeder();
+      }
+      */
+      
     //shooter.powerFeeder(controls.getFeedPower());
-    shooter.testFeeder();
     //cargoTracking.faceCargo();
     //grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
     //drive.testLimelightTargeting();
