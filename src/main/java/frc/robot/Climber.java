@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class Climber {
     //Spark Max ID for the climber
-    private final int CLIMBER_SPARKMAX_ID  = 21; 
+    private final int CLIMBER_SPARKMAX_ID  = 22; 
     private CANSparkMax climberMotor; 
 
     //Double Solenoid for the claws
-    private final int PCM_CAN_ID     = 1; 
+    private final int PCM_CAN_ID   = 1; 
     private final int CLAW_1_OPEN  = 1;
     private final int CLAW_1_CLOSE = 5;
     private final int CLAW_2_OPEN  = 2;

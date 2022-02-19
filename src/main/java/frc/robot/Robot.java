@@ -97,7 +97,7 @@ public class Robot extends TimedRobot {
     //Number of Balls to grab
     m_numBallsChooser.setDefaultOption("1 ball", kOneBall);
     m_numBallsChooser.addOption("2 ball", kTwoBall);
-    SmartDashboard.putData("Auto path", m_numBallsChooser);
+    SmartDashboard.putData("Number of Balls", m_numBallsChooser);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
@@ -225,18 +225,12 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    /*
-    while (statusTest == Robot.CONT)  {
-        statusTest = shooter.deployFeeder();
-    }
-    */
-    
+    //System.out.println(shooter.testFlipperSwitch());
     //shooter.powerFeeder(controls.getFeedPower());
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //shooter.testShooter(.60);
     //drive.testWheelAngle();
-    cargoTracking.faceCargo();
   }
 
   /**
@@ -319,10 +313,11 @@ public class Robot extends TimedRobot {
     }
     else {
       shooter.autoShooterControl(shootLocation);
+      System.out.println("Shooter On");
 
       if (shooter.shooterReady() == true) {
+        System.out.println("Shooter Ready");
         shooter.deployFeeder();
-        System.out.println("Deploying feeder");
       }
     }
   }

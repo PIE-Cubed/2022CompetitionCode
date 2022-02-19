@@ -381,10 +381,6 @@ public class Auto {
         return Robot.CONT;
     }
 
-    public int autoCargoTarget() {
-        return Robot.DONE;
-    }
-
     /**
      * A program to return a value after a certain number of miliseconds has passed 
      * @param miliseconds

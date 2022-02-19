@@ -12,8 +12,11 @@ import edu.wpi.first.networktables.*;
  * Start of class
  */
 public class CargoTracking {
+	// firstTime
+	private boolean cargoFirstTime = true;
+
 	// Object creation
-	Drive drive;
+	private Drive drive;
 
 	// Network Table
 	private NetworkTable TrackingValues;
@@ -25,14 +28,25 @@ public class CargoTracking {
 	private NetworkTableEntry empty;
 
 	// Variables
-	private double deadZoneCount = 0.00;
-	private double centerX    = 0.00;
+	private double deadZoneCount  = 0.00;
+	private double centerX        = 0.00;
+
+	// Auto Tracking Variables
+	private int noTargetCount     = 0;
+	private int targetLockedCount = 0;
+	private long timeOut = 0;
 
 	// CONSTANTS
 	private static final int IMG_WIDTH_RAW    = 160;
 	private static final int IMG_SCALE_FACTOR = 3;   //Can be derived from the Raspberry Pi Code
 	private static final int IMG_WIDTH_SCALED = IMG_WIDTH_RAW * IMG_SCALE_FACTOR;
 	//private static final int IMG_HEIGHT = 480;
+
+	// Auto Tracking Constants
+	private final int  TIME_OUT_SEC  = 2;
+	private final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
+	private final int  FAIL_DELAY = 5;
+	private final int  ON_TARGET_COUNT = 5;
 
 	// PID controller
 	private static PIDController cargoController;
@@ -42,8 +56,8 @@ public class CargoTracking {
 
 	// Cargo Controller
 	private static final double cP = 0.003; //0.0025
-	private static final double cI = 0.00;
-	private static final double cD = 0.00;
+	private static final double cI = 0.0001;
+	private static final double cD = 0.000;
 
 	// Integrator limits
 	private static final double MIN_INTEGRATOR = -0.050; //-0.075
@@ -76,9 +90,105 @@ public class CargoTracking {
 	}
 
 	/**
+	 * 
+	 * @return Targetting Status
+	 */
+	public int autoCargoTracking() {
+		// Variables
+		long    currentMs = System.currentTimeMillis();
+		boolean noTarget  = isEmpty.getBoolean(true);
+
+		// Runs the firstTime procedure
+		if (cargoFirstTime == true) {
+			//Sets firstTime to false
+			cargoFirstTime = false;
+
+			//Sets the timeOut
+			timeOut = currentMs + TIME_OUT_MSEC;
+			System.out.println("CargoTracking TimeOut: " + timeOut);
+		}
+
+		if (noTarget == true) {
+			//Increments the noTargetCount
+			noTargetCount++;
+
+			if (noTargetCount <= FAIL_DELAY) {
+				// Robot continues searching
+				faceCargo();
+
+				// Returns the error code for continue
+				return Robot.CONT;
+			}
+			else {
+				// Resets variables
+				noTargetCount = 0;
+				targetLockedCount = 0;
+				cargoFirstTime = true;
+				cargoController.reset();
+
+				// Stops the robot
+				drive.stopWheels();
+
+				// Prints telemetry
+				System.out.println("Cargo Not Found!");
+
+				// Returns error code for failure
+				return Robot.FAIL;
+			}
+		}
+
+		// Rotates the robot
+		faceCargo();
+
+		// If the robot is aat the setpoint, targetLockedCount increses
+		if (cargoController.atSetpoint() == true) {
+			targetLockedCount++;
+		}
+
+		// Checks if the targetLockedCount is greater than our threshold for success
+		if (targetLockedCount >= ON_TARGET_COUNT) {
+			// Resets variables
+			noTargetCount = 0;
+			targetLockedCount = 0;
+			cargoFirstTime = true;
+			cargoController.reset();
+
+			// Stops the robot
+			drive.stopWheels();
+
+			// Prints telemetry
+			System.out.println("Cargo Found!" + " CenterX: " + centerX);
+
+			// Returns error code for success
+			return Robot.DONE;
+		}
+
+		// Checks if the robot has passed the timeOut
+		if (currentMs > timeOut) {
+			// Resets variables
+			noTargetCount = 0;
+			targetLockedCount = 0;
+			cargoFirstTime = true;
+			cargoController.reset();
+
+			// Stops the robot
+			drive.stopWheels();
+
+			// Prints telemetry
+			System.out.println("TimeOut!" + " Cargo Present: " + noTarget);
+
+			// Returns error code for failure
+			return Robot.FAIL;
+		}
+
+		// Returns error code for continue
+		return Robot.CONT;
+	}
+
+	/**
 	 * Method to turn and face the cargo of selected color
 	 */
-	public void faceCargo() {
+	private void faceCargo() {
 		// Variables
 		double  turnAngle;
 		double  m_CargoCalculatedPower = 0.00;

@@ -44,11 +44,11 @@ public class Shooter {
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
 
-	public final double HIGH_SHOT_REAR_POWER   = 0.525;
-	public final double HIGH_SHOT_FRONT_POWER  = -0.525;
+	public final double HIGH_SHOT_REAR_POWER   = 0.45; //0.525 //Untested
+	public final double HIGH_SHOT_FRONT_POWER  = -0.45; //0.525 //Untested
 
-	public final double LOW_SHOT_REAR_POWER    = 0.25;
-	public final double LOW_SHOT_FRONT_POWER   = -0.25;
+	public final double LOW_SHOT_REAR_POWER    = 0.21; //0.29
+	public final double LOW_SHOT_FRONT_POWER   = -0.21; //-0.29
 
 	public final double LAUNCH_PAD_REAR_POWER  = 0.65;
 	public final double LAUNCH_PAD_FRONT_POWER = -0.65;
@@ -56,7 +56,7 @@ public class Shooter {
 	public final double AUTO_RING_REAR_POWER   = 0.6;
 	public final double AUTO_RING_FRONT_POWER  = -0.6;
 
-	private final double FEEDER_POWER          = -0.08;
+	private final double FEEDER_POWER          = -0.08; //Negative power raises the feeder
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
@@ -64,8 +64,8 @@ public class Shooter {
 	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2980;
 	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2980;
 
-	public final double LOW_SHOT_REAR_TARGET_RPM    = 1650;
-	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1650;
+	public final double LOW_SHOT_REAR_TARGET_RPM    = 1450; //1650
+	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1450; //1650
 
 	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3500;
 	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3500;
@@ -73,15 +73,14 @@ public class Shooter {
 	public final double AUTO_RING_REAR_TARGET_RPM   = 3300;
 	public final double AUTO_RING_FRONT_TARGET_RPM  = 3300;
 
-	private final double FEEDER_UP_ENCODER          = 0.24; //It's actually negative since the motor has negative power
+	private final double FEEDER_UP_ENCODER          = 0.33; //It's actually negative since the motor has negative power
 	private final double FEEDER_DOWN_ENCODER        = 0;
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
 
 	// Flipper Switch Constants
-	private final int DIGITAL_INPUT_FLIPPER        = 0;
-
+	private final int FLIPPER_ID                   = 0;
 
 	// Variables
 	public  double                frontTargetVelocity;
@@ -109,8 +108,13 @@ public class Shooter {
 	// Shooter PID Controller
 	private PIDController shooterController;
 
-	private static final double kP = 0.0001;
-	private static final double kI = 0.00;
+	// Integrator Constants
+	private static final double MIN_INTEGRATOR = -0.05;
+	private static final double MAX_INTEGRATOR =  0.05;
+
+	// P, I, D constants
+	private static final double kP = 0.0000; //0.00010
+	private static final double kI = 0.00005; //0.00005
 	private static final double kD = 0.00;
 
 
@@ -147,9 +151,10 @@ public class Shooter {
 
 		// PID Controller
 		shooterController = new PIDController(kP, kI, kD);
+		shooterController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
 
 		// Flipper Switch
-		flipperSwitch = new DigitalInput(DIGITAL_INPUT_FLIPPER);
+		flipperSwitch = new DigitalInput(FLIPPER_ID);
 	}
 
 
@@ -215,6 +220,8 @@ public class Shooter {
 		SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
 		SmartDashboard.putNumber("Rear power", rearPower);
 		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+
+		System.out.println("Front rpm: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear rpm: " + getabsRPM(REAR_SHOOTER_ID));
 
 		frontShooter.set(frontPower);
 		rearShooter.set(rearPower);
@@ -302,7 +309,7 @@ public class Shooter {
 			targetCount = 0;
 
 			//Timeout, shoots to clear system, better than holding ball
-			if (noTargetCount >= 300) {
+			/*if (noTargetCount >= 300) {
 				System.out.println("Not up to speed. Check battery or PID");
 				System.out.println("Front rpm: " + frontRpm + "front target rpm: " + frontTargetVelocity);
 				System.out.println("Rear rpm: " + rearRpm + "rear target rpm: " + rearTargetVelocity);
@@ -316,7 +323,8 @@ public class Shooter {
 			}
 			else {
 				return false;
-			}
+			}*/
+			return false;
 		}
 	}
 
@@ -329,14 +337,15 @@ public class Shooter {
     ******************************************************************************************/
 	public int deployFeeder() {
 		double absPosition = Math.abs(feederEncoder.getPosition());
-		System.out.println(feederEncoder.getPosition());
+		//System.out.println("Deployed: " + feederEncoder.getPosition());
 
 		if (absPosition >= FEEDER_UP_ENCODER) {
-			System.out.println("Deployed");
+			System.out.println("Stopping Deploy: " + feederEncoder.getPosition());
 			feeder.set(0.0);
 			return Robot.DONE;
 		}
 		else {
+			System.out.println("Deploying: " + feederEncoder.getPosition());
 			feeder.set(FEEDER_POWER);
 			return Robot.CONT;
 		}
@@ -358,9 +367,9 @@ public class Shooter {
 			return Robot.DONE;
 		}
 		*/
-		System.out.println(feederEncoder.getPosition());
-		if (absPosition <= FEEDER_DOWN_ENCODER) {
-			System.out.println("Retracted");
+		System.out.println("Retracted: " + feederEncoder.getPosition());
+
+		if (absPosition >= FEEDER_DOWN_ENCODER) {
 			feeder.set(0.0);
 			return Robot.DONE;
 		}
