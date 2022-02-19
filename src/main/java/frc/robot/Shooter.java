@@ -328,6 +328,7 @@ public class Shooter {
 		System.out.println(feederEncoder.getPosition());
 		if (feederEncoder.getPosition() <= FEEDER_UP_ENCODER) {
 			feeder.set(0.0);
+			System.out.println("Deployed");
 			return Robot.DONE;
 		}
 		else {
@@ -351,8 +352,10 @@ public class Shooter {
 			return Robot.DONE;
 		}
 		*/
+		System.out.println(feederEncoder.getPosition());
 		if (feederEncoder.getPosition() >= FEEDER_DOWN_ENCODER) {
 			feeder.set(0.0);
+			System.out.println("Retracted");
 			return Robot.DONE;
 		}
 		else {

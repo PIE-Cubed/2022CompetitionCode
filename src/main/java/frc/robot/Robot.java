@@ -52,6 +52,14 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private static final String kOneBall = "1";
+  private static final String kTwoBall = "2";
+  private String m_pathSelected;
+  private final SendableChooser<String> m_pathChooser = new SendableChooser<>();
+
+  private int autoDelayMS = 0;
+
+
   /**
    * Constructor
    */
@@ -84,6 +92,12 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    m_pathChooser.setDefaultOption("1 ball", kOneBall);
+    m_pathChooser.addOption("2 ball", kTwoBall);
+    SmartDashboard.putData("Auto path", m_pathChooser);
+
+    SmartDashboard.putNumber("Auto delay seconds", 0);
+
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
     
@@ -107,8 +121,12 @@ public class Robot extends TimedRobot {
    */
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    m_pathSelected = m_pathChooser.getSelected();
+    System.out.println("Auto path: " + m_pathSelected);
+
+    autoDelayMS = (int) (1000 * SmartDashboard.getNumber("Auto delay seconds", 0));
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
@@ -123,16 +141,25 @@ public class Robot extends TimedRobot {
    * Runs constantly during Autonomous
    */
   public void autonomousPeriodic() {
+    int balls = 1;
+
+    if (m_pathSelected.equals(kOneBall)) {
+      balls = 1;
+    }
+    else if (m_pathSelected.equals(kTwoBall)) {
+      balls = 2;
+    }
+
     if (status == Robot.CONT) {
       switch (m_autoSelected) {
         case kCenterAuto:
-          status = auto.centerAuto();
+          status = auto.centerAuto(balls, autoDelayMS);
           break;
         case kHangarAuto:
-          status = auto.hangerAuto();
+          status = auto.hangerAuto(balls, autoDelayMS);
           break;
         case kWallAuto:
-          status = auto.wallAuto();
+          status = auto.wallAuto(balls, autoDelayMS);
           break;
         default:
           status = DONE;
@@ -207,7 +234,7 @@ public class Robot extends TimedRobot {
           statusTest = shooter.deployFeeder();
       }
       */
-      
+
     //shooter.powerFeeder(controls.getFeedPower());
     //cargoTracking.faceCargo();
     //grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
