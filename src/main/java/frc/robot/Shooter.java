@@ -1,14 +1,17 @@
 package frc.robot;
 
+/**
+ * Imports
+ */
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
-
 
 public class Shooter {
 	//2 holes above marked one
@@ -70,7 +73,7 @@ public class Shooter {
 	public final double AUTO_RING_REAR_TARGET_RPM   = 3300;
 	public final double AUTO_RING_FRONT_TARGET_RPM  = 3300;
 
-	private final double FEEDER_UP_ENCODER          = -0.24;
+	private final double FEEDER_UP_ENCODER          = 0.24; //It's actually negative since the motor has negative power
 	private final double FEEDER_DOWN_ENCODER        = 0;
 
 	// Current Limit Constants
@@ -325,10 +328,12 @@ public class Shooter {
     *   
     ******************************************************************************************/
 	public int deployFeeder() {
+		double absPosition = Math.abs(feederEncoder.getPosition());
 		System.out.println(feederEncoder.getPosition());
-		if (feederEncoder.getPosition() <= FEEDER_UP_ENCODER) {
-			feeder.set(0.0);
+
+		if (absPosition >= FEEDER_UP_ENCODER) {
 			System.out.println("Deployed");
+			feeder.set(0.0);
 			return Robot.DONE;
 		}
 		else {
@@ -345,6 +350,7 @@ public class Shooter {
     *   
     ******************************************************************************************/
 	public int retractFeeder() {
+		double absPosition = Math.abs(feederEncoder.getPosition());
 		/*
 		if (flipperSwitch.get() == true)  {
 			feederEncoder.setPosition(0);
@@ -353,9 +359,9 @@ public class Shooter {
 		}
 		*/
 		System.out.println(feederEncoder.getPosition());
-		if (feederEncoder.getPosition() >= FEEDER_DOWN_ENCODER) {
-			feeder.set(0.0);
+		if (absPosition <= FEEDER_DOWN_ENCODER) {
 			System.out.println("Retracted");
+			feeder.set(0.0);
 			return Robot.DONE;
 		}
 		else {
@@ -368,7 +374,7 @@ public class Shooter {
 	 * DEBUG / TEST FUNCTIONS
 	 */
 	
-	 /**
+	/**
 	 * A debug function for the shooter
 	 * @param power
 	 */
@@ -378,6 +384,9 @@ public class Shooter {
 		System.out.println("Power: " + power + " RPM: " + getabsRPM(FRONT_SHOOTER_ID));
 	}
 
+	/**
+	 * Enables the shooter at full power
+	 */
 	public void enableShooterFullPower() {
 		frontShooter.set(1.00);
 		rearShooter.set(1.00);
@@ -395,7 +404,10 @@ public class Shooter {
 		retractFeeder();
 	}
 
-	public void disableRearShooterMotor() { //Was disableShooterMotor2
+	/**
+	 * Disables all shooter motors
+	 */
+	public void disableShooterMotors() { //Was disableShooterMotor2
 		rearShooter .set(0.00);
 		frontShooter.set(0.00);
 	}

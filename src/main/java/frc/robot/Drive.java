@@ -3,15 +3,15 @@ package frc.robot;
 /**
  * Imports
  */
-import java.util.stream.DoubleStream;
-
 import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.networktables.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
-import edu.wpi.first.math.MathUtil;
+import java.util.stream.DoubleStream;
 
 /**
  * Start of class
@@ -70,18 +70,17 @@ public class Drive {
 
 
     //BLUE ROBOT
+    /*
     private static final double FL_OFFSET = 309.8;
     private static final double FR_OFFSET = 248;
     private static final double BL_OFFSET = 165.7;
-    private static final double BR_OFFSET = -65.2;
+    private static final double BR_OFFSET = -65.2;*/
 
     //Yellow ROBOT
-    /*
     private static final double FL_OFFSET = -151.21;
     private static final double FR_OFFSET = -150.36;
     private static final double BL_OFFSET = -103.64;
     private static final double BR_OFFSET =  146.41;
-    */
 
 	//Limelight Variables
     private int     noTargetCount      = 0;

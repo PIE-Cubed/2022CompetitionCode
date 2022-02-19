@@ -10,10 +10,8 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class Climber {
     //Spark Max ID for the climber
-    private final int CLIMBER_LEFT_SPARKMAX_ID  = 21; 
-    private final int CLIMBER_RIGHT_SPARKMAX_ID = 22;
-    private CANSparkMax climberLeftMotor; 
-    private CANSparkMax climberRightMotor; 
+    private final int CLIMBER_SPARKMAX_ID  = 21; 
+    private CANSparkMax climberMotor; 
 
     //Double Solenoid for the claws
     private final int PCM_CAN_ID     = 1; 
@@ -31,22 +29,16 @@ public class Climber {
     }
     private ClawState claw1State;
     private ClawState claw2State;
-
-
-    //The Constructor
+    
+    /**
+     * CONSTRUCTOR
+     */
     public Climber() {
         //The Motor
-        climberLeftMotor  = new CANSparkMax(CLIMBER_LEFT_SPARKMAX_ID, MotorType.kBrushless);
-        climberRightMotor = new CANSparkMax(CLIMBER_RIGHT_SPARKMAX_ID, MotorType.kBrushless);
-
-        climberLeftMotor.setIdleMode(IdleMode.kBrake);
-        climberRightMotor.setIdleMode(IdleMode.kBrake);
-
-        climberLeftMotor.setSmartCurrentLimit(60);
-        climberRightMotor.setSmartCurrentLimit(60);
-
-        climberLeftMotor.follow(climberRightMotor, true);
-        climberRightMotor.set(0.0);
+        climberMotor  = new CANSparkMax(CLIMBER_SPARKMAX_ID, MotorType.kBrushless);
+        climberMotor.setIdleMode(IdleMode.kBrake);
+        climberMotor.setSmartCurrentLimit(60);
+        climberMotor.set(0.0);
 
         //The Claws
         claw1 = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, CLAW_1_OPEN, CLAW_1_CLOSE); 
@@ -55,7 +47,6 @@ public class Climber {
         claw2.set(Value.kForward);
         claw1State = ClawState.OPEN;
         claw2State = ClawState.OPEN;
-
     }
 
     //Toggle The Claws
@@ -81,9 +72,8 @@ public class Climber {
     }
 
     public void climberRotate(double rotatePower) {
-        climberRightMotor.set(rotatePower);
+        climberMotor.set(rotatePower);
     }
-
 
 }
 

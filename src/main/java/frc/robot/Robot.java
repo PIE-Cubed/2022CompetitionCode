@@ -52,12 +52,14 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private static final String kOneBall = "1";
-  private static final String kTwoBall = "2";
-  private String m_pathSelected;
-  private final SendableChooser<String> m_pathChooser = new SendableChooser<>();
+  //Number of balls
+  private static final int kOneBall = 1;
+  private static final int kTwoBall = 2;
+  private int m_numBalls;
+  private final SendableChooser<Integer> m_numBallsChooser = new SendableChooser<>();
 
-  private int autoDelayMS = 0;
+  //Auto Delay
+  private int delaySec = 0;
 
 
   /**
@@ -92,11 +94,10 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    m_pathChooser.setDefaultOption("1 ball", kOneBall);
-    m_pathChooser.addOption("2 ball", kTwoBall);
-    SmartDashboard.putData("Auto path", m_pathChooser);
-
-    SmartDashboard.putNumber("Auto delay seconds", 0);
+    //Number of Balls to grab
+    m_numBallsChooser.setDefaultOption("1 ball", kOneBall);
+    m_numBallsChooser.addOption("2 ball", kTwoBall);
+    SmartDashboard.putData("Auto path", m_numBallsChooser);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
@@ -120,13 +121,14 @@ public class Robot extends TimedRobot {
    * Runs once when Auto starts
    */
   public void autonomousInit() {
+    //Choses start position
     m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
 
-    m_pathSelected = m_pathChooser.getSelected();
-    System.out.println("Auto path: " + m_pathSelected);
+    m_numBalls = m_numBallsChooser.getSelected();
+    System.out.println("Auto path: " + m_numBalls);
 
-    autoDelayMS = (int) (1000 * SmartDashboard.getNumber("Auto delay seconds", 0));
+    delaySec = (int)SmartDashboard.getNumber("Auto delay seconds", 0);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
@@ -141,25 +143,19 @@ public class Robot extends TimedRobot {
    * Runs constantly during Autonomous
    */
   public void autonomousPeriodic() {
-    int balls = 1;
-
-    if (m_pathSelected.equals(kOneBall)) {
-      balls = 1;
-    }
-    else if (m_pathSelected.equals(kTwoBall)) {
-      balls = 2;
-    }
+    int balls = m_numBalls;
+    long autoDelayMSec = delaySec * 1000;
 
     if (status == Robot.CONT) {
       switch (m_autoSelected) {
         case kCenterAuto:
-          status = auto.centerAuto(balls, autoDelayMS);
+          status = auto.centerAuto(balls, autoDelayMSec);
           break;
         case kHangarAuto:
-          status = auto.hangerAuto(balls, autoDelayMS);
+          status = auto.hangerAuto(balls, autoDelayMSec);
           break;
         case kWallAuto:
-          status = auto.wallAuto(balls, autoDelayMS);
+          status = auto.wallAuto(balls, autoDelayMSec);
           break;
         default:
           status = DONE;
@@ -167,7 +163,7 @@ public class Robot extends TimedRobot {
       }
     }
     else if (status == DONE) {
-
+      //
     }
   }
 
@@ -206,7 +202,7 @@ public class Robot extends TimedRobot {
    * Shouldn't ever do anything
    */
   public void disabledPeriodic() {
-    //Turns off the limelight LEDs when the robot is disabled
+    //Turns off the limelight LEDs when the robot is disabled, saves our eyes
     drive.changeledMode(Drive.LEDState.OFF);
   }
 
@@ -230,18 +226,17 @@ public class Robot extends TimedRobot {
    */
   public void testPeriodic() {
     /*
-      while (statusTest == Robot.CONT)  {
-          statusTest = shooter.deployFeeder();
-      }
-      */
-
+    while (statusTest == Robot.CONT)  {
+        statusTest = shooter.deployFeeder();
+    }
+    */
+    
     //shooter.powerFeeder(controls.getFeedPower());
-    //cargoTracking.faceCargo();
-    //grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
     //drive.testLimelightTargeting();
     //drive.testRotate();
-    //drive.testWheelAngle();
     //shooter.testShooter(.60);
+    //drive.testWheelAngle();
+    cargoTracking.faceCargo();
   }
 
   /**
@@ -253,6 +248,8 @@ public class Robot extends TimedRobot {
     double driveY               = controls.getDriveY();
     double rotatePower          = controls.getRotatePower();
     ShootLocation shootLocation = controls.getShootLocation();
+
+    //The variable the kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
 
     //General state changes
@@ -277,7 +274,6 @@ public class Robot extends TimedRobot {
       if ((shootLocation == ShootLocation.HIGH_SHOT) || (shootLocation == ShootLocation.LAUNCH_PAD)) {
         driveMode = DriveMode.TARGETING;
       }
-
     } 
     //Limelight targetting
     else if (driveMode == DriveMode.TARGETING) {
@@ -305,7 +301,7 @@ public class Robot extends TimedRobot {
   private void ballControl() {
     /*
       Grabber control
-    */
+     */
     boolean deployRetract               = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
     Shooter.ShootLocation shootLocation = controls.getShootLocation();
@@ -315,10 +311,9 @@ public class Robot extends TimedRobot {
     }
     grabber.setGrabberMotor(grabberDir);
 
-
     /*
       Shooter control
-    */
+     */
     if (shootLocation == Shooter.ShootLocation.OFF) {
       shooter.disableShooter();
     }

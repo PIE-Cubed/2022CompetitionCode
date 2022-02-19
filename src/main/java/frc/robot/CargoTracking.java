@@ -4,10 +4,9 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 
 import edu.wpi.first.networktables.*;
-
-import edu.wpi.first.math.controller.PIDController;
 
 /**
  * Start of class
@@ -31,7 +30,7 @@ public class CargoTracking {
 
 	// CONSTANTS
 	private static final int IMG_WIDTH_RAW    = 160;
-	private static final int IMG_SCALE_FACTOR = 3; //Can be derived from the Raspberry Pi Code
+	private static final int IMG_SCALE_FACTOR = 3;   //Can be derived from the Raspberry Pi Code
 	private static final int IMG_WIDTH_SCALED = IMG_WIDTH_RAW * IMG_SCALE_FACTOR;
 	//private static final int IMG_HEIGHT = 480;
 
@@ -47,8 +46,8 @@ public class CargoTracking {
 	private static final double cD = 0.00;
 
 	// Integrator limits
-	private static final double MIN_INTEGRATOR = -0.075; //0.1
-	private static final double MAX_INTEGRATOR =  0.075; //0.1
+	private static final double MIN_INTEGRATOR = -0.050; //-0.075
+	private static final double MAX_INTEGRATOR =  0.050; // 0.075
 
 	/**
 	 * CONSTRUCTOR
@@ -110,7 +109,7 @@ public class CargoTracking {
 			// Prints calculated power
 			System.out.println("Rotate Power: " + m_CargoCalculatedPower);
 
-			// Starts rotating 
+			// Starts rotating
 			drive.teleopRotate(m_CargoCalculatedPower);
 		}
 		else {
@@ -129,19 +128,19 @@ public class CargoTracking {
 		boolean pipelineEmpty;
 		double  emptyCount;
 		double  turn;
-	
+
 		// Sets the double variables
 		pipelineEmpty = isEmpty.getBoolean(true);
 		centerX       = target.getDouble(0.00);
 		emptyCount    = empty.getDouble(0.00);
-	
+
 		// Ignores the 20 pixels on the edges
 		// CenterX is a misleading name beacuse it actually measures from left to right, not from the center
 		if ( (centerX < (0 + DEAD_ZONE)) || (centerX > (IMG_WIDTH_SCALED - DEAD_ZONE)) )  {
 		  pipelineEmpty = true;
 		  deadZoneCount++;
 		}
-	
+
 		if (pipelineEmpty == true) {
 		  // Prints the emptyCount
 		  System.out.println("IsEmpty: " + pipelineEmpty + " Empty Count: " + emptyCount + " Dead Zone " + deadZoneCount);
@@ -154,7 +153,7 @@ public class CargoTracking {
 		  turn = centerX - (IMG_WIDTH_SCALED / 2);
 
 		  // Prints the values
-		  System.out.println("IsEmpty: " + pipelineEmpty + " CenterX: " + centerX + " TurnPower: " + turn);
+		  System.out.println("IsEmpty: " + pipelineEmpty + " CenterX: " + centerX + " Turn: " + turn);
 	
 		  // Resets empty counters
 		  emptyCount    = 0;
@@ -166,7 +165,7 @@ public class CargoTracking {
 		  turn       = 0.00;
 		  centerX    = 0.00;
 		}
-    
+		
 		return turn;
 	}
 
@@ -182,7 +181,6 @@ public class CargoTracking {
 	/**
 	 * TEST FUNCTIONS
 	 */
-
 }
 
 //End of the CargoTracking class

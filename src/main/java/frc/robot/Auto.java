@@ -1,5 +1,8 @@
 package frc.robot;
 
+/**
+ * Imports
+ */
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
 import frc.robot.Drive.TargetPipeline;
@@ -19,6 +22,7 @@ public class Auto {
 	private boolean   shootFirstTime   = true;
 	private boolean   delayFirstTime   = true;
     
+    // Variables
     private long autoDelayTargetMs = 0;
 
     /**
@@ -36,7 +40,7 @@ public class Auto {
      * Autonomous program for the position closest to the center
      * @return status
      */
-    public int centerAuto(int balls, int delay) {
+    public int centerAuto(int balls, long delayMs) {
         int status = Robot.CONT;
 
 		if (firstTime == true) {
@@ -46,7 +50,7 @@ public class Auto {
 
         switch(step) {
             case 1:
-                status = autoDelay(delay);
+                status = autoDelay(delayMs);
             case 2:
                 status = drive.autoRotate(152);
                 break;
@@ -125,7 +129,7 @@ public class Auto {
      * Autonomous program for the position closest to the hanger
      * @return
      */
-    public int hangerAuto(int balls, int delay) {
+    public int hangerAuto(int balls, long delayMs) {
         int status = Robot.CONT;
 
 		if (firstTime == true) {
@@ -135,7 +139,7 @@ public class Auto {
 
         switch(step) {
             case 1:
-                status = autoDelay(delay);
+                status = autoDelay(delayMs);
             case 2:
                 status = drive.autoRotate(135);
                 break;
@@ -214,7 +218,7 @@ public class Auto {
      * Autonomous program for the position closest to the wall
      * @return
      */
-    public int wallAuto(int balls, int delay) {
+    public int wallAuto(int balls, long delayMs) {
         int status = Robot.CONT;
 
 		if (firstTime == true) {
@@ -224,7 +228,7 @@ public class Auto {
 
         switch(step) {
             case 1:
-                status = autoDelay(delay);
+                status = autoDelay(delayMs);
             case 2:
                 status = drive.autoRotate(90);
                 break;
@@ -375,6 +379,10 @@ public class Auto {
         }
 
         return Robot.CONT;
+    }
+
+    public int autoCargoTarget() {
+        return Robot.DONE;
     }
 
     /**

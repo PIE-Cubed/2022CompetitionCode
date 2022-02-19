@@ -3,20 +3,19 @@ package frc.robot;
 /**
  * Imports
  */
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
 /**
  * Start of class
  */
 public class Wheel {
-
     // Motor Controllers Declaration (instantiated in the constructor in order to dependency inject the IDs of each respective controller)
     private CANSparkMax      driveMotor;
     private RelativeEncoder  driveEncoder;
@@ -36,13 +35,14 @@ public class Wheel {
     // CONSTANTS
     private static final int WHEEL_CURRENT_LIMIT = 120;
 
-
-
-    /****************************************************************************************** 
-    *
-    *    Wheels constructor
-    * 
-    ******************************************************************************************/
+    /**
+     * Wheels Constructor
+     * @param driveMotorID
+     * @param rotateMotorID
+     * @param rotateMotorSensorID
+     * @param offsetDegrees
+     * @param motorName
+     */
     public Wheel(int driveMotorID, int rotateMotorID, int rotateMotorSensorID, double offsetDegrees, Drive.WheelProperties motorName) {
         // Motor Controllers Instantiation
         this.driveMotor   = new CANSparkMax(driveMotorID, MotorType.kBrushless);
@@ -64,8 +64,6 @@ public class Wheel {
         rotationPID.enableContinuousInput(-180, 180);
         rotationPID.setTolerance(2);
     }
-
-
 
     /****************************************************************************************** 
     *
@@ -101,7 +99,6 @@ public class Wheel {
         }
     }
 
-
     /****************************************************************************************** 
     *
     *    setRotateMotorPower()
@@ -112,8 +109,6 @@ public class Wheel {
         power = MathUtil.clamp(power, -1, 1);    
         rotateMotor.set(power);
     }
-
-
 
     /****************************************************************************************** 
     *
@@ -134,8 +129,6 @@ public class Wheel {
             driveMotor.set(power);
         }
     }
-
-
 
     /****************************************************************************************** 
     *
@@ -164,8 +157,6 @@ public class Wheel {
         return adjustedValue;
     }
 
-
-
     /****************************************************************************************** 
     *
     *    getRotateMotorPosition()
@@ -178,7 +169,6 @@ public class Wheel {
 
         return adjustedValue;
     }
-
 
     /****************************************************************************************** 
     *
