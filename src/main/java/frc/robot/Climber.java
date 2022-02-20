@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -9,11 +10,11 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class Climber {
     //Spark Max ID for the climber
-    private final int CLIMBER_SPARKMAX_ID = 19; 
+    private final int CLIMBER_SPARKMAX_ID  = 22; 
     private CANSparkMax climberMotor; 
 
     //Double Solenoid for the claws
-    private final int PCM_CAN_ID     = 1; 
+    private final int PCM_CAN_ID   = 1; 
     private final int CLAW_1_OPEN  = 1;
     private final int CLAW_1_CLOSE = 5;
     private final int CLAW_2_OPEN  = 2;
@@ -28,12 +29,14 @@ public class Climber {
     }
     private ClawState claw1State;
     private ClawState claw2State;
-
-
-    //The Constructor
+    
+    /**
+     * CONSTRUCTOR
+     */
     public Climber() {
         //The Motor
-        climberMotor = new CANSparkMax(CLIMBER_SPARKMAX_ID, MotorType.kBrushless);
+        climberMotor  = new CANSparkMax(CLIMBER_SPARKMAX_ID, MotorType.kBrushless);
+        climberMotor.setIdleMode(IdleMode.kBrake);
         climberMotor.setSmartCurrentLimit(60);
         climberMotor.set(0.0);
 
@@ -44,7 +47,6 @@ public class Climber {
         claw2.set(Value.kForward);
         claw1State = ClawState.OPEN;
         claw2State = ClawState.OPEN;
-
     }
 
     //Toggle The Claws
@@ -72,7 +74,6 @@ public class Climber {
     public void climberRotate(double rotatePower) {
         climberMotor.set(rotatePower);
     }
-
 
 }
 

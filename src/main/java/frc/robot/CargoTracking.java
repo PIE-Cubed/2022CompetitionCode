@@ -4,12 +4,6 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.math.MathUtil;
-<<<<<<< HEAD
-=======
-
-import edu.wpi.first.networktables.*;
-
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 import edu.wpi.first.math.controller.PIDController;
 
 import edu.wpi.first.networktables.*;
@@ -18,7 +12,6 @@ import edu.wpi.first.networktables.*;
  * A class that tracks cargo with the help of a Raspberry Pi
  */
 public class CargoTracking {
-<<<<<<< HEAD
 	// firstTime
 	private boolean cargoFirstTime = true;
 
@@ -29,15 +22,6 @@ public class CargoTracking {
 	private NetworkTable TrackingValues;
 
 	// Network Table Entries
-=======
-	//Object creation
-	Drive drive;
-
-	//Network Table: Tracking
-	private NetworkTable TrackingValues;
-
-	//Network Table Entries: Tracking
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 	private NetworkTableEntry isRedAlliance;
 	private NetworkTableEntry isEmpty;
 	private NetworkTableEntry target;
@@ -92,12 +76,9 @@ public class CargoTracking {
 		cargoController.setTolerance(cargoToleranceDegrees);
 		cargoController.enableContinuousInput(-180.0, 180.0);
 
-<<<<<<< HEAD
 		//Restricts the PID's integrator range
 		cargoController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
 
-=======
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 		// Creates a Network Tables instance
 		TrackingValues = NetworkTableInstance.getDefault().getTable("TrackingValues");
 
@@ -106,7 +87,6 @@ public class CargoTracking {
 		isEmpty       = TrackingValues.getEntry("IsEmpty");       // Boolean
 		target        = TrackingValues.getEntry("CenterX");       // Double
 		empty         = TrackingValues.getEntry("Empty");         // Double
-<<<<<<< HEAD
 	}
 
 	/**
@@ -203,26 +183,16 @@ public class CargoTracking {
 
 		// Returns error code for continue
 		return Robot.CONT;
-=======
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 	}
 
 	/**
 	 * Method to turn and face the cargo of selected color
 	 */
-<<<<<<< HEAD
 	private void faceCargo() {
 		// Variables
 		double  turnAngle;
 		double  m_CargoCalculatedPower = 0.00;
 		boolean isNotFull = isEmpty.getBoolean(true);
-=======
-	public void faceCargo() {
-		//Variables
-		double  turnAngle;
-		double  m_CargoCalculatedPower = 0;
-		boolean isFull = isEmpty.getBoolean(false);
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
 		// Calls the cargoDetection method
 		turnAngle = cargoDetection();
@@ -230,7 +200,6 @@ public class CargoTracking {
 		// Clamps turnAngle
 		turnAngle = MathUtil.clamp(turnAngle, -180.00, 180.00);
 
-<<<<<<< HEAD
 		if (isNotFull == true) {
 			// Doesn't do anything to prevent constant occilation
 		}
@@ -254,20 +223,6 @@ public class CargoTracking {
 		else {
 			// Should never even occur
 			drive.stopWheels();
-=======
-		if (isFull == true) {
-			//Rotate with PID
-			m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
-			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
-			drive.teleopRotate(m_CargoCalculatedPower);
-		}
-		else if (isFull == false) {
-			//Doesn't do anything to prevent constant occilation
-		}
-		else {
-			//Should never even occur
-			drive.teleopRotate(0.00);
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 		}
 	}
 
@@ -281,20 +236,9 @@ public class CargoTracking {
 		boolean pipelineEmpty;
 		double  emptyCount;
 		double  turn;
-<<<<<<< HEAD
 
 		// Sets the double variables
 		pipelineEmpty = isEmpty.getBoolean(true);
-=======
-	
-		//Network Tables
-		isEmpty = TrackingValues.getEntry("IsEmpty");
-		target = TrackingValues.getEntry("CenterX");
-		empty  = TrackingValues.getEntry("Empty");
-	
-		//Sets the double variables
-		pipelineEmpty = isEmpty.getBoolean(false);
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 		centerX       = target.getDouble(0.00);
 		emptyCount    = empty.getDouble(0.00);
 
@@ -333,7 +277,6 @@ public class CargoTracking {
 		return turn;
 	}
 
-<<<<<<< HEAD
 	/**
 	 * Determines if the alliance color is red or not
 	 * @param isRed
@@ -354,16 +297,6 @@ public class CargoTracking {
 		boolean validTarget = !isEmpty.getBoolean(true);
 		return validTarget;
 	}
-=======
-  /**
-   * Determines if the alliance color is red or not
-   * @param isRed
-   */
-  public void setRedAlliance(boolean isRed) {
-    //Sets the NetworkTable variable color to the selected alliance color
-	isRedAlliance.setBoolean(isRed);
-  }
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
 	/**
 	 * Returns distance of center

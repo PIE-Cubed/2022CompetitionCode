@@ -1,78 +1,100 @@
 package frc.robot;
 
+/**
+ * Imports
+ */
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.DigitalInput;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
+
 public class Shooter {
+	//2 holes above marked one
+	//Low shot against hub- 0.25 speed, 1380-1500 rpm
+	//High shot from edge of tarmac- 0.5 speed, 3800-4000 rpm
+
+	//3 holes above marked one
+	//Low against hub- 0.3 speed, 1650-1750 rpm
+	//High from edge of tarmac- 0.525 speed, 2980-3100 rpm
+
 	
 	// SPARK MAX
-	private CANSparkMax leftShooter;
-	private CANSparkMax rightShooter;
-	private CANSparkMax hoodMotor;
-	private CANSparkMax feedMotor;
+	private CANSparkMax frontShooter;
+	private CANSparkMax rearShooter;
+	private CANSparkMax feeder;
 
 	// SPARK MAX ID's
-	private int LEFT_SHOOTER_ID  = 20;
-	private int RIGHT_SHOOTER_ID = 21;
-	private int HOOD_MOTOR_ID    = 22;
-	private int BALL_FEEDER_ID   = 23;
-
-	// DIO Ports
-	public final int FRONT_SWITCH_ID = 0; 
-	public final int REAR_SWITCH_ID  = 1;
+	private int FRONT_SHOOTER_ID  = 19; //front
+	private int REAR_SHOOTER_ID   = 20; //right-->rear
+	private int FEEDER_ID         = 21; //starts at bottom
 
 	// Encoders
-	private RelativeEncoder leftShooterEncoder;
-	private RelativeEncoder rightShooterEncoder;
-	private RelativeEncoder hoodMotorEncoder;
+	private RelativeEncoder frontShooterEncoder;
+	private RelativeEncoder rearShooterEncoder;
+	private RelativeEncoder feederEncoder;
 
-	//DIO SENSORS
-	private DigitalInput frontSwitch;
-	private DigitalInput rearSwitch; 
+	// Shooter Flipper Switch
+	DigitalInput  flipperSwitch;
 
 	// POWER CONSTANTS
-	public final double HIGH_SHOT_POWER = 0.70;
-	public final double LOW_SHOT_POWER  = 0.40;
 	public final double OFF_POWER  = 0.00;
 
+	public final double HIGH_SHOT_REAR_POWER   = 0.45; //0.525 //Untested
+	public final double HIGH_SHOT_FRONT_POWER  = -0.45; //0.525 //Untested
+
+	public final double LOW_SHOT_REAR_POWER    = 0.21; //0.29
+	public final double LOW_SHOT_FRONT_POWER   = -0.21; //-0.29
+
+	public final double LAUNCH_PAD_REAR_POWER  = 0.65;
+	public final double LAUNCH_PAD_FRONT_POWER = -0.65;
+
+	public final double AUTO_RING_REAR_POWER   = 0.6;
+	public final double AUTO_RING_FRONT_POWER  = -0.6;
+
+	private final double FEEDER_POWER          = -0.08; //Negative power raises the feeder
+
 	// RPM CONSTANTS
-	public final double HIGH_SHOT_TARGET_RPM = 4000;
-	public final double LOW_SHOT_TARGET_RPM  = 2000;
-	public final double OFF_TARGET_RPM       = 0;
+	public final double OFF_TARGET_RPM              = 0;
 
-	// HOOD MOTOR CONSTANTS
-	public static final double   HIGH_SHOT_HOOD_ENCODER   = -12;
-	public static final double   LOW_SHOT_HOOD_ENCODER    = -5;
-	public static final double   FRONT_MAX_ENCODER        = 0;
-	public static final double   REAR_MAX_ENCODER         = -15;
+	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2980;
+	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2980;
 
-	private static final double  HOOD_POWER = 0.075;
+	public final double LOW_SHOT_REAR_TARGET_RPM    = 1450; //1650
+	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1450; //1650
+
+	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3500;
+	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3500;
+
+	public final double AUTO_RING_REAR_TARGET_RPM   = 3300;
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 3300;
+
+	private final double FEEDER_UP_ENCODER          = 0.33; //It's actually negative since the motor has negative power
+	private final double FEEDER_DOWN_ENCODER        = 0;
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
-	private static final int HOOD_CURRENT_LIMIT    = 50;
 
-	// FEED MOTOR CONSTANTS
-	public static final double   FEED_POWER = -0.25;
+	// Flipper Switch Constants
+	private final int FLIPPER_ID                   = 0;
 
 	// Variables
-	public  double                targetVelocity;
+	public  double                frontTargetVelocity;
+	public  double                rearTargetVelocity;
 	private int                   targetCount        = 0;
-	private boolean               firstTime          = true;
-	public  boolean               hoodFirstTime      = true;
-	private double                hoodTargetEncoder  = 0;
-	private double                calibrateStartTime = 0;
-	private double                hoodStartEncoder;
-	private double                startSec           = 0;     
-	Shooter.ShootLocation         startPosition      = Shooter.ShootLocation.OFF;
-
+	private int                   noTargetCount      = 0;
+	private double                frontPower         = 0;
+	private double                rearPower          = 0;
 
 	public static enum ShootLocation {
 		HIGH_SHOT,
 		LOW_SHOT,
+		LAUNCH_PAD,
+		AUTO_RING,
 		OFF;
 	}
 
@@ -86,8 +108,13 @@ public class Shooter {
 	// Shooter PID Controller
 	private PIDController shooterController;
 
-	private static final double kP = 0.0001;
-	private static final double kI = 0.00;
+	// Integrator Constants
+	private static final double MIN_INTEGRATOR = -0.05;
+	private static final double MAX_INTEGRATOR =  0.05;
+
+	// P, I, D constants
+	private static final double kP = 0.0000; //0.00010
+	private static final double kI = 0.00005; //0.00005
 	private static final double kD = 0.00;
 
 
@@ -98,40 +125,36 @@ public class Shooter {
     ******************************************************************************************/
 	public Shooter() {
 		// SPARK Max
-		leftShooter    = new CANSparkMax(LEFT_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
-		rightShooter   = new CANSparkMax(RIGHT_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
-		hoodMotor      = new CANSparkMax(HOOD_MOTOR_ID, MotorType.kBrushless);
-		feedMotor      = new CANSparkMax(BALL_FEEDER_ID, MotorType.kBrushless);
-
-		leftShooter.follow(rightShooter, true);
+		frontShooter  = new CANSparkMax(FRONT_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
+		rearShooter   = new CANSparkMax(REAR_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
+		feeder        = new CANSparkMax(FEEDER_ID, MotorType.kBrushless);
 
 		// Sets the current limtis for the motors
-		leftShooter .setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
-		rightShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
-		hoodMotor.   setSmartCurrentLimit(HOOD_CURRENT_LIMIT);
+		frontShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
+		rearShooter .setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
 
 		// Sets the mode of the motors (if this works in the code)
-		leftShooter. setIdleMode(CANSparkMax.IdleMode.kCoast);
-		rightShooter.setIdleMode(CANSparkMax.IdleMode.kCoast);
-		hoodMotor.   setIdleMode(CANSparkMax.IdleMode.kBrake);
+		frontShooter.setIdleMode(CANSparkMax.IdleMode.kCoast);
+		rearShooter .setIdleMode(CANSparkMax.IdleMode.kCoast);
+		feeder.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		
 		// Set Shooter related motors to off to Start the Match
-		leftShooter .set(0.0);
-		rightShooter.set(0.0);
-		hoodMotor.set (0.0);
-		feedMotor.set (0.0);
+		frontShooter.set(0.0);
+		rearShooter .set(0.0);
+		feeder.set(0.0);
 
 		// Encoders
-		leftShooterEncoder  = leftShooter.getEncoder();
-		rightShooterEncoder = rightShooter.getEncoder();
-		hoodMotorEncoder    = hoodMotor.getEncoder();
-
-		// DIO Sensors
-		frontSwitch = new DigitalInput(FRONT_SWITCH_ID); 
-		rearSwitch  = new DigitalInput(REAR_SWITCH_ID );
+		frontShooterEncoder = frontShooter.getEncoder();
+		rearShooterEncoder  = rearShooter.getEncoder();
+		feederEncoder       = feeder.getEncoder();
+		feederEncoder.setPosition(0);
 
 		// PID Controller
 		shooterController = new PIDController(kP, kI, kD);
+		shooterController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
+
+		// Flipper Switch
+		flipperSwitch = new DigitalInput(FLIPPER_ID);
 	}
 
 
@@ -141,39 +164,68 @@ public class Shooter {
 	*    Uses PID to get shooter to appropriate speed for given shot
     *   
 	******************************************************************************************/
-	/*
 	public void autoShooterControl(ShootLocation location) {
-		shotLocation = location;
-		double  powerError;
-		double  power;
-
-		if (location == ShootLocation.OFF) {
-			powerError     = OFF_POWER;
-			targetVelocity = OFF_TARGET_RPM;
-			targetPower    = OFF_POWER;
+		double frontPowerError;
+		double rearPowerError;
+		
+		if (location == ShootLocation.HIGH_SHOT) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), HIGH_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , HIGH_SHOT_REAR_TARGET_RPM);
+			frontTargetVelocity = HIGH_SHOT_FRONT_TARGET_RPM;
+			rearTargetVelocity  = HIGH_SHOT_REAR_TARGET_RPM;
+			frontPower          = HIGH_SHOT_FRONT_POWER;
+			rearPower           = HIGH_SHOT_REAR_POWER;
 		}
-		else if ( ((location == ShootLocation.TEN_FOOT) || (location == ShootLocation.TRENCH)) || (location == ShootLocation.HAIL_MARY) ) {
-			powerError     = shooterController.calculate( getabsRPM(LEFT_SHOOTER_ID), SHOOT_TARGET_RPM);
-			targetVelocity = SHOOT_TARGET_RPM;
-			targetPower    = SHOOT_POWER;
+		else if (location == ShootLocation.LOW_SHOT) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LOW_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LOW_SHOT_REAR_TARGET_RPM);
+			frontTargetVelocity = LOW_SHOT_FRONT_TARGET_RPM;
+			rearTargetVelocity  = LOW_SHOT_REAR_TARGET_RPM;
+			frontPower          = LOW_SHOT_FRONT_POWER;
+			rearPower           = LOW_SHOT_REAR_POWER;
+		}
+		else if (location == ShootLocation.LAUNCH_PAD) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LAUNCH_PAD_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LAUNCH_PAD_REAR_TARGET_RPM);
+			frontTargetVelocity = LAUNCH_PAD_FRONT_TARGET_RPM;
+			rearTargetVelocity  = LAUNCH_PAD_REAR_TARGET_RPM;
+			frontPower          = LAUNCH_PAD_FRONT_POWER;
+			rearPower           = LAUNCH_PAD_REAR_POWER;
+		}
+		else if (location == ShootLocation.AUTO_RING) {
+			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), AUTO_RING_FRONT_TARGET_RPM);
+			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , AUTO_RING_REAR_TARGET_RPM);
+			frontTargetVelocity = AUTO_RING_FRONT_TARGET_RPM;
+			rearTargetVelocity  = AUTO_RING_REAR_TARGET_RPM;
+			frontPower          = AUTO_RING_FRONT_POWER;
+			rearPower           = AUTO_RING_REAR_POWER;
 		}
 		else {
-			powerError     = OFF_POWER;
-			targetVelocity = OFF_TARGET_RPM;
-			targetPower    = OFF_POWER;
+			frontPowerError     = OFF_POWER;
+			rearPowerError      = OFF_POWER;
+			frontTargetVelocity = OFF_TARGET_RPM;
+			rearTargetVelocity  = OFF_TARGET_RPM;
+			frontPower          = OFF_POWER;
+			rearPower           = OFF_POWER;
 		}
 
-		power = targetPower + powerError;
-		power = MathUtil.clamp(power, 0.0, 1.0);
-		
-		System.out.println("power:" + power);
-		System.out.println("rpm:" + getabsRPM(LEFT_SHOOTER_ID));
-		
-		SmartDashboard.putNumber("power", power);
-		SmartDashboard.putNumber("rpm", getabsRPM(LEFT_SHOOTER_ID));
+		//Increments shooter powers by PID-calculated error
+		frontPower = frontPower - frontPowerError;
+		frontPower = MathUtil.clamp(frontPower, -1.0, 0.0);
+		rearPower  = rearPower + rearPowerError;
+		rearPower  = MathUtil.clamp(rearPower, 0.0, 1.0);
 
-		rightShooter.set(power);
-	}*/
+		//Displays powers and rpms to smartdashboard
+		SmartDashboard.putNumber("Front power", frontPower);
+		SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
+		SmartDashboard.putNumber("Rear power", rearPower);
+		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+
+		System.out.println("Front rpm: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear rpm: " + getabsRPM(REAR_SHOOTER_ID));
+
+		frontShooter.set(frontPower);
+		rearShooter.set(rearPower);
+	}
 
 
 	/****************************************************************************************** 
@@ -185,22 +237,40 @@ public class Shooter {
 	public void manualShooterControl(ShootLocation location) {
 											
 	if (location == ShootLocation.OFF) {
-			rightShooter.set(OFF_POWER);
-			feedMotor.set(OFF_POWER);
-			targetVelocity = OFF_TARGET_RPM;
+			rearShooter .set(OFF_POWER);
+			frontShooter.set(OFF_POWER);
+			rearTargetVelocity  = OFF_TARGET_RPM;
+			frontTargetVelocity = OFF_TARGET_RPM;
 		}
 		else if (location == ShootLocation.HIGH_SHOT) {
-			rightShooter.set(HIGH_SHOT_POWER);
-			targetVelocity = HIGH_SHOT_TARGET_RPM;
+			rearShooter .set(HIGH_SHOT_REAR_POWER);
+			frontShooter.set(HIGH_SHOT_FRONT_POWER);
+			rearTargetVelocity  = HIGH_SHOT_REAR_TARGET_RPM;
+			frontTargetVelocity = HIGH_SHOT_FRONT_TARGET_RPM;
 		}
 		else if (location == ShootLocation.LOW_SHOT) {
-			rightShooter.set(LOW_SHOT_POWER);
-			targetVelocity = LOW_SHOT_TARGET_RPM;
+			rearShooter .set(LOW_SHOT_REAR_POWER);
+			frontShooter.set(LOW_SHOT_FRONT_POWER);
+			rearTargetVelocity  = LOW_SHOT_REAR_TARGET_RPM;
+			frontTargetVelocity = LOW_SHOT_FRONT_TARGET_RPM;
+		}
+		else if (location == ShootLocation.LAUNCH_PAD) {
+			rearShooter .set(LAUNCH_PAD_REAR_POWER);
+			frontShooter.set(LAUNCH_PAD_FRONT_POWER);
+			rearTargetVelocity  = LAUNCH_PAD_REAR_TARGET_RPM;
+			frontTargetVelocity = LAUNCH_PAD_FRONT_TARGET_RPM;
+		}
+		else if (location == ShootLocation.AUTO_RING) {
+			rearShooter .set(AUTO_RING_REAR_POWER);
+			frontShooter.set(AUTO_RING_FRONT_POWER);
+			rearTargetVelocity  = AUTO_RING_REAR_TARGET_RPM;
+			frontTargetVelocity = AUTO_RING_FRONT_TARGET_RPM;
 		}
 		else {
-			rightShooter.set(OFF_POWER);
-			feedMotor.set(OFF_POWER);
-			targetVelocity = OFF_TARGET_RPM;
+			rearShooter.set(OFF_POWER);
+			frontShooter.set(OFF_POWER);
+			rearTargetVelocity  = OFF_TARGET_RPM;
+			frontTargetVelocity = OFF_TARGET_RPM;
 		}
 	}
 
@@ -212,11 +282,20 @@ public class Shooter {
     *   
     ******************************************************************************************/
 	public boolean shooterReady() {
-		double rpm;
-		rpm = getabsRPM(LEFT_SHOOTER_ID);
-				
-		if ( rpm > targetVelocity )  {
+		double rearRpm;
+		double frontRpm;
+		rearRpm  = getabsRPM(REAR_SHOOTER_ID);
+		frontRpm = getabsRPM(FRONT_SHOOTER_ID);
+
+		double rearLowerLimit  = rearTargetVelocity  - 100;
+		double rearUpperLimit  = rearTargetVelocity  + 100;
+		double frontLowerLimit = frontTargetVelocity - 100;
+		double frontUpperLimit = frontTargetVelocity + 100;
+
+		if ((rearRpm  > rearLowerLimit  && rearRpm < rearUpperLimit) && 
+			(frontRpm > frontLowerLimit && frontRpm < frontUpperLimit))  {
 			targetCount ++;
+			noTargetCount = 0;
 			
 			if(targetCount >= 5) { 
 				return true;
@@ -226,370 +305,116 @@ public class Shooter {
 			}
 		}
 		else {
+			noTargetCount ++;
 			targetCount = 0;
+
+			//Timeout, shoots to clear system, better than holding ball
+			/*if (noTargetCount >= 300) {
+				System.out.println("Not up to speed. Check battery or PID");
+				System.out.println("Front rpm: " + frontRpm + "front target rpm: " + frontTargetVelocity);
+				System.out.println("Rear rpm: " + rearRpm + "rear target rpm: " + rearTargetVelocity);
+
+				//Resets noTargetCount once it has been shooting for 150 iterations
+				if (noTargetCount >= 450) {
+					noTargetCount = 0;
+					return false;
+				}
+				return true;
+			}
+			else {
+				return false;
+			}*/
 			return false;
 		}
 	}
 
-
 	/****************************************************************************************** 
-     *
-     *    Methods relating to the ball feeder
-     * 
-     ******************************************************************************************/
-	/**
-	 * Manually controls the feed motor
-	 * @param dir
-	 */
-	public void manualBallFeederControl(BallFeederDirection dir) {
-		if (dir == BallFeederDirection.FORWARD) {
-			feedMotor.set(FEED_POWER);
-		}
-		else if (dir == BallFeederDirection.REVERSE) {
-			feedMotor.set(1);
-		}
-		else {
-			feedMotor.set(OFF_POWER);
-		}
-	}
-
-	/**
-	 * Enables the feed motor
-	 */
-	public void enableFeeder() {
-		if (shooterReady() == true) {
-			manualBallFeederControl(BallFeederDirection.FORWARD);
-		}
-	}
-
-	public void disableFeeder() {
-		feedMotor.set(OFF_POWER);
-	}
-
-	/**
-	 * Reverses the feeder motor for 0.5 seconds
-	 * @param activePeriodSec
-	 * @return status
-	 */
-	public int reverseFeeder(double activePeriodSec) {
-		//Variables
-		long startMili;
-		long currentTimeMilli;
-		double currentTimeSec;
-
-		//Gets the current time
-		currentTimeMilli = System.currentTimeMillis();
-		//Allows for calculations in seconds
-		currentTimeSec = currentTimeMilli / 1000;
-
-		//First Time routine
-		if (firstTime == true) {
-			//Gets the time at the start of the program
-			startMili = System.currentTimeMillis();
-			//Allows for calculations in seconds
-			startSec = startMili / 1000;
-
-			firstTime = false;
-		}
-
-		if ( (currentTimeSec - startSec) <= activePeriodSec ) {
-			manualBallFeederControl(BallFeederDirection.REVERSE);
-			
-			return Robot.CONT;
-		}
-		else if ( (currentTimeSec - startSec) > activePeriodSec ) {
-			disableBallFeeder();
-
-			return Robot.DONE;
-		}
-		else { //There is no case that I can think of that will trigger this
-			disableBallFeeder();
-
-			return Robot.FAIL;
-		}
-	}
-
-
-	/****************************************************************************************** 
-     *
-     *    manualHoodMotorControl()
-	 *    Moves hood to given location
-     *   
-     ******************************************************************************************/
-	public int manualHoodMotorControl(Shooter.ShootLocation motorPosition) {
-
-		//Variables
-		boolean atFrontSwitch = getFrontSwitchValue();
-		boolean atRearSwitch  = getRearSwitchValue ();
-		double  hoodCurrentEncoder = hoodMotorEncoder.getPosition();
-
-		//First time through, setting initial values
-		if (hoodFirstTime == true) {
-			hoodStartEncoder = hoodCurrentEncoder;
-			startPosition = motorPosition;
-
-			//Sets target encoder value
-			if (motorPosition == ShootLocation.HIGH_SHOT) {
-				hoodTargetEncoder = HIGH_SHOT_HOOD_ENCODER;
-			}
-			else if (motorPosition == ShootLocation.LOW_SHOT) {
-				hoodTargetEncoder = LOW_SHOT_HOOD_ENCODER;
-			}
-			else {
-				hoodFirstTime = true;
-				disableHoodMotor();
-				return Robot.FAIL;
-			}
-
-			hoodFirstTime = false;
-		}
-
-		//Error checking
-		if (startPosition != motorPosition) {
-			hoodFirstTime = true;
-			disableHoodMotor();
-			System.out.println("Changed shoot location, resetting hood movement");
-			return Robot.DONE;
-		}
-		else if (hoodMotor.getOutputCurrent() > HOOD_CURRENT_LIMIT) {
-			hoodFirstTime = true;
-			disableHoodMotor();
-			System.out.println("Hood current limit exceded. Value at " + hoodMotor.getOutputCurrent());
-			return Robot.FAIL;
-		}
-		else if (   ((hoodCurrentEncoder > FRONT_MAX_ENCODER) || (atFrontSwitch))    && (hoodStartEncoder < hoodTargetEncoder) ){ //Going forward and at limit switch 1
-			hoodFirstTime = true;
-			disableHoodMotor();
-			System.out.println("Hood at front limit");
-			return Robot.DONE;
-		}
-		else if (   ((hoodCurrentEncoder < REAR_MAX_ENCODER) || (atRearSwitch))  &&  (hoodStartEncoder > hoodTargetEncoder) ){ //Going backwards and at limit switch 2
-			hoodFirstTime = true;
-			disableHoodMotor();
-			System.out.println("Hood at back limit");
-			return Robot.DONE;
-		}
-		
-		//Checking if we have reached target
-
-		//Started behind the target position, move hood forward
-		if (hoodStartEncoder < hoodTargetEncoder) {
-			//Have moved forward past the target position
-			if (hoodCurrentEncoder > hoodTargetEncoder) {
-				hoodFirstTime = true;
-				disableHoodMotor();
-				System.out.println("Hood at target position of " + hoodTargetEncoder + ". Current encoder is " + hoodCurrentEncoder);
-				return Robot.DONE;
-			}
-			else {
-				hoodMotor.set(HOOD_POWER);
-				return Robot.CONT;
-			}
-		}
-		//Started in front of the target position, move hood backwards
-		else if (hoodStartEncoder > hoodTargetEncoder) {
-			//Have moved back past the target position
-			if (hoodCurrentEncoder < hoodTargetEncoder) {
-				hoodFirstTime = true;
-				disableHoodMotor();
-				System.out.println("Hood at target position of " + hoodTargetEncoder + ". Current encoder is " + hoodCurrentEncoder);
-				return Robot.DONE;
-			}
-			else {
-				hoodMotor.set(-1 * HOOD_POWER);
-				return Robot.CONT;
-			}
-		}
-		else {
-			System.out.println("Should not be here. Line 419 in shooter");
-			hoodFirstTime = true;
-			disableHoodMotor();
-			return Robot.DONE;
-		}
-	}
-
-
-	/****************************************************************************************** 
-     *
-     *    Methods relating to the hood motor and its sensors
-     * 
-     ******************************************************************************************/
-	/**
-	 * Gets the value from the frontSwitch
-	 * The value returned is opposite from what the sensor gets since it returns true when there is nothing
-	 * @return The value of the frontSwitch
-	 */
-	public boolean getFrontSwitchValue() {
-		boolean frontSwitchTriggered;
-
-		frontSwitchTriggered = frontSwitch.get();
-
-		if (frontSwitchTriggered == false) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * Gets the value from the rearSwitch
-	 * The value returned is opposite from what the sensor gets since it returns true when there is nothing
-	 * @return The value of the rearSwitch
-	 */
-	public boolean getRearSwitchValue() {
-		boolean rearSwitchTriggered;
-
-		rearSwitchTriggered = rearSwitch.get();
-
-		if (rearSwitchTriggered == false) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	public void enableHoodMotor(double power) {
-		hoodMotor.set(power);
-	}
-
-	public void disableHoodMotor() {
-		hoodMotor.set(0.00);
-	}
-
-
-    /****************************************************************************************** 
     *
-    *    moveHoodFullForward()
-    *    Moves hood to forward sensor and calibrates encoders
-    * 
+    *    deployFeeder()
+	*    Moves feeder to up position
+	*    Returns status, but it is usually uneeded because this function automatically stops motor
+    *   
     ******************************************************************************************/
-	public int moveHoodFullForward() {
+	public int deployFeeder() {
+		double absPosition = Math.abs(feederEncoder.getPosition());
+		//System.out.println("Deployed: " + feederEncoder.getPosition());
 
-		if (calibrateStartTime == 0) {
-			calibrateStartTime = System.currentTimeMillis();
-		}
-		double currentTime = System.currentTimeMillis();
-
-		if (getFrontSwitchValue() == true) { //Reached position sensor
-			disableHoodMotor();
-			hoodMotorEncoder.setPosition(0.0);
-			System.out.println("Hood at sensor 1, encoder is " + hoodMotorEncoder.getPosition());
+		if (absPosition >= FEEDER_UP_ENCODER) {
+			feeder.set(0.0);
 			return Robot.DONE;
 		}
-		else if (hoodMotor.getOutputCurrent() >= HOOD_CURRENT_LIMIT) { //Current spike
-			disableHoodMotor();
-			System.out.println("Hood motor amps: " + hoodMotor.getOutputCurrent());
-			return Robot.FAIL;
-		} 
-		else if (currentTime - calibrateStartTime > 10000) {
-			disableHoodMotor();
-			System.out.println("Hood calibration timed out");
-			return Robot.FAIL;
-		}
-		else { //No need to stop
-			hoodMotor.set(HOOD_POWER);
+		else {
+			feeder.set(FEEDER_POWER);
 			return Robot.CONT;
 		}
 	}
 
 	/****************************************************************************************** 
     *
-    *    getHoodEncoder()
-    *    returns hood encoder value
-    * 
-	******************************************************************************************/
-	public double getHoodEncoder() {
-		return hoodMotorEncoder.getPosition();
+    *    retractFeeder()
+	*    Moves feeder to down position
+	*    Returns status, but it is usually uneeded because this function automatically stops motor
+    *   
+    ******************************************************************************************/
+	public int retractFeeder() {
+		double absPosition = Math.abs(feederEncoder.getPosition());
+		/*
+		if (flipperSwitch.get() == true)  {
+			feederEncoder.setPosition(0);
+            feeder.set(0.0);
+			return Robot.DONE;
+		}
+		*/
+		if (absPosition >= FEEDER_DOWN_ENCODER) {
+			feeder.set(0.0);
+			return Robot.DONE;
+		}
+		else {
+			feeder.set(-1 * FEEDER_POWER);
+			return Robot.CONT;
+		}
 	}
-
 
 	/**
 	 * DEBUG / TEST FUNCTIONS
 	 */
 	
-	 /**
+	/**
 	 * A debug function for the shooter
 	 * @param power
 	 */
 	public void testShoooter(double power) {
-		//leftShooter.set(power * -1);
-		rightShooter.set(power);
-		feedMotor.set(power * -1); //Negative power makes it intake
-
-		System.out.println("Power: " + power + " RPM: " + getabsRPM(LEFT_SHOOTER_ID));
+		frontShooter.set(power);
+		rearShooter .set(power);
+		System.out.println("Power: " + power + " RPM: " + getabsRPM(FRONT_SHOOTER_ID));
 	}
 
 	/**
-	 * Prints the speed of the wheel
+	 * Enables the shooter at full power
 	 */
-	public void printSpeed() {
-		double π = Math.PI;
-		double wheel_size = 6;                                                 // Wheel diameter Inches 
-
-		double RPM = (getabsRPM(LEFT_SHOOTER_ID) + getabsRPM(RIGHT_SHOOTER_ID) ) / 2; // Rotations per minute average
-		double RPH = RPM / 60;                                                 // Rotations per hour
-		
-		double circumferenceInches = wheel_size * π;                           // Circumference in Inches
-		double circumferenceFeet = circumferenceInches / 12;                   // Circumference in Feet
-		double circumferenceMiles = circumferenceFeet / 5280;                  // Circumference in Miles
-
-		double MPH = RPH * circumferenceMiles;                                 // Miles Per Hour
-
-		if (RPM > 0) { 
-			//System.out.println("MPH: " + MPH);
-			if (MPH != 0) {
-				System.out.println("RPM 1: " + getabsRPM(LEFT_SHOOTER_ID));
-				System.out.println("RPM 2: " + getabsRPM(RIGHT_SHOOTER_ID));
-			}
-		}
-	}
-
 	public void enableShooterFullPower() {
-		//leftShooter.set(-0.70);
-		rightShooter.set(1.00);
-		feedMotor.set(FEED_POWER);
+		frontShooter.set(1.00);
+		rearShooter.set(1.00);
 
-		System.out.println("RPM 1: " + getabsRPM(LEFT_SHOOTER_ID));
-		System.out.println("RPM 2: " + getabsRPM(RIGHT_SHOOTER_ID));
-	}
-
-	/**
-	 * Debug function to enable all three shooting related motors 
-	 */
-	public void testShooter(double power) {
-		testRightShooterMotor(power);
-		testBallFeeder();
-	}
-
-	/*private void enableLeftShooterMotor(double power) { //Was enableShooterMotor1() 
-		leftShooter.set(power * -1);
-	}*/
-
-	private void testRightShooterMotor(double power) { //Was enableShooterMotor2()
-		rightShooter.set(power);
-	}
-
-	private void testBallFeeder() {
-		feedMotor.set(-0.50);
+		System.out.println("RPM 1: " + getabsRPM(FRONT_SHOOTER_ID));
+		System.out.println("RPM 2: " + getabsRPM(REAR_SHOOTER_ID));
 	}
 
 	/**
 	 * Debug function to disable all motors that are controlled by this class
 	 */
 	public void disableShooter(){
-		disableRightShooterMotor();
-		disableBallFeeder();
-		disableHoodMotor();
+		frontShooter.set(0);
+		rearShooter.set(0);
+		retractFeeder();
 	}
 
-	public void disableRightShooterMotor() { //Was disableShooterMotor2
-		rightShooter.set(0.00);
-	}
-
-	private void disableBallFeeder() {
-		feedMotor.set(0.00);
+	/**
+	 * Disables all shooter motors
+	 */
+	public void disableShooterMotors() { //Was disableShooterMotor2
+		rearShooter .set(0.00);
+		frontShooter.set(0.00);
 	}
 
 	/**
@@ -603,15 +428,13 @@ public class Shooter {
 
 	private double shooter1RPM() {
 		double rpm;
-		rpm = getabsRPM(LEFT_SHOOTER_ID);
-		
+		rpm = getabsRPM(FRONT_SHOOTER_ID);
 		return rpm;
 	}
 
 	private double shooter2RPM() {
 		double rpm;
-		rpm = getabsRPM(RIGHT_SHOOTER_ID);
-		
+		rpm = getabsRPM(REAR_SHOOTER_ID);
 		return rpm;
 	}
 
@@ -623,14 +446,11 @@ public class Shooter {
 		double rpm;
 		double absRPM;
 
-		if (MOTOR_CAN_ID == LEFT_SHOOTER_ID) {
-			rpm = leftShooterEncoder.getVelocity();
+		if (MOTOR_CAN_ID == FRONT_SHOOTER_ID) {
+			rpm = frontShooterEncoder.getVelocity();
 		}
-		else if (MOTOR_CAN_ID == RIGHT_SHOOTER_ID) {
-			rpm = rightShooterEncoder.getVelocity();
-		}
-		else if (MOTOR_CAN_ID == HOOD_MOTOR_ID) {
-			rpm = hoodMotorEncoder.getVelocity();
+		else if (MOTOR_CAN_ID == REAR_SHOOTER_ID) {
+			rpm = rearShooterEncoder.getVelocity();
 		}
 		else {
 			//It should never come to this case
@@ -638,7 +458,6 @@ public class Shooter {
 		}
 
 		absRPM = Math.abs(rpm);
-
 		return absRPM;
 	}
 
@@ -647,46 +466,25 @@ public class Shooter {
    *    Test functions for shooter 
    * 
    ******************************************************************************************/
-	public void testHoodMotor(double power) {
-		//Positive power moves hood forward. Reasonable speed is 0.75
-		hoodMotor.set(power);
-		//System.out.println("Amps: " + hoodMotor.getOutputCurrent() + " Encoder: " + hoodMotorEncoder.getPosition());
-		System.out.println("Encoder: " + hoodMotorEncoder.getPosition());
-
+	public void testShootMotors(double powerF, double powerR) {
+		//Shooter motor 1 (front motor) needs to be negative to shoot a ball
+		//Shooter motor 2 (rear motor) needs to be positive to shoot a ball
+		frontShooter.set(-powerF);
+		rearShooter.set(powerR);
+		System.out.println("Front RPM: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear RPM: " + getabsRPM(REAR_SHOOTER_ID));
 	}
 
-	public void testFeedMotor(double power) {
-		//Negative values makes it intake balls
-		feedMotor.set(power);
+	public void testFeeder() {
+		System.out.println(feederEncoder.getPosition());
 	}
 
-	public void testShootMotors(double power) {
-		//Shooter motor 1 (left motor) needs to be negative to shoot a ball
-		//Shooter motor 2 (right motor) needs to be positive to shoot a ball
-		//leftShooter.set(-power);
-		leftShooter.follow(rightShooter, true); //put in the constructor
-		rightShooter.set(power);
-		System.out.println("Shooter motor power: " + rightShooter.getOutputCurrent());
+	public void powerFeeder(double pow) {
+		feeder.set(pow);
 	}
 
-	public int testHoodMotorEncoder(double encoderTarget){
-		
-		double encoderCurrent = hoodMotorEncoder.getPosition();
-
-		//Hasn't reached target yet
-		if (encoderCurrent > encoderTarget){
-			hoodMotor.set(-1* HOOD_POWER);
-			return Robot.CONT;
-		}
-		else if (encoderCurrent <= encoderTarget) {
-			hoodMotor.set(0.00);
-			return Robot.DONE;
-		}
-		else {
-			return Robot.FAIL;
-		}
-
+	public boolean testFlipperSwitch()  {
+		return flipperSwitch.get();
 	}
 
-
-} //End of the Shooter Class
+}
+//End of the Shooter Class

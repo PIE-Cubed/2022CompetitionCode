@@ -40,24 +40,16 @@ public class Controls {
     private Joystick joystick;
     private XboxController xboxController;
 
-<<<<<<< HEAD
     //Constructor
-=======
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     public Controls() {
         //Instance Creation
         joystick       = new Joystick(ControllerIDs.JOYSTICK.getId());
         xboxController = new XboxController(ControllerIDs.XBOX_MANIP_CONTROLLER.getId());
     }
 
-<<<<<<< HEAD
     /**
      * JOYSTICK FUNCTIONS
      */
-=======
-
-
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     // SHOOTER ENABLED
     public boolean getShooterEnable() {        
         return joystick.getTrigger();        
@@ -66,39 +58,18 @@ public class Controls {
     /**
      * DRIVE FUNCTIONS
      */
-<<<<<<< HEAD
-=======
-    public double getDriveAngle() {
-        double x = joystick.getX();
-        double y = joystick.getY();
-        
-        //Does math to figure out the drive angle 
-        double rad = Math.atan2(x, y);
-        double deg = Math.toDegrees(rad);
-
-        return deg;
-    }
-
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     /**
      * Positive values are from clockwise rotation and negative values are from counter-clockwise
      * @return rotatePower
      */
     public double getRotatePower() {
         double power = joystick.getZ(); 
-<<<<<<< HEAD
 
         //If we are in deadzone or strafelock is on, rotatepower is 0
         if ((Math.abs(power) < 0.3) || (getStrafeLock() == true)) {
             power = 0;
         }
 
-=======
-        if (Math.abs(power) < 0.3) {
-            power = 0;
-        }
-
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
         //Cubes the power and clamps it because the rotate is SUPER sensitive
         power = Math.pow(power, 3.0); 
         power = MathUtil.clamp(power, -.5, .5);
@@ -107,30 +78,11 @@ public class Controls {
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * Gets the drive power
-     * @return drivePower
-     *
-    public double getDrivePower() {
-        double x = joystick.getX();
-        double y = joystick.getY() * -1;
-
-        //Does math to calculate the power we want if on an angle  
-        double hyp = Math.sqrt(x*x + y*y);
-        double hypClamp = MathUtil.clamp(hyp, -1, 1);
- 
-        return hypClamp;
-    }*/
-
-    /**
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
      * Gets the drive X
      * @return driveX
      */
     public double getDriveX() {
         double power = joystick.getX();
-<<<<<<< HEAD
 
         //Strafe lock removes deadzone and cubes power for more precision
         if (getStrafeLock() == true) {
@@ -138,9 +90,6 @@ public class Controls {
         }
         //If we are in deadzone or rotatelock is on, x is 0
         if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
-=======
-        if (Math.abs(power) < 0.05) {
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
             power = 0;
         }
         return power;
@@ -152,7 +101,6 @@ public class Controls {
      */
     public double getDriveY() {
         double power = joystick.getY() * -1;
-<<<<<<< HEAD
 
         //Strafe lock removes deadzone and cubes power for more precision
         if (getStrafeLock() == true) {
@@ -160,9 +108,6 @@ public class Controls {
         }
         //If we are in deadzone or rotatelock is on, y is 0
         else if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
-=======
-        if (Math.abs(power) < 0.05) {
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
             power = 0;
         }
         return power;
@@ -228,10 +173,6 @@ public class Controls {
         return xboxController.getAButtonPressed();
     }
         
-<<<<<<< HEAD
-=======
-
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     /** 
      * Left Bumper Pressed
      * @return leftBumperPressed 
@@ -250,7 +191,6 @@ public class Controls {
 
     public double getClimberPower() {
         return -1 * xboxController.getLeftY();
-<<<<<<< HEAD
     }
      
     //Grabber Direction based off of D-Pad
@@ -293,20 +233,9 @@ public class Controls {
         }
         else if (xboxController.getRightTriggerAxis() > 0) {
             return 0.2 * xboxController.getRightTriggerAxis();
-=======
-    }
-     
-    //Grabber Direction based off of D-Pad
-    public Grabber.GrabberDirection getGrabberDirection() {
-        if (xboxController.getPOV() == 0) {
-            return Grabber.GrabberDirection.FORWARD;
-        }
-        else if (xboxController.getPOV() == 180) {
-            return Grabber.GrabberDirection.REVERSE;
->>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
         }
         else {
-            return Grabber.GrabberDirection.OFF;
+            return 0;
         }
     }
 }
