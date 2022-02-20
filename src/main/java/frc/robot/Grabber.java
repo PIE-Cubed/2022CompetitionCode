@@ -76,12 +76,10 @@ public class Grabber {
     public void deployRetract() {
         // Toggle the State of the Piston
         if (grabberState == GrabberState.DEPLOY) {
-            grabberPiston.set(Value.kReverse);
-            grabberState = GrabberState.RETRACT;
+            retract();
         }
         else if (grabberState == GrabberState.RETRACT) {
-            grabberPiston.set(Value.kForward);
-            grabberState = GrabberState.DEPLOY;
+            deploy();
         }
     }
 
@@ -89,23 +87,40 @@ public class Grabber {
         //Don't allow grabber to turn manually if it's retracted
         if (grabberState == GrabberState.RETRACT)  {
             grabberMotor.set(0.0);
-            return;
         }
-        
-        // Grabber Intake
-        if (dir == GrabberDirection.FORWARD) {
-            grabberMotor.set(GRABBER_POWER);
+        //Allows the grabber to move if deployed
+        else if (grabberState == GrabberState.DEPLOY) {
+            // Grabber Intake
+            if (dir == GrabberDirection.FORWARD) {
+                grabberMotor.set(GRABBER_POWER);
+            }
+            // Grabber Reverse
+            else if (dir == GrabberDirection.REVERSE) {
+                grabberMotor.set(GRABBER_POWER * -1);
+            }
+            // No direction
+            else {
+                grabberMotor.set(0.0);
+            }
         }
-        // Grabber Reverse
-        else if (dir == GrabberDirection.REVERSE) {
-            grabberMotor.set(GRABBER_POWER * -1);
-        }
-        // No direction
+        //Shouldn't happen, but stops the grabber anyway
         else {
-            grabberMotor.set(0.0);
-        }    
+            grabberMotor.set(0.00);
+        }
     }
 
+    /**
+     * Individual functions
+     */
+    public void deploy() {
+        grabberPiston.set(Value.kForward);
+        grabberState = GrabberState.DEPLOY;
+    }
+
+    public void retract() {
+        grabberPiston.set(Value.kReverse);
+        grabberState = GrabberState.RETRACT;
+    }
 
 }
 

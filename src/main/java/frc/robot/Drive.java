@@ -31,7 +31,7 @@ public class Drive {
     private NetworkTableEntry pipeline;
 
     //NAVX
-    private static AHRS ahrs;
+    public static AHRS ahrs;
 
     //PID controllers
     private PIDController rotateController;
@@ -66,7 +66,6 @@ public class Drive {
     //CONSTANTS
     private final int    FAIL_DELAY   = 5;
     private final double ticksPerFoot = 5.65;
-
 
     //BLUE ROBOT
     private static final double FL_OFFSET = 309.8;

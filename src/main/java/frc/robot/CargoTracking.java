@@ -9,7 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.*;
 
 /**
- * Start of class
+ * A class that tracks cargo with the help of a Raspberry Pi
  */
 public class CargoTracking {
 	// firstTime
@@ -43,9 +43,9 @@ public class CargoTracking {
 	//private static final int IMG_HEIGHT = 480;
 
 	// Auto Tracking Constants
-	private final int  TIME_OUT_SEC  = 2;
+	private final int  TIME_OUT_SEC  = 5;
 	private final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
-	private final int  FAIL_DELAY = 5;
+	private final int  FAIL_COUNT      = 10;
 	private final int  ON_TARGET_COUNT = 5;
 
 	// PID controller
@@ -93,7 +93,7 @@ public class CargoTracking {
 	 * 
 	 * @return Targetting Status
 	 */
-	public int autoCargoTracking() {
+	public int autoCargoTrack() {
 		// Variables
 		long    currentMs = System.currentTimeMillis();
 		boolean noTarget  = isEmpty.getBoolean(true);
@@ -112,7 +112,7 @@ public class CargoTracking {
 			//Increments the noTargetCount
 			noTargetCount++;
 
-			if (noTargetCount <= FAIL_DELAY) {
+			if (noTargetCount <= FAIL_COUNT) {
 				// Robot continues searching
 				faceCargo();
 
@@ -289,8 +289,25 @@ public class CargoTracking {
 	}
 	
 	/**
-	 * TEST FUNCTIONS
+	 * RETURN FUNCTIONS
 	 */
+	/**
+	 * Checks if there is a valid target
+	 * @return validTarget
+	 */
+	public boolean isTargetValid() {
+		boolean validTarget = !isEmpty.getBoolean(true);
+		return validTarget;
+	}
+
+	/**
+	 * Returns distance of center
+	 * @return
+	 */
+	public double getCenterOffset() {
+		double error = centerX - (IMG_WIDTH_SCALED / 2);
+		return error;
+	}
 }
 
 //End of the CargoTracking class

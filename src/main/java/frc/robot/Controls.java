@@ -6,7 +6,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
 
@@ -45,22 +45,19 @@ public class Controls {
         xboxController = new XboxController(ControllerIDs.XBOX_MANIP_CONTROLLER.getId());
     }
 
-
-
+    /**
+     * JOYSTICK FUNCTIONS
+     */
     // SHOOTER ENABLED
     public boolean getShooterEnable() {        
         return joystick.getTrigger();        
     }
-
-
     
-    /*
-        DRIVE FUNCTIONS
-    */
-
     /**
-     * Positive values are from clockwise rotation 
-     * and negative values are from counter-clockwise
+     * DRIVE FUNCTIONS
+     */
+    /**
+     * Positive values are from clockwise rotation and negative values are from counter-clockwise
      * @return rotatePower
      */
     public double getRotatePower() {
@@ -149,12 +146,13 @@ public class Controls {
         }
     }
 
+
     /**
-     * These are all Functions of the Xbox controller
+     * XBOX CONTROLLER FUNCTIONS
      */
     /**
      * Start Button Pressed
-     * WHETER TO KILL ALL ACTIVE AUTO PROGRAMS!
+     * <p>KILLS ALL ACTIVE AUTO PROGRAMS!
      * @return startButtonPressed
      */
     public boolean autoKill() {
@@ -169,7 +167,6 @@ public class Controls {
         return xboxController.getAButtonPressed();
     }
         
-
     /** 
      * Left Bumper Pressed
      * @return leftBumperPressed 
@@ -203,6 +200,25 @@ public class Controls {
         }
     }
 
+    /**
+     * Uses the Xbox Controller's rumbing to display CargoTracking error
+     * @param rumblePower
+     */
+    public void controllerRumble(double rumblePower) {
+        double scaledRumble = rumblePower / 240;
+        double absPower = Math.abs(scaledRumble);
+
+        if (scaledRumble < 0) {
+            xboxController.setRumble(RumbleType.kLeftRumble , absPower / 3);
+        }
+        else if (scaledRumble > 0) {
+            xboxController.setRumble(RumbleType.kRightRumble, absPower / 3);
+        }
+        else {
+            xboxController.setRumble(RumbleType.kLeftRumble , 0);
+            xboxController.setRumble(RumbleType.kRightRumble, 0);
+        }
+    }
 
     //Test controls
     public double getFeedPower() {

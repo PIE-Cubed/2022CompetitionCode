@@ -12,14 +12,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Shooter.ShootLocation;
 
 /**
- * Start of class
+ * The class that runs with the start of a match
  */
 public class Robot extends TimedRobot {
-  //Networktables
+  // ERROR CODES
+  public static final int FAIL = -1;
+  public static final int PASS =  1;
+  public static final int DONE =  2;
+  public static final int CONT =  3;
+
+  // Networktables
   private NetworkTable FMSInfo;
   private NetworkTableEntry isRedAlliance;	
 
-  //Object creation
+  // Object creation
   Drive         drive;
   Controls      controls;
   Grabber       grabber;
@@ -28,20 +34,16 @@ public class Robot extends TimedRobot {
   CargoTracking cargoTracking;
   Auto          auto;
 
-  // ERROR CODES
-  public static final int FAIL = -1;
-  public static final int PASS =  1;
-  public static final int DONE =  2;
-  public static final int CONT =  3;
-
-  private int status = CONT;
-  private int statusTest = CONT;
+  // Variables
+  private int status = Robot.CONT;
 
   //Enumeration for manual or limelight control
   public static enum DriveMode {
     MANUAL,
-    TARGETING,
-    TARGETED;
+    LIMELIGHT_TARGETING,
+    LIMELIGHT_TARGETED,
+    CARGO_TARGETING,
+    CARGO_TARGETED;
   }
   private DriveMode driveMode = DriveMode.MANUAL;
 
@@ -61,7 +63,6 @@ public class Robot extends TimedRobot {
   //Auto Delay
   private int delaySec = 0;
 
-
   /**
    * Constructor
    */
@@ -73,7 +74,7 @@ public class Robot extends TimedRobot {
     //climber       = new Climber();
     shooter       = new Shooter();
     cargoTracking = new CargoTracking(drive);
-    auto          = new Auto(drive, grabber, shooter);
+    auto          = new Auto(drive, grabber, shooter, cargoTracking);
 
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -237,13 +238,16 @@ public class Robot extends TimedRobot {
    * Controls the wheels in TeleOp
    */
   private void wheelControl() {
-    //Get joystick values
+    //Gets Joystick Values
     double driveX               = controls.getDriveX();
     double driveY               = controls.getDriveY();
     double rotatePower          = controls.getRotatePower();
     ShootLocation shootLocation = controls.getShootLocation();
 
-    //The variable the kills all automatic funcitons (Start on the Xbox controller)
+    //Gets Xbox Values
+    boolean cargoTrackingActive = false;
+
+    //Kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
 
     //General state changes
@@ -266,26 +270,50 @@ public class Robot extends TimedRobot {
 
       //Exit conditions
       if ((shootLocation == ShootLocation.HIGH_SHOT) || (shootLocation == ShootLocation.LAUNCH_PAD)) {
-        driveMode = DriveMode.TARGETING;
+        driveMode = DriveMode.LIMELIGHT_TARGETING;
+      }
+
+      //Exit coditions
+      if (cargoTrackingActive == true) {
+        driveMode = DriveMode.CARGO_TARGETING;
       }
     } 
-    //Limelight targetting
-    else if (driveMode == DriveMode.TARGETING) {
+    //Limelight targeting
+    else if (driveMode == DriveMode.LIMELIGHT_TARGETING) {
       int targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);  
 
       if (targetStatus == Robot.DONE) {
-        driveMode = DriveMode.TARGETED;
+        driveMode = DriveMode.LIMELIGHT_TARGETED;
       }
       else if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
         driveMode = DriveMode.MANUAL;
       }
     }
-    //Limelight targetted
-    else if (driveMode == DriveMode.TARGETED) {
+    //Limelight targeted
+    else if (driveMode == DriveMode.LIMELIGHT_TARGETED) {
       //Does nothing until trigger is released
       if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
         driveMode = DriveMode.MANUAL;
       }
+    }
+    //Raspberry Pi Targeting
+    else if (driveMode == DriveMode.CARGO_TARGETING) {
+      int    cargoStatus = cargoTracking.autoCargoTrack();
+      double error       = cargoTracking.getCenterOffset();
+
+      if (cargoStatus == Robot.CONT) {
+        controls.controllerRumble(error);
+      }
+      else if (cargoStatus == Robot.DONE) {
+        driveMode = DriveMode.CARGO_TARGETED;
+      }
+      else if (cargoStatus == Robot.FAIL) {
+        driveMode = DriveMode.MANUAL;
+      }
+    }
+    //Raspberry Pi Targeted
+    else if (driveMode == DriveMode.CARGO_TARGETED) {
+      driveMode = DriveMode.MANUAL;
     }
   }
 

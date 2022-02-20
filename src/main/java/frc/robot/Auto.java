@@ -8,32 +8,38 @@ import frc.robot.Shooter.ShootLocation;
 import frc.robot.Drive.TargetPipeline;
 
 public class Auto {
-    // Step Variables
-    private int step = 1;
-    private int shootStep = 1;
-
     // Object creation
     Drive   drive;
     Grabber grabber;
     Shooter shooter;
+    CargoTracking cargoTracking;
+
+    // Step Variables
+    private int step = 1;
+    private int shootStep = 1;
+    private int cargoStep = 1;
 
     // First Time variables 
-	private boolean   firstTime        = true;
-	private boolean   shootFirstTime   = true;
-	private boolean   delayFirstTime   = true;
+	private boolean firstTime      = true;
+	private boolean shootFirstTime = true;
+    private boolean cargoFirstTime = true;
+	private boolean delayFirstTime = true;
     
     // Variables
-    private long autoDelayTargetMs = 0;
+    private long   autoDelayTargetMs = 0;
+    private int    noTargetCount     = 0;
+    private double cargoHeading      = 0;
 
     /**
      * CONSTRUCTOR
      * @param drive
      * @param grabber
      */
-    public Auto(Drive drive, Grabber grabber, Shooter shooter){
+    public Auto(Drive drive, Grabber grabber, Shooter shooter, CargoTracking cargoTracking){
         this.drive   = drive;
 		this.grabber = grabber;
         this.shooter = shooter;
+        this.cargoTracking = cargoTracking;
     }
 
     /**
@@ -378,6 +384,79 @@ public class Auto {
             shootStep++;
         }
 
+        return Robot.CONT;
+    }
+
+    public int autoCargoPickup() {
+        int status = Robot.CONT;
+        boolean targetValid = cargoTracking.isTargetValid();
+        final double FAIL_COUNT = 10;
+
+        // Runs the firstTime procedure
+        if (cargoFirstTime == true) {
+			cargoFirstTime = false;
+			cargoStep = 1;
+		}
+
+        switch (cargoStep) {
+            case 1:
+                status = cargoTracking.autoCargoTrack();
+                break;
+            case 2:
+                grabber.deploy();
+                status = Robot.DONE;
+                break;
+            case 3:
+                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                cargoHeading = Drive.ahrs.getYaw();
+                status = Robot.DONE;
+                break;
+            case 4:
+                if (targetValid == true) {
+                    drive.autoCrabDrive(0.05, cargoHeading);
+                }
+                else {
+                    noTargetCount++;
+                }
+
+                // Only goes to next case if the cargo is not visible for 10+ itterations (a.k.a inside the robot)
+                if (noTargetCount >= FAIL_COUNT) {
+                    status = Robot.DONE;
+                }
+                break;
+            default:
+                // Finishes the routine
+                shootStep = 1;
+                shootFirstTime = true;
+
+                // Resets applicable motors
+                grabber.retract();
+                grabber.setGrabberMotor(GrabberDirection.OFF);
+
+                // Returns the error code for success
+                return Robot.DONE;
+        }
+
+        // If we are done with a step, we go on to the next one and continue the routine
+        if (status == Robot.DONE) {
+            cargoStep++;
+        }
+
+        // If a step fails, exits the routine
+        if (status == Robot.FAIL) {
+            // Resets variables
+            shootStep = 1;
+            shootFirstTime = true;
+
+            // Stops applicable motors
+            grabber.retract();
+            grabber.setGrabberMotor(GrabberDirection.OFF);
+
+            // Returns the error code for failure 
+            return Robot.FAIL;
+        }
+
+        // Returns the error code for continue
         return Robot.CONT;
     }
 
