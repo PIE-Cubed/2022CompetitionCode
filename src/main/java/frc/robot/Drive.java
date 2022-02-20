@@ -3,7 +3,13 @@ package frc.robot;
 /**
  * Imports
  */
+<<<<<<< HEAD
+=======
+import java.util.stream.DoubleStream;
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.networktables.*;
@@ -11,7 +17,11 @@ import edu.wpi.first.networktables.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
+<<<<<<< HEAD
 import java.util.stream.DoubleStream;
+=======
+import edu.wpi.first.math.MathUtil;
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
 /**
  * Start of class
@@ -21,10 +31,17 @@ public class Drive {
     private NetworkTable limelightEntries;
 
     //Network Table Entries
+<<<<<<< HEAD
     private NetworkTableEntry targetX;
     private NetworkTableEntry targetY;
     private NetworkTableEntry targetArea;
     private NetworkTableEntry targetValid;
+=======
+    private NetworkTableEntry targetValid;
+    private NetworkTableEntry targetX;
+    private NetworkTableEntry targetY;
+    private NetworkTableEntry targetArea;
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     private NetworkTableEntry ledMode;
     private NetworkTableEntry cameraMode;
     private NetworkTableEntry stream;
@@ -66,12 +83,15 @@ public class Drive {
     //CONSTANTS
     private final int    FAIL_DELAY   = 5;
     private final double ticksPerFoot = 5.65;
+<<<<<<< HEAD
 
     //BLUE ROBOT
     //private static final double FL_OFFSET = 309.8;
     //private static final double FR_OFFSET = 248;
     //private static final double BL_OFFSET = 165.7;
     //private static final double BR_OFFSET = -65.2;
+=======
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
     //Yellow ROBOT
     private static final double FL_OFFSET = -151.21;
@@ -90,6 +110,16 @@ public class Drive {
     //Limelight
 	public boolean limeControl   = false;
 	public int     limeStatus    = 0;
+<<<<<<< HEAD
+=======
+
+    //Limelight distance
+    private static final double CameraMountingAngle = 22.0;	// 25.6 degrees, 22.0
+	private static final double CameraHeightFeet 	= 26.5 / 12;	        // 16.5 inches
+	private static final double VisionTapeHeightFt 	= 7 + (7.5 / 12.0) ;	// 8ft 2.25 inches
+	private static double mountingRadians = Math.toRadians(CameraMountingAngle); // a1, converted to radians
+	private static double differenceOfHeights = VisionTapeHeightFt - CameraHeightFeet; // Find result of h2 - h1
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
         
     /**
@@ -135,10 +165,17 @@ public class Drive {
                         (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         FL_OFFSET), //Offset
         REAR_RIGHT_WHEEL(14, // DRIVE MOTOR ID
+<<<<<<< HEAD
                         15, // ROTATE MOTOR ID
                         2, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         BR_OFFSET), //Offset
+=======
+                         15, // ROTATE MOTOR ID
+                         2, // ROTATE SENSOR ID
+                         (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
+                         -65.2), //Offset
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
         REAR_LEFT_WHEEL(12, // DRIVE MOTOR ID
                         13, // ROTATE MOTOR ID
                         1, // ROTATE SENSOR ID
@@ -739,6 +776,12 @@ public class Drive {
                 //Stops the robot
                 stopWheels();
                 
+<<<<<<< HEAD
+=======
+                //Turns LED's off
+                changeledMode(LEDState.OFF);
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
                 //Returns the error code for failure
 				return Robot.DONE;
 			}
@@ -771,6 +814,14 @@ public class Drive {
             //Stops the robot
 			stopWheels();
 
+<<<<<<< HEAD
+=======
+            //Turns LED's off
+            changeledMode(LEDState.OFF);
+
+            //System.out.println("On target or not moving");
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
             //Returns the error code for success
 			return Robot.DONE;
         }
@@ -797,6 +848,131 @@ public class Drive {
         }
         
 		return Robot.CONT;   
+    }
+	
+	/** 
+	 * D = (h2 - h1) / tan(a1 + a2). This equation, along with known numbers, helps find the distance
+	 * from a target.
+	 */
+	public double getDistance() {
+	  // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
+	  double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+		
+	  // a2, converted to radians
+	  double radiansToTarget = Math.toRadians(ty); 
+
+	  // find result of a1 + a2
+	  double angleInRadians = mountingRadians + radiansToTarget;
+
+	  // find the tangent of a1 + a2
+	  double tangentOfAngle = Math.tan(angleInRadians); 
+
+	  // Divide the two results ((h2 - h1) / tan(a1 + a2)) for the distance to target
+	  double distance = differenceOfHeights / tangentOfAngle;
+
+	  // outputs the distance calculated
+	  return distance; 
+	}
+
+	/** 
+	 * a1 = arctan((h2 - h1) / d - tan(a2)). This equation, with a known distance input, helps find the 
+	 * mounted camera angle.
+	 */
+	public double getCameraMountingAngle(double measuredDistance) {
+	  // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
+	  double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+
+	  // convert a2 to radians
+	  double radiansToTarget = Math.toRadians(ty);
+
+	  // find result of (h2 - h1) / d
+	  double heightOverDistance = differenceOfHeights / measuredDistance;
+
+	  // find result of tan(a2)
+	  double tangentOfAngle = Math.tan(radiansToTarget);
+
+	  // (h2-h1)/d - tan(a2) subtract two results for the tangent of the two sides
+	  double TangentOfSides = heightOverDistance - tangentOfAngle; 
+
+	  // invert tangent operation to get the camera mounting angle in radians
+	  double newMountingRadians = Math.atan(TangentOfSides);
+
+	  // change result into degrees
+	  double cameraMountingAngle = Math.toDegrees(newMountingRadians);
+	  
+	  return cameraMountingAngle; // output result
+	}
+
+    /**
+     * Gets the value of tv
+     * @return validTarget
+     */
+    public double get_tv() {
+        return targetValid.getDouble(0.00);
+    }
+
+    /**
+     * Gets the value of tx
+     * @return xOffset
+     */
+    public double get_tx() {
+        return targetX.getDouble(0.00);
+    }
+
+    /**
+     * Gets the value of ty
+     * @return YOffset
+     */
+    public double get_ty() {
+        return targetY.getDouble(0.00);
+    }
+
+    /**
+     * Gets the value of ta
+     * @return area
+     */
+    public double get_ta() {
+        return targetArea.getDouble(0.00);
+    }
+
+    /**
+     * Chanegs the current pipeline on the Limelight
+     * @param pipelineName
+     */
+    public void changePipeline(TargetPipeline pipelineName) {
+        //Makes it a bit easier to change pipelines
+        if (pipelineName == TargetPipeline.ON_TARMAC) {
+            // Configures the limelight for on tarmac targeting
+            pipeline.setNumber(0);
+        }
+        else if (pipelineName == TargetPipeline.ON_TARMAC) {
+            // Configures the limelight for on tarmac targeting
+            pipeline.setNumber(1);
+        }
+        else {
+            // Configures the limelight to do nothing
+            pipeline.setNumber(2);
+        }
+    }
+
+    /**
+     * Changes the limelight LED mode
+     * @param state
+     */
+    public void changeledMode(LEDState mode) {
+        //Makes it easier to change the LED mode
+        if (mode == LEDState.ON) {
+            // Sets limelight to on
+            ledMode.setNumber(0);
+        }
+        else if (mode == LEDState.OFF) {
+            // Sets limelight to on
+            ledMode.setNumber(1);
+        }
+        else {
+            // Sets limelight to on
+            ledMode.setNumber(0);
+        }
     }
 
     /**
@@ -901,10 +1077,14 @@ public class Drive {
     public void testWheelAngle(){
         //Use this to calibrate wheel angle sensors
         //Offset in wheel constructor should be the returned value * -1
+<<<<<<< HEAD
         System.out.println("FL Angle: " + frontLeftWheel.testWheelAngle());
         System.out.println("FR Angle: " + frontRightWheel.testWheelAngle());
         System.out.println("RL Angle: " + rearLeftWheel.testWheelAngle());
         System.out.println("RR Angle: " + rearRightWheel.testWheelAngle());
+=======
+        System.out.println("Angle: " + rearRightWheel.testWheelAngle());
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     }
 
     public void testLimelightTargeting() {

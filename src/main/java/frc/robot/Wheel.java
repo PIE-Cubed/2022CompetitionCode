@@ -198,4 +198,10 @@ public class Wheel {
 
 }
 
+<<<<<<< HEAD
+=======
+
+}
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 // End of the Wheel Class

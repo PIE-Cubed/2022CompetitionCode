@@ -15,12 +15,28 @@ import frc.robot.Shooter.ShootLocation;
  * The class that runs with the start of a match
  */
 public class Robot extends TimedRobot {
+<<<<<<< HEAD
+=======
+  //Networktables
+  private NetworkTable FMSInfo;
+  private NetworkTableEntry isRedAlliance;	
+
+  //Object creation
+  Drive         drive;
+  Controls      controls;
+  Grabber       grabber;
+  Climber       climber;
+  CargoTracking cargoTracking;
+  Auto          auto;
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
   // ERROR CODES
   public static final int FAIL = -1;
   public static final int PASS =  1;
   public static final int DONE =  2;
   public static final int CONT =  3;
 
+<<<<<<< HEAD
   // Networktables
   private NetworkTable FMSInfo;
   private NetworkTableEntry isRedAlliance;	
@@ -47,6 +63,9 @@ public class Robot extends TimedRobot {
     CARGO_TARGETED;
   }
   private DriveMode driveMode = DriveMode.MANUAL;
+=======
+  private int status = CONT;
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
   //Auto path
   private static final String kCenterAuto = "Center";
@@ -54,6 +73,7 @@ public class Robot extends TimedRobot {
   private static final String kHangarAuto = "Hangar";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+<<<<<<< HEAD
 
   //Number of balls
   private static final int kOneBall = 1;
@@ -63,6 +83,8 @@ public class Robot extends TimedRobot {
 
   //Auto Delay
   private int delaySec = 0;
+=======
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
   /**
    * Constructor
@@ -72,10 +94,16 @@ public class Robot extends TimedRobot {
     drive         = new Drive();
     grabber       = new Grabber();
     controls      = new Controls();
+<<<<<<< HEAD
     //climber       = new Climber();
     shooter       = new Shooter();
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber, shooter, cargoTracking);
+=======
+    climber       = new Climber();
+    cargoTracking = new CargoTracking(drive);
+    auto          = new Auto(drive, grabber);
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -96,6 +124,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+<<<<<<< HEAD
     //Number of Balls to grab
     m_numBallsChooser.setDefaultOption("1 ball", kOneBall);
     m_numBallsChooser.addOption("2 ball", kTwoBall);
@@ -103,6 +132,10 @@ public class Robot extends TimedRobot {
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
+=======
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance(setRedAlliance());
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -123,6 +156,7 @@ public class Robot extends TimedRobot {
    * Runs once when Auto starts
    */
   public void autonomousInit() {
+<<<<<<< HEAD
     //Choses start position
     m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
@@ -134,6 +168,14 @@ public class Robot extends TimedRobot {
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
+=======
+    m_autoSelected = m_chooser.getSelected();
+    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    System.out.println("Auto selected: " + m_autoSelected);
+
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance(setRedAlliance());
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -145,6 +187,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during Autonomous
    */
   public void autonomousPeriodic() {
+<<<<<<< HEAD
     int balls = m_numBalls;
     long autoDelayMSec = delaySec * 1000;
 
@@ -158,6 +201,18 @@ public class Robot extends TimedRobot {
           break;
         case kWallAuto:
           status = auto.wallAuto(balls, autoDelayMSec);
+=======
+    if (status == Robot.CONT) {
+      switch (m_autoSelected) {
+        case kCenterAuto:
+          status = auto.centerAuto();
+          break;
+        case kHangarAuto:
+          status = auto.hangerAuto();
+          break;
+        case kWallAuto:
+          status = auto.wallAuto();
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
           break;
         default:
           status = DONE;
@@ -165,7 +220,11 @@ public class Robot extends TimedRobot {
       }
     }
     else if (status == DONE) {
+<<<<<<< HEAD
       //
+=======
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     }
   }
 
@@ -176,7 +235,11 @@ public class Robot extends TimedRobot {
    */
   public void teleopInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
+<<<<<<< HEAD
     cargoTracking.setRedAlliance( setRedAlliance() );
+=======
+    cargoTracking.setRedAlliance(setRedAlliance());
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -215,12 +278,19 @@ public class Robot extends TimedRobot {
    */
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
+<<<<<<< HEAD
     cargoTracking.setRedAlliance( setRedAlliance() );
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
 
     cargoStatus = Robot.CONT;
+=======
+    cargoTracking.setRedAlliance(setRedAlliance());
+
+    //Sets the limelight LED mode
+    drive.changeledMode(Drive.LEDState.ON);
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
   }
 
   @Override
@@ -229,6 +299,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+<<<<<<< HEAD
     while (cargoStatus == Robot.CONT) {
       if (controls.autoKill() == true) {
         cargoStatus = Robot.FAIL;
@@ -245,10 +316,20 @@ public class Robot extends TimedRobot {
     //drive.testWheelAngle();
   }
 
+=======
+    grabber.setGrabberMotor(Grabber.GrabberDirection.FORWARD);
+    //drive.testLimelightTargeting();
+    //drive.testRotate();
+    //drive.testWheelAngle();
+    //cargoTracking.faceCargo();
+  }
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
   /**
    * Controls the wheels in TeleOp
    */
   private void wheelControl() {
+<<<<<<< HEAD
     //Gets Joystick Values
     double driveX               = controls.getDriveX();
     double driveY               = controls.getDriveY();
@@ -337,6 +418,32 @@ public class Robot extends TimedRobot {
     /*
       Grabber control
      */
+=======
+    //Get joystick values
+    double driveX      = controls.getDriveX();
+    double driveY      = controls.getDriveY();
+    double rotatePower = controls.getRotatePower();
+
+    //Drives if we are out of dead zone
+    if ((Math.abs(driveX) > 0) ||
+        (Math.abs(driveY) > 0) || 
+        (Math.abs(rotatePower) > 0)) {
+      drive.teleopSwerve(driveX, driveY, rotatePower, false);
+    }
+    else {
+      //Robot is in dead zone, doesn't drive
+      drive.stopWheels();
+    }
+  }
+
+  /**
+   * Controls the grabber in TeleOp
+   */
+  private void ballControl() {
+    //Connected pair of pistons to retract and deploy
+    //One motor to take balls in and out
+  
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     boolean deployRetract               = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
     Shooter.ShootLocation shootLocation = controls.getShootLocation();
@@ -344,6 +451,7 @@ public class Robot extends TimedRobot {
     if (deployRetract == true) {
       grabber.deployRetract();
     }
+<<<<<<< HEAD
     grabber.setGrabberMotor(grabberDir);
 
     /*
@@ -361,25 +469,40 @@ public class Robot extends TimedRobot {
         shooter.deployFeeder();
       }
     }
+=======
+
+    grabber.setGrabberMotor(grabberDir);
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
   }
 
   /**
    * Controls the climber in TeleOp
    */
   private void climberControl() {
+<<<<<<< HEAD
     /*
     boolean toggleClaw1  = controls.getClimberClaw1();
     boolean toggleClaw2  = controls.getClimberClaw2();
     double  climberPower = controls.getClimberPower();
     */
     /*
+=======
+    boolean toggleClaw1  = controls.getClimberClaw1();
+    boolean toggleClaw2  = controls.getClimberClaw2();
+    double  climberPower = controls.getClimberPower();
+
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
     if (toggleClaw1 == true) {
       climber.claw1Toggle();
     }
     if (toggleClaw2 == true) {
       climber.claw2Toggle();
     }
+<<<<<<< HEAD
     climber.climberRotate(climberPower);*/
+=======
+    climber.climberRotate(climberPower);
+>>>>>>> 2cec6435eeb90ccda826d86a4dd4fb5f05bc5196
   }
 
   /**
