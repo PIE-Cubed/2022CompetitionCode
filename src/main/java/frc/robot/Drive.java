@@ -43,7 +43,7 @@ public class Drive {
     
     // Turn Controller
 	private static final double kP = 0.01; //0.02
-	private static final double kI = 0.00;
+	private static final double kI = 0.0000;
     private static final double kD = 0.00;
     
     //Auto crab drive controller
@@ -71,7 +71,7 @@ public class Drive {
     private static final double FL_OFFSET = 309.8;
     private static final double FR_OFFSET = 248;
     private static final double BL_OFFSET = 165.7;
-    private static final double BR_OFFSET = -65.2;
+    private static final double BR_OFFSET = -33.2;
 
     //Yellow ROBOT
     /*
@@ -508,7 +508,7 @@ public class Drive {
 			count = 0;
             rotateFirstTime = true;
             
-			System.out.println("Timed out");
+			System.out.println("Auto rotate timed out");
             stopWheels();
             return Robot.FAIL;
 		}
@@ -701,7 +701,7 @@ public class Drive {
             
             //Sets and displays the forced time out
 			timeOut = currentMs + TIME_OUT_MSEC;
-            System.out.println("Limelight timeOut " + TIME_OUT_SEC + " seconds");
+            //System.out.println("Limelight timeOut " + TIME_OUT_SEC + " seconds");
             
             //Turns the limelight on
             changeledMode(LEDState.ON);
@@ -773,6 +773,7 @@ public class Drive {
             //Stops the robot
 			stopWheels();
 
+            System.out.println("Limelight on target");
             //Returns the error code for success
 			return Robot.DONE;
         }
@@ -792,7 +793,7 @@ public class Drive {
             System.out.println("timeout " + tx + " Target Acquired " + tv);
 
             //Turns LED's off
-            changeledMode(LEDState.OFF);
+            //changeledMode(LEDState.OFF);
 
             //Returns the error code for failure
 			return Robot.FAIL;

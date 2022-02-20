@@ -6,7 +6,9 @@ package frc.robot;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
@@ -24,28 +26,27 @@ public class Shooter {
 
 	
 	// SPARK MAX
-	private CANSparkMax frontShooter;
-	private CANSparkMax rearShooter;
-	private CANSparkMax feeder;
+	private CANSparkMax    frontShooter;
+	private CANSparkMax    rearShooter;
+	private DoubleSolenoid feeder;
 
 	// SPARK MAX ID's
 	private int FRONT_SHOOTER_ID  = 19; //front
 	private int REAR_SHOOTER_ID   = 20; //right-->rear
-	private int FEEDER_ID         = 21; //starts at bottom
+
+	private int FEEDER_DEPLOY_ID  = 8;
+	private int FEEDER_RETRACT_ID = 9;
+	private int PCM_CAN_ID        = 2;
 
 	// Encoders
 	private RelativeEncoder frontShooterEncoder;
 	private RelativeEncoder rearShooterEncoder;
-	private RelativeEncoder feederEncoder;
-
-	// Shooter Flipper Switch
-	DigitalInput  flipperSwitch;
 
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
 
-	public final double HIGH_SHOT_REAR_POWER   = 0.45; //0.525 //Untested
-	public final double HIGH_SHOT_FRONT_POWER  = -0.45; //0.525 //Untested
+	public final double HIGH_SHOT_REAR_POWER   = 0.46; //0.525 //Untested
+	public final double HIGH_SHOT_FRONT_POWER  = -0.46; //0.525 //Untested
 
 	public final double LOW_SHOT_REAR_POWER    = 0.21; //0.29
 	public final double LOW_SHOT_FRONT_POWER   = -0.21; //-0.29
@@ -53,16 +54,14 @@ public class Shooter {
 	public final double LAUNCH_PAD_REAR_POWER  = 0.65;
 	public final double LAUNCH_PAD_FRONT_POWER = -0.65;
 
-	public final double AUTO_RING_REAR_POWER   = 0.6;
-	public final double AUTO_RING_FRONT_POWER  = -0.6;
-
-	private final double FEEDER_POWER          = -0.08; //Negative power raises the feeder
+	public final double AUTO_RING_REAR_POWER   = 0.5;
+	public final double AUTO_RING_FRONT_POWER  = -0.5;
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
 
-	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2980;
-	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2980;
+	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2670;
+	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2770;
 
 	public final double LOW_SHOT_REAR_TARGET_RPM    = 1450; //1650
 	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1450; //1650
@@ -70,17 +69,11 @@ public class Shooter {
 	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3500;
 	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3500;
 
-	public final double AUTO_RING_REAR_TARGET_RPM   = 3300;
-	public final double AUTO_RING_FRONT_TARGET_RPM  = 3300;
-
-	private final double FEEDER_UP_ENCODER          = 0.33; //It's actually negative since the motor has negative power
-	private final double FEEDER_DOWN_ENCODER        = 0;
+	public final double AUTO_RING_REAR_TARGET_RPM   = 2830;
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 2930; //Front moves faster, so it needs faster target rpm
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
-
-	// Flipper Switch Constants
-	private final int FLIPPER_ID                   = 0;
 
 	// Variables
 	public  double                frontTargetVelocity;
@@ -127,7 +120,7 @@ public class Shooter {
 		// SPARK Max
 		frontShooter  = new CANSparkMax(FRONT_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
 		rearShooter   = new CANSparkMax(REAR_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
-		feeder        = new CANSparkMax(FEEDER_ID, MotorType.kBrushless);
+		feeder        = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, FEEDER_DEPLOY_ID, FEEDER_RETRACT_ID);
 
 		// Sets the current limtis for the motors
 		frontShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
@@ -136,25 +129,19 @@ public class Shooter {
 		// Sets the mode of the motors (if this works in the code)
 		frontShooter.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		rearShooter .setIdleMode(CANSparkMax.IdleMode.kCoast);
-		feeder.setIdleMode(CANSparkMax.IdleMode.kBrake);
 		
 		// Set Shooter related motors to off to Start the Match
 		frontShooter.set(0.0);
 		rearShooter .set(0.0);
-		feeder.set(0.0);
+		feeder.set(Value.kReverse);
 
 		// Encoders
 		frontShooterEncoder = frontShooter.getEncoder();
 		rearShooterEncoder  = rearShooter.getEncoder();
-		feederEncoder       = feeder.getEncoder();
-		feederEncoder.setPosition(0);
 
 		// PID Controller
 		shooterController = new PIDController(kP, kI, kD);
 		shooterController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
-
-		// Flipper Switch
-		flipperSwitch = new DigitalInput(FLIPPER_ID);
 	}
 
 
@@ -207,6 +194,12 @@ public class Shooter {
 			rearTargetVelocity  = OFF_TARGET_RPM;
 			frontPower          = OFF_POWER;
 			rearPower           = OFF_POWER;
+		}
+
+		//Resets the I value of PID until we are at 80% speed to prevent 
+		//I value from growing out of control at start
+		if (getabsRPM(FRONT_SHOOTER_ID) < frontTargetVelocity * 0.8) {
+			shooterController.reset();
 		}
 
 		//Increments shooter powers by PID-calculated error
@@ -287,10 +280,10 @@ public class Shooter {
 		rearRpm  = getabsRPM(REAR_SHOOTER_ID);
 		frontRpm = getabsRPM(FRONT_SHOOTER_ID);
 
-		double rearLowerLimit  = rearTargetVelocity  - 100;
-		double rearUpperLimit  = rearTargetVelocity  + 100;
-		double frontLowerLimit = frontTargetVelocity - 100;
-		double frontUpperLimit = frontTargetVelocity + 100;
+		double rearLowerLimit  = rearTargetVelocity  - 90;
+		double rearUpperLimit  = rearTargetVelocity  + 90;
+		double frontLowerLimit = frontTargetVelocity - 90;
+		double frontUpperLimit = frontTargetVelocity + 90;
 
 		if ((rearRpm  > rearLowerLimit  && rearRpm < rearUpperLimit) && 
 			(frontRpm > frontLowerLimit && frontRpm < frontUpperLimit))  {
@@ -335,20 +328,9 @@ public class Shooter {
 	*    Returns status, but it is usually uneeded because this function automatically stops motor
     *   
     ******************************************************************************************/
-	public int deployFeeder() {
-		double absPosition = Math.abs(feederEncoder.getPosition());
-		//System.out.println("Deployed: " + feederEncoder.getPosition());
+	public void deployFeeder() {
+		feeder.set(Value.kForward);
 
-		if (absPosition >= FEEDER_UP_ENCODER) {
-			System.out.println("Stopping Deploy: " + feederEncoder.getPosition());
-			feeder.set(0.0);
-			return Robot.DONE;
-		}
-		else {
-			System.out.println("Deploying: " + feederEncoder.getPosition());
-			feeder.set(FEEDER_POWER);
-			return Robot.CONT;
-		}
 	}
 
 	/****************************************************************************************** 
@@ -358,25 +340,8 @@ public class Shooter {
 	*    Returns status, but it is usually uneeded because this function automatically stops motor
     *   
     ******************************************************************************************/
-	public int retractFeeder() {
-		double absPosition = Math.abs(feederEncoder.getPosition());
-		/*
-		if (flipperSwitch.get() == true)  {
-			feederEncoder.setPosition(0);
-            feeder.set(0.0);
-			return Robot.DONE;
-		}
-		*/
-		System.out.println("Retracted: " + feederEncoder.getPosition());
-
-		if (absPosition >= FEEDER_DOWN_ENCODER) {
-			feeder.set(0.0);
-			return Robot.DONE;
-		}
-		else {
-			feeder.set(-1 * FEEDER_POWER);
-			return Robot.CONT;
-		}
+	public void retractFeeder() {
+		feeder.set(Value.kReverse);
 	}
 
 	/**
@@ -446,7 +411,7 @@ public class Shooter {
 	 * Gets the abs RPM of the passed motor
 	 * @return absRPM
 	 */
-	private double getabsRPM(int MOTOR_CAN_ID) {
+	public double getabsRPM(int MOTOR_CAN_ID) {
 		double rpm;
 		double absRPM;
 
@@ -470,23 +435,11 @@ public class Shooter {
    *    Test functions for shooter 
    * 
    ******************************************************************************************/
-	public void testShootMotors(double powerF, double powerR) {
+	public void testShootMotors(double power) {
 		//Shooter motor 1 (front motor) needs to be negative to shoot a ball
 		//Shooter motor 2 (rear motor) needs to be positive to shoot a ball
-		frontShooter.set(-powerF);
-		rearShooter.set(powerR);
+		frontShooter.set(-power);
+		rearShooter.set(power);
 		System.out.println("Front RPM: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear RPM: " + getabsRPM(REAR_SHOOTER_ID));
-	}
-
-	public void testFeeder() {
-		System.out.println(feederEncoder.getPosition());
-	}
-
-	public void powerFeeder(double pow) {
-		feeder.set(pow);
-	}
-
-	public boolean testFlipperSwitch()  {
-		return flipperSwitch.get();
 	}
 } //End of the Shooter Class

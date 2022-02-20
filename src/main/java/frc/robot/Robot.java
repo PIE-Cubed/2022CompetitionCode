@@ -94,6 +94,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("Wall Auto", kWallAuto);
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+    SmartDashboard.putNumber("Auto delay seconds", 0);
 
     //Number of Balls to grab
     m_numBallsChooser.setDefaultOption("1 ball", kOneBall);
@@ -204,7 +205,7 @@ public class Robot extends TimedRobot {
    */
   public void disabledPeriodic() {
     //Turns off the limelight LEDs when the robot is disabled, saves our eyes
-    drive.changeledMode(Drive.LEDState.OFF);
+    //drive.changeledMode(Drive.LEDState.OFF);
   }
 
   @Override
@@ -214,6 +215,7 @@ public class Robot extends TimedRobot {
    */
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
+    SmartDashboard.putNumber("Test Shooter Power", 0.55);
     cargoTracking.setRedAlliance( setRedAlliance() );
 
     //Sets the limelight LED mode
@@ -226,6 +228,10 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+    //drive.testWheelAngle();
+    shooter.testShootMotors(SmartDashboard.getNumber("Test Shooter Power", 0.55));
+    SmartDashboard.putNumber("Test front rpm", shooter.getabsRPM(19));
+    SmartDashboard.putNumber("Test back rpm", shooter.getabsRPM(20));
     //System.out.println(shooter.testFlipperSwitch());
     //shooter.powerFeeder(controls.getFeedPower());
     //drive.testLimelightTargeting();

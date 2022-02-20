@@ -53,10 +53,11 @@ public class Auto {
 			firstTime = false;
 			step = 1;
 		}
-
+        System.out.println("Step: " + step);
         switch(step) {
             case 1:
                 status = autoDelay(delayMs);
+                break;
             case 2:
                 status = drive.autoRotate(152);
                 break;
@@ -69,10 +70,10 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 5:
-                status = drive.autoCrabDrive(4, 0, 0.4);
+                status = drive.autoCrabDrive(4, 0, 0.25);
                 break;
             case 6:
-                status = autoDelay(1000);
+                status = autoDelay(1500);
                 break;
             case 7:
                 grabber.deployRetract();
@@ -103,7 +104,7 @@ public class Auto {
                 status = drive.autoCrabDrive(8, 0);
                 break;
             case 14:
-                status = autoDelay(1000);
+                status = autoDelay(1500);
                 break;
             case 15:
                 grabber.deployRetract();
@@ -146,6 +147,7 @@ public class Auto {
         switch(step) {
             case 1:
                 status = autoDelay(delayMs);
+                break;
             case 2:
                 status = drive.autoRotate(135);
                 break;
@@ -158,10 +160,10 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 5:
-                status = drive.autoCrabDrive(4, 0, 0.4);
+                status = drive.autoCrabDrive(4, 0, 0.25);
                 break;
             case 6:
-                status = autoDelay(1000);
+                status = autoDelay(1500);
                 break;
             case 7:
                 grabber.deployRetract();
@@ -235,6 +237,7 @@ public class Auto {
         switch(step) {
             case 1:
                 status = autoDelay(delayMs);
+                break;
             case 2:
                 status = drive.autoRotate(90);
                 break;
@@ -247,12 +250,15 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 5:
-                status = drive.autoCrabDrive(2.5, 0, 0.4);
+                shooter.autoShooterControl(ShootLocation.AUTO_RING);
+                status = drive.autoCrabDrive(3.0, 0, 0.25);
                 break;
             case 6:
-                status = autoDelay(1000);
+                shooter.autoShooterControl(ShootLocation.AUTO_RING);
+                status = autoDelay(1500);
                 break;
             case 7:
+                shooter.autoShooterControl(ShootLocation.AUTO_RING);
                 grabber.deployRetract();
                 grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
                 status = Robot.DONE;
@@ -331,7 +337,7 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
-                shooter.manualShooterControl(location);
+                shooter.autoShooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
                 status = Robot.DONE;
                 break;
@@ -342,15 +348,18 @@ public class Auto {
                 else {
                     status = Robot.CONT;
                 }
-                shooter.manualShooterControl(location);
+                shooter.autoShooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
+                System.out.println("Auto shoot: waiting for shooterReady()");
                 break;
             case 3:
-                shooter.manualShooterControl(location);
+                shooter.autoShooterControl(location);
                 status = drive.limelightPIDTargeting(targettingLocation);
+                System.out.println("Auto shoot: shooter ready, waiting for limelight");
                 break;
             case 4:
                 shooter.deployFeeder();
+                System.out.println("Auto shoot: deploying feeder");
                 status = autoDelay(1000);
                 break;
             case 5:
