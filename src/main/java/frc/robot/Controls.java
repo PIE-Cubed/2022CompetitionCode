@@ -4,25 +4,19 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.math.MathUtil;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+
+import frc.robot.Grabber.GrabberDirection;
+import frc.robot.Shooter.ShootLocation;
 
 /**
  * Start of class
  */
 public class Controls {
     
-    //Singleton Method to insure that there is ever only one instance of Controls
-    private static Controls instance = null;
-
-    public static synchronized Controls getInstance() {
-        if (instance == null) {
-            instance = new Controls();
-        }
-
-        return instance;
-    }
-
     /**
      * Enumerator for controller ID's
      */
@@ -46,61 +40,37 @@ public class Controls {
     private Joystick joystick;
     private XboxController xboxController;
 
-    private Controls() {
+    //Constructor
+    public Controls() {
         //Instance Creation
-        joystick = new Joystick(ControllerIDs.JOYSTICK.getId());
+        joystick       = new Joystick(ControllerIDs.JOYSTICK.getId());
         xboxController = new XboxController(ControllerIDs.XBOX_MANIP_CONTROLLER.getId());
     }
 
     /**
-     * JOYSTICK DRIVE VALUES
+     * JOYSTICK FUNCTIONS
      */
-    private double getX() {
-        return joystick.getX();
-    }
-
-    private double getY() {
-        return joystick.getY();
-    }
-
-    private double getZ() {
-        return joystick.getZ();
-    }
-
-
     // SHOOTER ENABLED
-    private boolean getShooterEnable() {
+    public boolean getShooterEnable() {        
         return joystick.getTrigger();        
     }
-
     
     /**
-     * 0 degrees is forward on the Joystick
-     * this method returns values from -180 to +180
-     * @return driveAngle
+     * DRIVE FUNCTIONS
      */
-    public double getDriveAngle() {
-        //Gets X and Y positions
-        double x = getX();
-        double y = getY();
-        
-        //Does math to figure out the drive angle
-        double rad = Math.atan2(x, y);
-        double deg = Math.toDegrees(rad);
-
-        return deg;
-    }
-
     /**
-     * Positive values are from clockwise rotation 
-     * and negative values are from counter-clockwise
+     * Positive values are from clockwise rotation and negative values are from counter-clockwise
      * @return rotatePower
      */
     public double getRotatePower() {
-        //double deadZone = 0.3;
-        double power = getZ();
+        double power = joystick.getZ(); 
 
-        //Halves the power because the rotate is SUPER sensitive
+        //If we are in deadzone or strafelock is on, rotatepower is 0
+        if ((Math.abs(power) < 0.3) || (getStrafeLock() == true)) {
+            power = 0;
+        }
+
+        //Cubes the power and clamps it because the rotate is SUPER sensitive
         power = Math.pow(power, 3.0); 
         power = MathUtil.clamp(power, -.5, .5);
             
@@ -108,28 +78,20 @@ public class Controls {
     }
 
     /**
-     * Gets the drive power
-     * @return drivePower
-     */
-    public double getDrivePower() {
-        //Gets X and Y positions
-        double x = getX();
-        double y = getY() * -1;
-
-        //Does math to calculate the power we want if on an angle 
-        double hyp = Math.sqrt(x*x + y*y);
-        double hypClamp = MathUtil.clamp(hyp, -1, 1);
-
-        return hypClamp;
-    }
-
-    /**
      * Gets the drive X
      * @return driveX
      */
     public double getDriveX() {
-        double power = getX();
+        double power = joystick.getX();
 
+        //Strafe lock removes deadzone and cubes power for more precision
+        if (getStrafeLock() == true) {
+            power = Math.pow(power, 3);
+        }
+        //If we are in deadzone or rotatelock is on, x is 0
+        if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
+            power = 0;
+        }
         return power;
     }
 
@@ -138,18 +100,65 @@ public class Controls {
      * @return driveY
      */
     public double getDriveY() {
-        double power = getY() * -1;
+        double power = joystick.getY() * -1;
 
+        //Strafe lock removes deadzone and cubes power for more precision
+        if (getStrafeLock() == true) {
+            power = Math.pow(power, 3);
+        }
+        //If we are in deadzone or rotatelock is on, y is 0
+        else if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
+            power = 0;
+        }
         return power;
+    }
+
+    /**
+     * Checks if we are in strafe lock mode
+     * @return joystick button 2
+     */
+    private boolean getStrafeLock() {
+        return joystick.getRawButton(2);
+    }
+
+    /**
+     * Checks if we are in rotate lock mode
+     * @return joystick button 3
+     */
+    private boolean getRotateLock() {
+        return joystick.getRawButton(3);
+    }
+
+    /**
+     * Returns shoot location based off of trigger and button 4
+     * @return shoot location
+     */
+    public ShootLocation getShootLocation() {
+        if (joystick.getTrigger() && joystick.getRawButton(4)) {
+            return ShootLocation.LOW_SHOT;
+        }
+        else if (joystick.getTrigger() && joystick.getRawButton(6)) {
+            return ShootLocation.LAUNCH_PAD;
+        }
+        else if (joystick.getTrigger()) {
+            return ShootLocation.HIGH_SHOT;
+        }
+        else {
+            return ShootLocation.OFF;
+        }
+    }
+
+    public boolean getCargoTargeting() {
+        return joystick.getRawButton(5);
     }
 
 
     /**
-     * These are all Functions of the Xbox controller
+     * XBOX CONTROLLER FUNCTIONS
      */
     /**
      * Start Button Pressed
-     * WHETER TO KILL ALL ACTIVE AUTO PROGRAMS!
+     * <p>KILLS ALL ACTIVE AUTO PROGRAMS!
      * @return startButtonPressed
      */
     public boolean autoKill() {
@@ -163,68 +172,67 @@ public class Controls {
     public boolean grabberDeployRetract() {
         return xboxController.getAButtonPressed();
     }
-    //
-
-    /**
-     * Button B
-     * @return buttonBPressed
-     */
-    //
-
-    /**
-     * Button X
-     * @return buttonXPressed
-     */
-    //
-
-    /**
-     * Button Y
-     * @return buttonYPressed
-     */
-    public boolean getXboxY() {
-        return xboxController.getYButtonPressed();
-    }
-
-    
-
-    /**
-     * Right Bumper Pressed
-     * @return rightBumperPresed
-     */
-    public boolean getRightBumper() {
-        return xboxController.getRightBumper();
-    }
-
-    /**
+        
+    /** 
      * Left Bumper Pressed
-     * @return leftBumperPresed
+     * @return leftBumperPressed 
      */
-    public boolean getLeftBumper() {
-        return xboxController.getLeftBumper();
+    public boolean getClimberClaw1() { 
+        return xboxController.getLeftBumperPressed(); 
     }
 
     /**
-     * Right trigger
+     * Right Bumper Pressed 
+     * @return rightBumperPressed 
      */
-    public double getRightTrigger() {
-        double power;
-        power = xboxController.getRightTriggerAxis();
+    public boolean getClimberClaw2() { 
+        return xboxController.getRightBumperPressed(); 
+    }
 
-        //trigger dead band
-        if (power > 0.1) {
-            return power;
+    public double getClimberPower() {
+        return -1 * xboxController.getLeftY();
+    }
+     
+    //Grabber Direction based off of D-Pad
+    public GrabberDirection getGrabberDirection() {
+        if (xboxController.getPOV() == 0) {
+            return GrabberDirection.FORWARD;
+        }
+        else if (xboxController.getPOV() == 180) {
+            return GrabberDirection.REVERSE;
         }
         else {
-            return 0;
+            return GrabberDirection.OFF;
         }
     }
 
-    //Left trigger
-    public double getLeftTrigger() {
-        double power = xboxController.getLeftTriggerAxis();
+    /**
+     * Uses the Xbox Controller's rumbing to display CargoTracking error
+     * @param rumblePower
+     */
+    public void controllerRumble(double rumblePower) {
+        double scaledRumble = rumblePower / 240;
+        double absPower = Math.abs(scaledRumble);
 
-        if (power > 0.1) {
-            return power;
+        if (scaledRumble < 0) {
+            xboxController.setRumble(RumbleType.kLeftRumble , absPower / 4);
+        }
+        else if (scaledRumble > 0) {
+            xboxController.setRumble(RumbleType.kRightRumble, absPower / 4);
+        }
+        else {
+            xboxController.setRumble(RumbleType.kLeftRumble , 0);
+            xboxController.setRumble(RumbleType.kRightRumble, 0);
+        }
+    }
+
+    //Test controls
+    public double getFeedPower() {
+        if (xboxController.getLeftTriggerAxis() > 0) {
+            return -0.2 * xboxController.getLeftTriggerAxis();
+        }
+        else if (xboxController.getRightTriggerAxis() > 0) {
+            return 0.2 * xboxController.getRightTriggerAxis();
         }
         else {
             return 0;

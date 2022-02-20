@@ -3,20 +3,19 @@ package frc.robot;
 /**
  * Imports
  */
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
 /**
  * Start of class
  */
 public class Wheel {
-
     // Motor Controllers Declaration (instantiated in the constructor in order to dependency inject the IDs of each respective controller)
     private CANSparkMax      driveMotor;
     private RelativeEncoder  driveEncoder;
@@ -29,20 +28,21 @@ public class Wheel {
     private PIDController rotationPID;
 
     // PID Controller Values (static and final so that all wheels share the same values, and they will never change)
-    private static final double kP = 0.005; //0.03
+    private static final double kP = 0.03; //0.03
     private static final double kI = 0.00;
     private static final double kD = 0.00;
 
     // CONSTANTS
     private static final int WHEEL_CURRENT_LIMIT = 120;
 
-
-
-    /****************************************************************************************** 
-    *
-    *    Wheels constructor
-    * 
-    ******************************************************************************************/
+    /**
+     * Wheels Constructor
+     * @param driveMotorID
+     * @param rotateMotorID
+     * @param rotateMotorSensorID
+     * @param offsetDegrees
+     * @param motorName
+     */
     public Wheel(int driveMotorID, int rotateMotorID, int rotateMotorSensorID, double offsetDegrees, Drive.WheelProperties motorName) {
         // Motor Controllers Instantiation
         this.driveMotor   = new CANSparkMax(driveMotorID, MotorType.kBrushless);
@@ -65,8 +65,6 @@ public class Wheel {
         rotationPID.setTolerance(2);
     }
 
-
-
     /****************************************************************************************** 
     *
     *    rotateAndDrive()
@@ -80,12 +78,15 @@ public class Wheel {
         currWheelAngle = getRotateMotorPosition();
         rotatePower = rotationPID.calculate(currWheelAngle, targetWheelAngle);
 
-        /**
+        /** FOR OLD ROBOT (victor SP):
          * If PID output is positive you want to rotate the wheel clockwise
          * In order to rotate clockwise, a negative power is required
          * And vise-versa.
+         * 
+         * THE NEW ROBOT USES SPARKMAXES FOR ROTATE MOTORS
+         * Positive power --> clockwise
          */
-        setRotateMotorPower(-1 * rotatePower);
+        setRotateMotorPower(rotatePower);
         setDriveMotorPower(drivePower);
 
         //Are we within 2 degrees of target wheel angle? 
@@ -98,7 +99,6 @@ public class Wheel {
         }
     }
 
-
     /****************************************************************************************** 
     *
     *    setRotateMotorPower()
@@ -106,12 +106,9 @@ public class Wheel {
     * 
     ******************************************************************************************/
     public void setRotateMotorPower(double power) {
-        power = MathUtil.clamp(power, -1, 1);
-        //System.out.println("Rotate Power is " + power + " for " + this.name);
+        power = MathUtil.clamp(power, -1, 1);    
         rotateMotor.set(power);
     }
-
-
 
     /****************************************************************************************** 
     *
@@ -132,8 +129,6 @@ public class Wheel {
             driveMotor.set(power);
         }
     }
-
-
 
     /****************************************************************************************** 
     *
@@ -162,8 +157,6 @@ public class Wheel {
         return adjustedValue;
     }
 
-
-
     /****************************************************************************************** 
     *
     *    getRotateMotorPosition()
@@ -176,7 +169,6 @@ public class Wheel {
 
         return adjustedValue;
     }
-
 
     /****************************************************************************************** 
     *
@@ -201,9 +193,9 @@ public class Wheel {
     * 
     ******************************************************************************************/
     public double testWheelAngle() {
-        return rotateMotorSensor.get();
+        return this.getRotateMotorPosition();
     }
 
+}
 
-
-} // End of the Wheel Class
+// End of the Wheel Class
