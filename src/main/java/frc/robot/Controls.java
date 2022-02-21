@@ -166,6 +166,14 @@ public class Controls {
     public boolean grabberDeployRetract() {
         return xboxController.getAButtonPressed();
     }
+
+    /**
+     * Button B
+     * @return buttonBPressed
+     */
+    public boolean testButtonB() {
+        return xboxController.getBButtonPressed();
+    }
         
     /** 
      * Left Bumper Pressed

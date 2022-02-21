@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class Climber {
     //Spark Max ID for the climber
-    private final int CLIMBER_SPARKMAX_ID  = 22; 
+    private final int CLIMBER_SPARKMAX_ID  = 22;
+
+    //Object creation for the climberMotor
     private CANSparkMax climberMotor; 
 
     //Double Solenoid for the claws
@@ -49,7 +51,9 @@ public class Climber {
         claw2State = ClawState.OPEN;
     }
 
-    //Toggle The Claws
+    /**
+     * Claw one toggle
+     */
     public void claw1Toggle() {
         if (claw1State == ClawState.OPEN) {
             claw1.set(Value.kReverse);
@@ -60,6 +64,10 @@ public class Climber {
             claw1State = ClawState.OPEN;
         }
     }
+
+    /**
+     * Claw two toggle
+     */
     public void claw2Toggle() {
         if (claw2State == ClawState.OPEN) {
             claw2.set(Value.kReverse);
@@ -71,6 +79,10 @@ public class Climber {
         }
     }
 
+    /**
+     * Rotates the climber arms
+     * @param rotatePower
+     */
     public void climberRotate(double rotatePower) {
         climberMotor.set(rotatePower);
     }

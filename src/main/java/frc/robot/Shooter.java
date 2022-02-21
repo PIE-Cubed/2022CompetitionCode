@@ -34,8 +34,8 @@ public class Shooter {
 	private int FRONT_SHOOTER_ID  = 19; //front
 	private int REAR_SHOOTER_ID   = 20; //right-->rear
 
-	private int FEEDER_DEPLOY_ID  = 8;
-	private int FEEDER_RETRACT_ID = 9;
+	private int FEEDER_DEPLOY_ID  = 0;
+	private int FEEDER_RETRACT_ID = 7;
 	private int PCM_CAN_ID        = 2;
 
 	// Encoders
@@ -48,8 +48,8 @@ public class Shooter {
 	public final double HIGH_SHOT_REAR_POWER   = 0.46; //0.525 //Untested
 	public final double HIGH_SHOT_FRONT_POWER  = -0.46; //0.525 //Untested
 
-	public final double LOW_SHOT_REAR_POWER    = 0.21; //0.29
-	public final double LOW_SHOT_FRONT_POWER   = -0.21; //-0.29
+	public final double LOW_SHOT_REAR_POWER    = 0.23; //0.21
+	public final double LOW_SHOT_FRONT_POWER   = -0.23; //-0.21
 
 	public final double LAUNCH_PAD_REAR_POWER  = 0.65;
 	public final double LAUNCH_PAD_FRONT_POWER = -0.65;
@@ -99,15 +99,16 @@ public class Shooter {
 
 
 	// Shooter PID Controller
-	private PIDController shooterController;
+	private PIDController frontShooterController;
+	private PIDController rearShooterController;
 
 	// Integrator Constants
-	private static final double MIN_INTEGRATOR = -0.05;
-	private static final double MAX_INTEGRATOR =  0.05;
+	private static final double MIN_INTEGRATOR = -0.1; //-0.05
+	private static final double MAX_INTEGRATOR =  0.1; //0.05
 
 	// P, I, D constants
 	private static final double kP = 0.0000; //0.00010
-	private static final double kI = 0.00005; //0.00005
+	private static final double kI = 0.0001; //0.00005
 	private static final double kD = 0.00;
 
 
@@ -140,8 +141,10 @@ public class Shooter {
 		rearShooterEncoder  = rearShooter.getEncoder();
 
 		// PID Controller
-		shooterController = new PIDController(kP, kI, kD);
-		shooterController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
+		frontShooterController = new PIDController(kP, kI, kD);
+		rearShooterController  = new PIDController(kP, kI, kD);
+		frontShooterController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
+
 	}
 
 
@@ -156,32 +159,32 @@ public class Shooter {
 		double rearPowerError;
 		
 		if (location == ShootLocation.HIGH_SHOT) {
-			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), HIGH_SHOT_FRONT_TARGET_RPM);
-			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , HIGH_SHOT_REAR_TARGET_RPM);
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), HIGH_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , HIGH_SHOT_REAR_TARGET_RPM);
 			frontTargetVelocity = HIGH_SHOT_FRONT_TARGET_RPM;
 			rearTargetVelocity  = HIGH_SHOT_REAR_TARGET_RPM;
 			frontPower          = HIGH_SHOT_FRONT_POWER;
 			rearPower           = HIGH_SHOT_REAR_POWER;
 		}
 		else if (location == ShootLocation.LOW_SHOT) {
-			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LOW_SHOT_FRONT_TARGET_RPM);
-			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LOW_SHOT_REAR_TARGET_RPM);
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LOW_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LOW_SHOT_REAR_TARGET_RPM);
 			frontTargetVelocity = LOW_SHOT_FRONT_TARGET_RPM;
 			rearTargetVelocity  = LOW_SHOT_REAR_TARGET_RPM;
 			frontPower          = LOW_SHOT_FRONT_POWER;
 			rearPower           = LOW_SHOT_REAR_POWER;
 		}
 		else if (location == ShootLocation.LAUNCH_PAD) {
-			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LAUNCH_PAD_FRONT_TARGET_RPM);
-			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LAUNCH_PAD_REAR_TARGET_RPM);
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LAUNCH_PAD_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LAUNCH_PAD_REAR_TARGET_RPM);
 			frontTargetVelocity = LAUNCH_PAD_FRONT_TARGET_RPM;
 			rearTargetVelocity  = LAUNCH_PAD_REAR_TARGET_RPM;
 			frontPower          = LAUNCH_PAD_FRONT_POWER;
 			rearPower           = LAUNCH_PAD_REAR_POWER;
 		}
 		else if (location == ShootLocation.AUTO_RING) {
-			frontPowerError     = shooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), AUTO_RING_FRONT_TARGET_RPM);
-			rearPowerError      = shooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , AUTO_RING_REAR_TARGET_RPM);
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), AUTO_RING_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , AUTO_RING_REAR_TARGET_RPM);
 			frontTargetVelocity = AUTO_RING_FRONT_TARGET_RPM;
 			rearTargetVelocity  = AUTO_RING_REAR_TARGET_RPM;
 			frontPower          = AUTO_RING_FRONT_POWER;
@@ -199,14 +202,32 @@ public class Shooter {
 		//Resets the I value of PID until we are at 80% speed to prevent 
 		//I value from growing out of control at start
 		if (getabsRPM(FRONT_SHOOTER_ID) < frontTargetVelocity * 0.8) {
-			shooterController.reset();
+			frontShooterController.reset();
+			//Low shot needs more of a kick to get up to speed
+			if (location == ShootLocation.LOW_SHOT) {
+				frontPower *= 1.25;
+			}
+			else {
+				frontPower *= 1.15;
+			}
+		}
+		else {
+			frontPower = frontPower - frontPowerError;
+			frontPower = MathUtil.clamp(frontPower, -1.0, 0.0);
 		}
 
-		//Increments shooter powers by PID-calculated error
-		frontPower = frontPower - frontPowerError;
-		frontPower = MathUtil.clamp(frontPower, -1.0, 0.0);
-		rearPower  = rearPower + rearPowerError;
-		rearPower  = MathUtil.clamp(rearPower, 0.0, 1.0);
+		if (getabsRPM(REAR_SHOOTER_ID) < rearTargetVelocity * 0.8) {
+			rearShooterController.reset();
+			if (location == ShootLocation.LOW_SHOT) {
+				rearPower *= 1.25;
+			}
+			else {
+				rearPower *= 1.15;
+			}		}
+		else {
+			rearPower  = rearPower + rearPowerError;
+			rearPower  = MathUtil.clamp(rearPower, 0.0, 1.0);
+		}
 
 		//Displays powers and rpms to smartdashboard
 		SmartDashboard.putNumber("Front power", frontPower);

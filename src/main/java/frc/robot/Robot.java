@@ -229,9 +229,18 @@ public class Robot extends TimedRobot {
    */
   public void testPeriodic() {
     //drive.testWheelAngle();
-    shooter.testShootMotors(SmartDashboard.getNumber("Test Shooter Power", 0.55));
+    /*if (controls.grabberDeployRetract()) {
+      shooter.deployFeeder();
+    }
+    if (controls.testButtonB()) {
+      shooter.retractFeeder();
+    }*/
+    shooter.autoShooterControl(ShootLocation.LOW_SHOT);
+    SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());
     SmartDashboard.putNumber("Test front rpm", shooter.getabsRPM(19));
-    SmartDashboard.putNumber("Test back rpm", shooter.getabsRPM(20));
+    SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
+    SmartDashboard.putNumber("Target RPM", 1450);
+    SmartDashboard.putNumber("80% RPM", 1450 * 0.8);
     //System.out.println(shooter.testFlipperSwitch());
     //shooter.powerFeeder(controls.getFeedPower());
     //drive.testLimelightTargeting();

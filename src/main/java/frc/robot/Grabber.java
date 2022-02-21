@@ -19,8 +19,8 @@ public class Grabber {
 
     //PNEUMATICS IDS
     private final int PCM_CAN_ID    = 1;
-    private final int DEPLOY_ID     = 0;
-    private final int RETRACT_ID    = 4;
+    private final int DEPLOY_ID     = 4;
+    private final int RETRACT_ID    = 0;
 
     //SPARK MAX CURRENT LIMIT
     private int GRABBER_CURRENT_LIMIT = 60;
@@ -32,7 +32,7 @@ public class Grabber {
     private DoubleSolenoid grabberPiston;
 
     //CONSTANTS
-    private final double GRABBER_POWER = -0.85;
+    private final double GRABBER_POWER = -0.8;
 
     
     /**

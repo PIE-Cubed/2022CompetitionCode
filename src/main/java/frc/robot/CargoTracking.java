@@ -45,23 +45,23 @@ public class CargoTracking {
 	// Auto Tracking Constants
 	private final int  TIME_OUT_SEC  = 5;
 	private final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
-	private final int  FAIL_COUNT      = 10;
+	private final int  FAIL_COUNT      = 20;
 	private final int  ON_TARGET_COUNT = 5;
 
 	// PID controller
 	private static PIDController cargoController;
 
 	// PID tolerance
-	private double cargoToleranceDegrees = 1.0f;
+	private double cargoToleranceDegrees = 6.00f;
 
 	// Cargo Controller
-	private static final double cP = 0.003; //0.0025
-	private static final double cI = 0.0001;
-	private static final double cD = 0.000;
+	private static final double cP = 0.0025; //0.0030
+	private static final double cI = 0.0023; //0.0037
+	private static final double cD = 0.0000;
 
 	// Integrator limits
-	private static final double MIN_INTEGRATOR = -0.050; //-0.075
-	private static final double MAX_INTEGRATOR =  0.050; // 0.075
+	private static final double MIN_INTEGRATOR = -0.07; //-0.08
+	private static final double MAX_INTEGRATOR =  0.07; // 0.08
 
 	/**
 	 * CONSTRUCTOR
@@ -175,7 +175,7 @@ public class CargoTracking {
 			drive.stopWheels();
 
 			// Prints telemetry
-			System.out.println("TimeOut!" + " Cargo Present: " + noTarget);
+			System.out.println("TimeOut!" + " Cargo Present: " + !noTarget);
 
 			// Returns error code for failure
 			return Robot.FAIL;
@@ -224,7 +224,7 @@ public class CargoTracking {
 		}
 		else {
 			// Should never even occur
-			drive.teleopRotate(0.00);
+			drive.stopWheels();
 		}
 	}
 
@@ -234,7 +234,7 @@ public class CargoTracking {
 	 */
 	private double cargoDetection() {
 		//Variables
-		final int DEAD_ZONE = 20; // Creates a 20 pixel dead zone on either side of the camera's FOV
+		final int DEAD_ZONE = 5; // Creates a 5 pixel dead zone on either side of the camera's FOV
 		boolean pipelineEmpty;
 		double  emptyCount;
 		double  turn;
@@ -244,7 +244,7 @@ public class CargoTracking {
 		centerX       = target.getDouble(0.00);
 		emptyCount    = empty.getDouble(0.00);
 
-		// Ignores the 20 pixels on the edges
+		// Ignores the 5 pixels on the edges
 		// CenterX is a misleading name beacuse it actually measures from left to right, not from the center
 		if ( (centerX < (0 + DEAD_ZONE)) || (centerX > (IMG_WIDTH_SCALED - DEAD_ZONE)) )  {
 		  pipelineEmpty = true;
