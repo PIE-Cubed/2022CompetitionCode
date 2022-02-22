@@ -27,7 +27,7 @@ public class Auto {
     
     // Variables
     private long   autoDelayTargetMs = 0;
-    private int    noTargetCount     = 0;
+    //private int    noTargetCount     = 0;
     private double cargoHeading      = 0;
 
     /**
@@ -36,9 +36,9 @@ public class Auto {
      * @param grabber
      */
     public Auto(Drive drive, Grabber grabber, Shooter shooter, CargoTracking cargoTracking){
-        this.drive   = drive;
-		this.grabber = grabber;
-        this.shooter = shooter;
+        this.drive         = drive;
+		this.grabber       = grabber;
+        this.shooter       = shooter;
         this.cargoTracking = cargoTracking;
     }
 
@@ -396,10 +396,12 @@ public class Auto {
         return Robot.CONT;
     }
 
+    /**
+     * A method to autmatically track and pick up balls
+     * @return status
+     */
     public int autoCargoPickup() {
         int status = Robot.CONT;
-        boolean targetValid = cargoTracking.isTargetValid();
-        final double FAIL_COUNT = 10;
 
         // Runs the firstTime procedure
         if (cargoFirstTime == true) {
@@ -416,22 +418,16 @@ public class Auto {
                 status = Robot.DONE;
                 break;
             case 3:
+                System.out.println("Yaw: " + Drive.ahrs.getYaw());
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 cargoHeading = Drive.ahrs.getYaw();
                 status = Robot.DONE;
                 break;
             case 4:
-                if (targetValid == true) {
-                    drive.autoCrabDrive(0.05, cargoHeading);
-                }
-                else {
-                    noTargetCount++;
-                }
-
-                // Only goes to next case if the cargo is not visible for 10+ itterations (a.k.a inside the robot)
-                if (noTargetCount >= FAIL_COUNT) {
-                    status = Robot.DONE;
-                }
+                status = drive.autoAdjustWheels(0.00);
+                break;
+            case 5:
+                status = drive.autoCrabDrive(2.00, cargoHeading, 0.10);
                 break;
             default:
                 // Finishes the routine
