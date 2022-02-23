@@ -1,12 +1,14 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 
 public class Climber {
     //Spark Max ID for the climber
@@ -14,23 +16,27 @@ public class Climber {
 
     //Object creation for the climberMotor
     private CANSparkMax climberMotor; 
+    private RelativeEncoder climberEncoder;
 
     //Double Solenoid for the claws
-    private final int PCM_CAN_ID   = 1; 
-    private final int CLAW_1_OPEN  = 1;
-    private final int CLAW_1_CLOSE = 5;
-    private final int CLAW_2_OPEN  = 2;
-    private final int CLAW_2_CLOSE = 6;
-    private DoubleSolenoid claw1;
-    private DoubleSolenoid claw2;
+    private final int PCM_CAN_ID   = 2; 
+    private final int CLIMBER_LOCK = 1;
+    private final int BLUE_CLAW_OPEN    = 3;
+    private final int BLUE_CLAW_CLOSE   = 7;
+    private final int YELLOW_CLAW_OPEN  = 2;
+    private final int YELLOW_CLAW_CLOSE = 6;
+    private DoubleSolenoid blueClaw;
+    private DoubleSolenoid yellowClaw;
+    private Solenoid climberLock;
 
     //The enum and claw variables
     public enum ClawState {
         OPEN,
         CLOSE;
     }
-    private ClawState claw1State;
-    private ClawState claw2State;
+    private ClawState blueClawState;
+    private ClawState yellowClawState;
+    private ClawState climberLockState;
     
     /**
      * CONSTRUCTOR
@@ -42,41 +48,91 @@ public class Climber {
         climberMotor.setSmartCurrentLimit(60);
         climberMotor.set(0.0);
 
+        //Encoder
+        climberEncoder = climberMotor.getEncoder();
+        climberEncoder.setPosition(0.0); 
+
         //The Claws
-        claw1 = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, CLAW_1_OPEN, CLAW_1_CLOSE); 
-        claw2 = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, CLAW_2_OPEN, CLAW_2_CLOSE); 
-        claw1.set(Value.kForward);
-        claw2.set(Value.kForward);
-        claw1State = ClawState.OPEN;
-        claw2State = ClawState.OPEN;
+        blueClaw   = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, BLUE_CLAW_OPEN, BLUE_CLAW_CLOSE); 
+        yellowClaw = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, YELLOW_CLAW_OPEN, YELLOW_CLAW_CLOSE); 
+        climberLock = new Solenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, CLIMBER_LOCK);
+        
+        blueClaw.set(Value.kForward);
+        yellowClaw.set(Value.kForward);
+        climberLock.set(true);
+        blueClawState    = ClawState.OPEN;
+        yellowClawState  = ClawState.OPEN;
+        climberLockState = ClawState.OPEN;
     }
 
     /**
      * Claw one toggle
      */
-    public void claw1Toggle() {
-        if (claw1State == ClawState.OPEN) {
-            claw1.set(Value.kReverse);
-            claw1State = ClawState.CLOSE;
+    public void blueClawToggle() {
+        if (blueClawState == ClawState.OPEN) {
+            blueClaw.set(Value.kReverse);
+            blueClawState = ClawState.CLOSE;
         }
-        else if (claw1State == ClawState.CLOSE) {
-            claw1.set(Value.kForward);
-            claw1State = ClawState.OPEN;
+        else if (blueClawState == ClawState.CLOSE) {
+            blueClaw.set(Value.kForward);
+            blueClawState = ClawState.OPEN;
         }
     }
 
     /**
      * Claw two toggle
      */
-    public void claw2Toggle() {
-        if (claw2State == ClawState.OPEN) {
-            claw2.set(Value.kReverse);
-            claw2State = ClawState.CLOSE;
+    public void yellowClawToggle() {
+        if (yellowClawState == ClawState.OPEN) {
+            yellowClaw.set(Value.kReverse);
+            yellowClawState = ClawState.CLOSE;
         }
-        else if (claw2State == ClawState.CLOSE) {
-            claw2.set(Value.kForward);
-            claw2State = ClawState.OPEN;
+        else if (yellowClawState == ClawState.CLOSE) {
+            yellowClaw.set(Value.kForward);
+            yellowClawState = ClawState.OPEN;
         }
+    }
+
+    /**
+     * Climber lock toggle
+     */
+    public void climberLockToggle() {
+        if (climberLockState == ClawState.OPEN) {
+            climberLock.set(true);
+            climberLockState = ClawState.CLOSE;
+        }
+        else if (climberLockState == ClawState.CLOSE) {
+            climberLock.set(false);
+            climberLockState = ClawState.OPEN;
+        }
+    }
+
+    //Direct setting of pistons
+    public void blueClawOpen() {
+        blueClaw.set(Value.kForward);
+        blueClawState = ClawState.OPEN;
+    }
+    public void blueClawClose() {
+        blueClaw.set(Value.kReverse);
+        blueClawState = ClawState.CLOSE;
+    }
+
+    public void yellowClawOpen() {
+        yellowClaw.set(Value.kForward);
+        yellowClawState = ClawState.OPEN;
+    }
+    public void yellowClawClose() {
+        yellowClaw.set(Value.kReverse);
+        yellowClawState = ClawState.CLOSE;
+    }
+
+    public void climberLockDeploy() {
+        climberLock.set(true);
+        climberLockState = ClawState.OPEN;
+    }
+    public void climberLockRetract() {
+        climberLock.set(false);
+        climberLockState = ClawState.CLOSE;
     }
 
     /**
@@ -85,6 +141,10 @@ public class Climber {
      */
     public void climberRotate(double rotatePower) {
         climberMotor.set(rotatePower);
+    }
+
+    public double getClimberEncoder() {
+        return climberEncoder.getPosition();
     }
 
 }

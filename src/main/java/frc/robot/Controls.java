@@ -179,7 +179,7 @@ public class Controls {
      * Left Bumper Pressed
      * @return leftBumperPressed 
      */
-    public boolean getClimberClaw1() { 
+    public boolean getBlueClaw() { 
         return xboxController.getLeftBumperPressed(); 
     }
 
@@ -187,8 +187,12 @@ public class Controls {
      * Right Bumper Pressed 
      * @return rightBumperPressed 
      */
-    public boolean getClimberClaw2() { 
+    public boolean getYellowClaw() { 
         return xboxController.getRightBumperPressed(); 
+    }
+
+    public boolean getClimberLock() {
+        return xboxController.getBButtonPressed();
     }
 
     public double getClimberPower() {

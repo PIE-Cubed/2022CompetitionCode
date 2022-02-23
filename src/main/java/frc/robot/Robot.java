@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
   Drive         drive;
   Controls      controls;
   Grabber       grabber;
-  //Climber       climber;
+  Climber       climber;
   Shooter       shooter;
   CargoTracking cargoTracking;
   Auto          auto;
@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
     drive         = new Drive();
     grabber       = new Grabber();
     controls      = new Controls();
-    //climber       = new Climber();
+    climber       = new Climber();
     shooter       = new Shooter();
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber, shooter, cargoTracking);
@@ -228,6 +228,9 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
+    System.out.println("Climber encoder: " + climber.getClimberEncoder());
+    SmartDashboard.putNumber("Climber power", 0);
+    climber.climberRotate(SmartDashboard.getNumber("Climber power", 0));
     //drive.testWheelAngle();
     /*if (controls.grabberDeployRetract()) {
       shooter.deployFeeder();
@@ -235,12 +238,13 @@ public class Robot extends TimedRobot {
     if (controls.testButtonB()) {
       shooter.retractFeeder();
     }*/
+    /*
     shooter.autoShooterControl(ShootLocation.LOW_SHOT);
     SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());
     SmartDashboard.putNumber("Test front rpm", shooter.getabsRPM(19));
     SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
     SmartDashboard.putNumber("Target RPM", 1450);
-    SmartDashboard.putNumber("80% RPM", 1450 * 0.8);
+    SmartDashboard.putNumber("80% RPM", 1450 * 0.8);*/
     //System.out.println(shooter.testFlipperSwitch());
     //shooter.powerFeeder(controls.getFeedPower());
     //drive.testLimelightTargeting();
@@ -369,19 +373,21 @@ public class Robot extends TimedRobot {
    * Controls the climber in TeleOp
    */
   private void climberControl() {
-    /*
-    boolean toggleClaw1  = controls.getClimberClaw1();
-    boolean toggleClaw2  = controls.getClimberClaw2();
-    double  climberPower = controls.getClimberPower();
-    */
-    /*
-    if (toggleClaw1 == true) {
-      climber.claw1Toggle();
+    boolean toggleBlueClaw   = controls.getBlueClaw();
+    boolean toggleYellowClaw = controls.getYellowClaw();
+    boolean openClimberLock  = controls.getClimberLock();
+    double  climberPower     = controls.getClimberPower();
+    
+    if (toggleBlueClaw == true) {
+      climber.blueClawToggle();
     }
-    if (toggleClaw2 == true) {
-      climber.claw2Toggle();
+    if (toggleYellowClaw == true) {
+      climber.yellowClawToggle();
     }
-    climber.climberRotate(climberPower);*/
+    if (openClimberLock == true) {
+      climber.climberLockRetract();
+    }
+    climber.climberRotate(climberPower);
   }
 
   /**
