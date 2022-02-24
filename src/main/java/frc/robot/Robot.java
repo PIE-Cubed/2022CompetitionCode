@@ -229,7 +229,7 @@ public class Robot extends TimedRobot {
    */
   public void testPeriodic() {
     System.out.println("Climber encoder: " + climber.getClimberEncoder());
-    SmartDashboard.putNumber("Climber power", 0);
+    SmartDashboard.getNumber("Climber power", 0);
     climber.climberRotate(SmartDashboard.getNumber("Climber power", 0));
     //drive.testWheelAngle();
     /*if (controls.grabberDeployRetract()) {
@@ -373,8 +373,8 @@ public class Robot extends TimedRobot {
    * Controls the climber in TeleOp
    */
   private void climberControl() {
-    boolean toggleBlueClaw   = controls.getBlueClaw();
-    boolean toggleYellowClaw = controls.getYellowClaw();
+    boolean toggleBlueClaw   = controls.toggleBlueClaw();
+    boolean toggleYellowClaw = controls.toggleYellowClaw();
     boolean openClimberLock  = controls.getClimberLock();
     double  climberPower     = controls.getClimberPower();
     
@@ -385,7 +385,8 @@ public class Robot extends TimedRobot {
       climber.yellowClawToggle();
     }
     if (openClimberLock == true) {
-      climber.climberLockRetract();
+    //  climber.climberLockRetract();
+        climber.climberLockToggle();
     }
     climber.climberRotate(climberPower);
   }

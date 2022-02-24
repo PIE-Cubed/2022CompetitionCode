@@ -19,10 +19,10 @@ public class Climber {
     private RelativeEncoder climberEncoder;
 
     //Double Solenoid for the claws
-    private final int PCM_CAN_ID   = 2; 
-    private final int CLIMBER_LOCK = 1;
-    private final int BLUE_CLAW_OPEN    = 3;
-    private final int BLUE_CLAW_CLOSE   = 7;
+    private final int PCM_CAN_ID1   = 1; 
+    private final int CLIMBER_LOCK = 5;
+    private final int BLUE_CLAW_OPEN    = 7;
+    private final int BLUE_CLAW_CLOSE   = 3;
     private final int YELLOW_CLAW_OPEN  = 2;
     private final int YELLOW_CLAW_CLOSE = 6;
     private DoubleSolenoid blueClaw;
@@ -53,9 +53,9 @@ public class Climber {
         climberEncoder.setPosition(0.0); 
 
         //The Claws
-        blueClaw   = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, BLUE_CLAW_OPEN, BLUE_CLAW_CLOSE); 
-        yellowClaw = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, YELLOW_CLAW_OPEN, YELLOW_CLAW_CLOSE); 
-        climberLock = new Solenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, CLIMBER_LOCK);
+        blueClaw   = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, BLUE_CLAW_OPEN, BLUE_CLAW_CLOSE); 
+        yellowClaw = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, YELLOW_CLAW_OPEN, YELLOW_CLAW_CLOSE); 
+        climberLock = new Solenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, CLIMBER_LOCK);
         
         blueClaw.set(Value.kForward);
         yellowClaw.set(Value.kForward);
@@ -138,11 +138,23 @@ public class Climber {
     /**
      * Rotates the climber arms
      * @param rotatePower
+     * neagtive power raises arm from horizontal start position at bar 1
      */
     public void climberRotate(double rotatePower) {
         climberMotor.set(rotatePower);
     }
 
+    /**
+     * encoder values...
+     *      horizontal  0
+     *      bar1        -15.5
+     *      bar2        
+     *      bar3        
+     * 
+     *  how much does encoder change with small changes in rotation?
+     * 
+     * @return
+     */
     public double getClimberEncoder() {
         return climberEncoder.getPosition();
     }

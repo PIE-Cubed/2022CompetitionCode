@@ -179,7 +179,7 @@ public class Controls {
      * Left Bumper Pressed
      * @return leftBumperPressed 
      */
-    public boolean getBlueClaw() { 
+    public boolean toggleBlueClaw() { 
         return xboxController.getLeftBumperPressed(); 
     }
 
@@ -187,7 +187,7 @@ public class Controls {
      * Right Bumper Pressed 
      * @return rightBumperPressed 
      */
-    public boolean getYellowClaw() { 
+    public boolean toggleYellowClaw() { 
         return xboxController.getRightBumperPressed(); 
     }
 
