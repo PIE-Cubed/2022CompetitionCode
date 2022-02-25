@@ -71,6 +71,7 @@ public class Controls {
         //Cubes the power and clamps it because the rotate is SUPER sensitive
         power = Math.pow(power, 3.0); 
         power = MathUtil.clamp(power, -.5, .5);
+        power = -1 * power;
             
         return power;    
     }
@@ -193,6 +194,10 @@ public class Controls {
 
     public boolean getClimberLock() {
         return xboxController.getBButtonPressed();
+    }
+
+    public boolean getClimberMoveToBar3() {
+        return joystick.getRawButton(7);
     }
 
     public double getClimberPower() {

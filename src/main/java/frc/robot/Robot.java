@@ -187,6 +187,7 @@ public class Robot extends TimedRobot {
     wheelControl();
     ballControl();
     climberControl();
+    System.out.println("Climber encoder: " + climber.getClimberEncoder());
   }
 
   @Override
@@ -216,6 +217,8 @@ public class Robot extends TimedRobot {
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
     SmartDashboard.putNumber("Test Shooter Power", 0.55);
+    SmartDashboard.putNumber("Climber power", 0);
+
     cargoTracking.setRedAlliance( setRedAlliance() );
 
     //Sets the limelight LED mode
@@ -389,6 +392,10 @@ public class Robot extends TimedRobot {
         climber.climberLockToggle();
     }
     climber.climberRotate(climberPower);
+
+    if (controls.getClimberMoveToBar3()) {
+      climber.moveToBar3();
+    }
   }
 
   /**
