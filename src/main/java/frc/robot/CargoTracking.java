@@ -60,8 +60,8 @@ public class CargoTracking {
 	private static final double cD = 0.0000;
 
 	// Integrator limits
-	private static final double MIN_INTEGRATOR = -0.07; //-0.08
-	private static final double MAX_INTEGRATOR =  0.07; // 0.08
+	private static final double MAX_INTEGRATOR =  0.07;               // 0.08
+	private static final double MIN_INTEGRATOR = -1 * MAX_INTEGRATOR; //-0.08
 
 	/**
 	 * CONSTRUCTOR

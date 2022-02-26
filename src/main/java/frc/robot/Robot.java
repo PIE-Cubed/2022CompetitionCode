@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
 
   // Variables
   private int status = Robot.CONT;
+  private int targetStatus = 0;
 
   //Enumeration for manual or limelight control
   public static enum DriveMode {
@@ -187,7 +188,6 @@ public class Robot extends TimedRobot {
     wheelControl();
     ballControl();
     climberControl();
-    System.out.println("Climber encoder: " + climber.getClimberEncoder());
   }
 
   @Override
@@ -231,9 +231,10 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    System.out.println("Climber encoder: " + climber.getClimberEncoder());
-    SmartDashboard.getNumber("Climber power", 0);
-    climber.climberRotate(SmartDashboard.getNumber("Climber power", 0));
+    cargoTracking.autoCargoTrack();
+    // System.out.println("Climber encoder: " + climber.getClimberEncoder());
+    // SmartDashboard.getNumber("Climber power", 0);
+    // climber.climberRotate(SmartDashboard.getNumber("Climber power", 0));
     //drive.testWheelAngle();
     /*if (controls.grabberDeployRetract()) {
       shooter.deployFeeder();
@@ -302,12 +303,22 @@ public class Robot extends TimedRobot {
     } 
     //Limelight targeting
     else if (driveMode == DriveMode.LIMELIGHT_TARGETING) {
-      int targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);  
+      if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
+        driveMode = DriveMode.MANUAL;
+      }
+      else {
+        if (shootLocation == ShootLocation.LAUNCH_PAD) {
+          targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
+        }
+        else {
+          targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+        }
+      }
 
       if (targetStatus == Robot.DONE) {
         driveMode = DriveMode.LIMELIGHT_TARGETED;
       }
-      else if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
+      else if (targetStatus == Robot.FAIL) {
         driveMode = DriveMode.MANUAL;
       }
     }
@@ -363,7 +374,7 @@ public class Robot extends TimedRobot {
     }
     else {
       shooter.autoShooterControl(shootLocation);
-      System.out.println("Shooter On");
+      //System.out.println("Shooter On");
 
       if (shooter.shooterReady() == true) {
         System.out.println("Shooter Ready");

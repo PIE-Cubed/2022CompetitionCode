@@ -32,9 +32,8 @@ public class Grabber {
     private DoubleSolenoid grabberPiston;
 
     //CONSTANTS
-    private final double GRABBER_POWER = -0.8;
+    private final double GRABBER_POWER = 0.8;
 
-    
     /**
      * Enumerator for Grabber States
      */
@@ -43,7 +42,6 @@ public class Grabber {
         RETRACT;
     }
     private GrabberState grabberState;
-
 
     /**
      * Enumerater for Grabber Direction
@@ -84,7 +82,19 @@ public class Grabber {
     }
 
     public void setGrabberMotor(GrabberDirection dir) {
-        //Don't allow grabber to turn manually if it's retracted
+        // Grabber Intake
+        if (dir == GrabberDirection.FORWARD) {
+            grabberMotor.set(GRABBER_POWER);
+        }
+        // Grabber Reverse
+        else if (dir == GrabberDirection.REVERSE) {
+            grabberMotor.set(GRABBER_POWER * -1);
+        }
+        // No direction
+        else {
+            grabberMotor.set(0.0);
+        }
+        /*//Don't allow grabber to turn manually if it's retracted
         if (grabberState == GrabberState.RETRACT)  {
             grabberMotor.set(0.0);
         }
@@ -106,7 +116,7 @@ public class Grabber {
         //Shouldn't happen, but stops the grabber anyway
         else {
             grabberMotor.set(0.00);
-        }
+        }*/
     }
 
     /**

@@ -53,7 +53,7 @@ public class Auto {
 			firstTime = false;
 			step = 1;
 		}
-        System.out.println("Step: " + step);
+
         switch(step) {
             case 1:
                 status = autoDelay(delayMs);
@@ -84,37 +84,43 @@ public class Auto {
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
             case 9:
+                status = drive.autoAdjustWheels(0);
+                break;
+            case 10:
+                status = drive.autoCrabDrive(2, 0);
+                break;
+            case 11:
                 //If we are only doing 1 ball path, the routine is over
                 if (balls == 1) {
                     step = 100;
                 }
                 status = Robot.DONE;
                 break;            
-            case 10:
+            case 12:
                 status = drive.autoRotate(35);
                 break;
-            case 11:
+            case 13:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 12:
+            case 14:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 break;
-            case 13:
+            case 15:
                 status = drive.autoCrabDrive(8, 0);
                 break;
-            case 14:
+            case 16:
                 status = autoDelay(1500);
                 break;
-            case 15:
+            case 17:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 status = Robot.DONE;
                 break;
-            case 16:
+            case 18:
                 status = drive.autoRotate(-90);
                 break;
-            case 17:
+            case 19:
                 status = autoShoot(ShootLocation.AUTO_RING, 1);
                 break;
             default:
@@ -128,7 +134,6 @@ public class Auto {
         if (status == Robot.DONE) {
             step++;
         }
-
         return Robot.CONT;
     }
 

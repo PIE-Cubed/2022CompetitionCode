@@ -43,7 +43,7 @@ public class Drive {
     
     // Turn Controller
 	private static final double kP = 0.01; //0.02
-	private static final double kI = 0.0000;
+	private static final double kI = 0.00;
     private static final double kD = 0.00;
     
     //Auto crab drive controller
@@ -53,15 +53,19 @@ public class Drive {
 
 	//Target Controller
 	private static final double tP = 0.015; //0.033
-	private static final double tI = 0.00;
+	private static final double tI = 0.002;
     private static final double tD = 0.00;
 
+    //Integrator Range
+    private static final double TARGET_I_MAX = 0.06;
+    private static final double TARGET_I_MIN = -1 * TARGET_I_MAX;
+
 	//Variables
-    private boolean firstTime               = true;
-    private boolean rotateFirstTime         = true;
-    private int     count                   = 0;
-    private double  encoderTarget           = 0;
-    private double  targetOrientation       = 0;
+    private boolean firstTime         = true;
+    private boolean rotateFirstTime   = true;
+    private int     count             = 0;
+    private double  encoderTarget     = 0;
+    private double  targetOrientation = 0;
     
     //CONSTANTS
     private final int    FAIL_DELAY   = 5;
@@ -92,7 +96,6 @@ public class Drive {
     //Limelight
 	public boolean limeControl   = false;
 	public int     limeStatus    = 0;
-
         
     /**
      * Enumerators
@@ -209,10 +212,10 @@ public class Drive {
     private static final double rotateMotorAngleDeg = Math.toDegrees(rotateMotorAngleRad);
  
     // These numbers were selected to make the angles between -180 and +180
-    private static final double rotateRightFrontMotorAngle = 180 - rotateMotorAngleDeg; //-1 * rotateMotorAngleDeg;
-    private static final double rotateLeftFrontMotorAngle = rotateMotorAngleDeg;        //-180 + rotateMotorAngleDeg;
-    private static final double rotateRightRearMotorAngle = -180 + rotateMotorAngleDeg; //rotateMotorAngleDeg;
-    private static final double rotateLeftRearMotorAngle =  -1 * rotateMotorAngleDeg;   //180 - rotateMotorAngleDeg;
+    private static final double rotateRightFrontMotorAngle = -1 * rotateMotorAngleDeg; //-1 * rotateMotorAngleDeg;
+    private static final double rotateLeftFrontMotorAngle = -180 + rotateMotorAngleDeg; //rotateRightFrontMotorAngle - 90;
+    private static final double rotateRightRearMotorAngle = rotateMotorAngleDeg; //rotateRightFrontMotorAngle + 90;
+    private static final double rotateLeftRearMotorAngle =  180 -rotateMotorAngleDeg;       //rotateRightFrontMotorAngle + 180;
 
 
     /****************************************************************************************** 
@@ -283,6 +286,9 @@ public class Drive {
 
         targetController = new PIDController(tP, tI, tD);
         targetController.setTolerance(kLimeLightToleranceDegrees);
+
+        //Inegrator Ranges
+        targetController.setIntegratorRange(TARGET_I_MIN, TARGET_I_MAX);
 
         /**
          * LIMELIGHT
@@ -481,10 +487,10 @@ public class Drive {
     * 
     ******************************************************************************************/
     public void teleopRotate(double rotatePower) {
-        frontRightWheel.rotateAndDrive(rotateRightFrontMotorAngle, rotatePower);
-        frontLeftWheel.rotateAndDrive(rotateLeftFrontMotorAngle, rotatePower);
-        rearRightWheel.rotateAndDrive(rotateRightRearMotorAngle, rotatePower);
-        rearLeftWheel.rotateAndDrive(rotateLeftRearMotorAngle, rotatePower);
+        frontRightWheel.rotateAndDrive(rotateRightFrontMotorAngle, rotatePower * -1);
+        frontLeftWheel.rotateAndDrive(rotateLeftFrontMotorAngle, rotatePower * -1);
+        rearRightWheel.rotateAndDrive(rotateRightRearMotorAngle, rotatePower * -1);
+        rearLeftWheel.rotateAndDrive(rotateLeftRearMotorAngle, rotatePower * -1);
     }
 
 
@@ -517,7 +523,7 @@ public class Drive {
         rotateError = rotateController.calculate(ahrs.getYaw(), degrees);
         rotateError = MathUtil.clamp(rotateError, -0.5, 0.5);
         System.out.println(rotateError + " " + ahrs.getYaw());
-		teleopRotate(-1 * rotateError);
+		teleopRotate(rotateError);
 
 		// CHECK: Routine Complete
 		if (rotateController.atSetpoint() == true) {
@@ -753,7 +759,7 @@ public class Drive {
         // Rotate
 		m_LimelightCalculatedPower = targetController.calculate(tx, 0.0);
         m_LimelightCalculatedPower = MathUtil.clamp(m_LimelightCalculatedPower, -0.50, 0.50);
-		teleopRotate(m_LimelightCalculatedPower);
+		teleopRotate(-1 * m_LimelightCalculatedPower);
 		//System.out.println("Pid out: " + m_LimelightCalculatedPower);
 
 		// CHECK: Routine Complete
