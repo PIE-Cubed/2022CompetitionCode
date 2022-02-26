@@ -216,8 +216,8 @@ public class Robot extends TimedRobot {
    */
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    SmartDashboard.putNumber("Test Shooter Power", 0.55);
-    SmartDashboard.putNumber("Climber power", 0);
+    SmartDashboard.putNumber("Shooter power", 0.55);
+    //SmartDashboard.putNumber("Climber power", 0);
 
     cargoTracking.setRedAlliance( setRedAlliance() );
 
@@ -231,17 +231,17 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    cargoTracking.autoCargoTrack();
+    //cargoTracking.autoCargoTrack();
     // System.out.println("Climber encoder: " + climber.getClimberEncoder());
-    // SmartDashboard.getNumber("Climber power", 0);
-    // climber.climberRotate(SmartDashboard.getNumber("Climber power", 0));
+    shooter.autoShooterControl(ShootLocation.AUTO_RING);
+    //shooter.testShootMotors(SmartDashboard.getNumber("Shooter power", 0));
     //drive.testWheelAngle();
-    /*if (controls.grabberDeployRetract()) {
+    if (controls.grabberDeployRetract()) {
       shooter.deployFeeder();
     }
     if (controls.testButtonB()) {
       shooter.retractFeeder();
-    }*/
+    }
     /*
     shooter.autoShooterControl(ShootLocation.LOW_SHOT);
     SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());

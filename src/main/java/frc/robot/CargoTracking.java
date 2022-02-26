@@ -133,7 +133,7 @@ public class CargoTracking {
 				System.out.println("Cargo Not Found!");
 
 				// Returns error code for failure
-				return Robot.FAIL;
+				return Robot.DONE;
 			}
 		}
 
@@ -178,7 +178,7 @@ public class CargoTracking {
 			System.out.println("TimeOut!" + " Cargo Present: " + !noTarget);
 
 			// Returns error code for failure
-			return Robot.FAIL;
+			return Robot.DONE;
 		}
 
 		// Returns error code for continue

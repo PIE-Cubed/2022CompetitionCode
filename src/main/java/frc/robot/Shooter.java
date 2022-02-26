@@ -45,17 +45,18 @@ public class Shooter {
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
 
+	//Safe shot
 	public final double HIGH_SHOT_REAR_POWER   = 0.46; //0.525 //Untested
 	public final double HIGH_SHOT_FRONT_POWER  = -0.46; //0.525 //Untested
 
 	public final double LOW_SHOT_REAR_POWER    = 0.23; //0.21
 	public final double LOW_SHOT_FRONT_POWER   = -0.23; //-0.21
 
-	public final double LAUNCH_PAD_REAR_POWER  = 0.65;
-	public final double LAUNCH_PAD_FRONT_POWER = -0.65;
+	public final double LAUNCH_PAD_REAR_POWER  = 0.46;
+	public final double LAUNCH_PAD_FRONT_POWER = -0.46;
 
-	public final double AUTO_RING_REAR_POWER   = 0.5;
-	public final double AUTO_RING_FRONT_POWER  = -0.5;
+	public final double AUTO_RING_REAR_POWER   = 0.42; //0.5
+	public final double AUTO_RING_FRONT_POWER  = -0.42; //0.5
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
@@ -66,11 +67,11 @@ public class Shooter {
 	public final double LOW_SHOT_REAR_TARGET_RPM    = 1450; //1650
 	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1450; //1650
 
-	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3500;
-	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3500;
+	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 2670;
+	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 2770;
 
-	public final double AUTO_RING_REAR_TARGET_RPM   = 2830;
-	public final double AUTO_RING_FRONT_TARGET_RPM  = 2930; //Front moves faster, so it needs faster target rpm
+	public final double AUTO_RING_REAR_TARGET_RPM   = 2550;
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 2480; //Front moves faster, so it needs faster target rpm
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;

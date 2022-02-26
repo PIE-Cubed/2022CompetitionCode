@@ -59,26 +59,24 @@ public class Auto {
                 status = autoDelay(delayMs);
                 break;
             case 2:
-                status = drive.autoRotate(152);
+                status = drive.autoRotate(147);
                 break;
             case 3:
+                status = cargoTracking.autoCargoTrack();
+                break;
+            case 4:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 4:
+            case 5:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 5:
-                status = drive.autoCrabDrive(4, 0, 0.25);
-                break;
             case 6:
-                status = autoDelay(1500);
+                status = drive.autoCrabDrive(5, 0, 0.25);
                 break;
             case 7:
-                grabber.deployRetract();
-                grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
-                status = Robot.DONE;
+                status = autoDelay(2000);
                 break;
             case 8:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
@@ -87,7 +85,7 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 10:
-                status = drive.autoCrabDrive(2, 0);
+                status = Robot.DONE;//drive.autoCrabDrive(2, 0);
                 break;
             case 11:
                 //If we are only doing 1 ball path, the routine is over
@@ -365,12 +363,12 @@ public class Auto {
             case 4:
                 shooter.deployFeeder();
                 System.out.println("Auto shoot: deploying feeder");
-                status = autoDelay(1000);
+                status = autoDelay(400);
                 break;
             case 5:
                 if (numBalls == 2) {
                     shooter.retractFeeder();
-                    status = autoDelay(1000);
+                    status = autoDelay(1200);
                 }
                 else {
                     status = Robot.DONE;
@@ -379,7 +377,7 @@ public class Auto {
             case 6:
                 if (numBalls == 2) {
                     shooter.deployFeeder();
-                    status = autoDelay(1000);
+                    status = autoDelay(400);
                 }
                 else {
                     status = Robot.DONE;
