@@ -78,12 +78,10 @@ public class Drive {
     private static final double BR_OFFSET = -33.2;
 
     //Yellow ROBOT
-    /*
-    private static final double FL_OFFSET = -151.21;
-    private static final double FR_OFFSET = -150.36;
-    private static final double BL_OFFSET = -103.64;
-    private static final double BR_OFFSET =  146.41;
-    */
+    //private static final double FL_OFFSET = -151.21;
+    //private static final double FR_OFFSET = -150.36;
+    //private static final double BL_OFFSET = -103.64;
+    //private static final double BR_OFFSET =  146.41; //93.10
 
 	//Limelight Variables
     private int     noTargetCount      = 0;

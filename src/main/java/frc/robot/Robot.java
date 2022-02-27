@@ -231,17 +231,18 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    //cargoTracking.autoCargoTrack();
+    cargoTracking.autoCargoTrack();
     // System.out.println("Climber encoder: " + climber.getClimberEncoder());
-    shooter.autoShooterControl(ShootLocation.AUTO_RING);
+    //shooter.autoShooterControl(ShootLocation.AUTO_RING);
     //shooter.testShootMotors(SmartDashboard.getNumber("Shooter power", 0));
     //drive.testWheelAngle();
+    /*
     if (controls.grabberDeployRetract()) {
       shooter.deployFeeder();
     }
     if (controls.testButtonB()) {
       shooter.retractFeeder();
-    }
+    }*/
     /*
     shooter.autoShooterControl(ShootLocation.LOW_SHOT);
     SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());
@@ -249,11 +250,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
     SmartDashboard.putNumber("Target RPM", 1450);
     SmartDashboard.putNumber("80% RPM", 1450 * 0.8);*/
-    //System.out.println(shooter.testFlipperSwitch());
-    //shooter.powerFeeder(controls.getFeedPower());
     //drive.testLimelightTargeting();
     //drive.testRotate();
-    //shooter.testShooter(.60);
     //drive.testWheelAngle();
   }
 

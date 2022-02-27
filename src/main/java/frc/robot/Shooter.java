@@ -6,14 +6,15 @@ package frc.robot;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Shooter {
 	//2 holes above marked one
@@ -49,7 +50,7 @@ public class Shooter {
 	public final double HIGH_SHOT_REAR_POWER   = 0.46; //0.525 //Untested
 	public final double HIGH_SHOT_FRONT_POWER  = -0.46; //0.525 //Untested
 
-	public final double LOW_SHOT_REAR_POWER    = 0.23; //0.21
+	public final double LOW_SHOT_REAR_POWER    = 0.24; //0.21
 	public final double LOW_SHOT_FRONT_POWER   = -0.23; //-0.21
 
 	public final double LAUNCH_PAD_REAR_POWER  = 0.46;
@@ -80,7 +81,7 @@ public class Shooter {
 	public  double                frontTargetVelocity;
 	public  double                rearTargetVelocity;
 	private int                   targetCount        = 0;
-	private int                   noTargetCount      = 0;
+	//private int                   noTargetCount      = 0;
 	private double                frontPower         = 0;
 	private double                rearPower          = 0;
 
@@ -297,22 +298,28 @@ public class Shooter {
     *   
     ******************************************************************************************/
 	public boolean shooterReady() {
+		//Variables
 		double rearRpm;
 		double frontRpm;
+		final int RPM_OFFSET = 80;
+		final int ON_TRAGET_DELAY = 10;
+
+		//Gets rpm values
 		rearRpm  = getabsRPM(REAR_SHOOTER_ID);
 		frontRpm = getabsRPM(FRONT_SHOOTER_ID);
 
-		double rearLowerLimit  = rearTargetVelocity  - 90;
-		double rearUpperLimit  = rearTargetVelocity  + 90;
-		double frontLowerLimit = frontTargetVelocity - 90;
-		double frontUpperLimit = frontTargetVelocity + 90;
+		//Calculates tolerable RPM range
+		double rearLowerLimit  = rearTargetVelocity  - RPM_OFFSET;
+		double rearUpperLimit  = rearTargetVelocity  + RPM_OFFSET;
+		double frontLowerLimit = frontTargetVelocity - RPM_OFFSET;
+		double frontUpperLimit = frontTargetVelocity + RPM_OFFSET;
 
 		if ((rearRpm  > rearLowerLimit  && rearRpm < rearUpperLimit) && 
 			(frontRpm > frontLowerLimit && frontRpm < frontUpperLimit))  {
 			targetCount ++;
-			noTargetCount = 0;
+			//noTargetCount = 0;
 			
-			if(targetCount >= 5) { 
+			if(targetCount >= ON_TRAGET_DELAY) { 
 				return true;
 			}
 			else {
@@ -320,7 +327,7 @@ public class Shooter {
 			}
 		}
 		else {
-			noTargetCount ++;
+			//noTargetCount ++;
 			targetCount = 0;
 
 			//Timeout, shoots to clear system, better than holding ball
@@ -339,6 +346,7 @@ public class Shooter {
 			else {
 				return false;
 			}*/
+
 			return false;
 		}
 	}
