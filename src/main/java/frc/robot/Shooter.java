@@ -237,7 +237,7 @@ public class Shooter {
 		SmartDashboard.putNumber("Rear power", rearPower);
 		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
 
-		System.out.println("Front rpm: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear rpm: " + getabsRPM(REAR_SHOOTER_ID));
+		//System.out.println("Front rpm: " + getabsRPM(FRONT_SHOOTER_ID) + " Rear rpm: " + getabsRPM(REAR_SHOOTER_ID));
 
 		frontShooter.set(frontPower);
 		rearShooter.set(rearPower);

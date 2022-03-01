@@ -188,6 +188,17 @@ public class Wheel {
 
     /****************************************************************************************** 
     *
+    *    setCoastMode()
+    *    Returns the encoder value of the drive motor
+    * 
+    ******************************************************************************************/
+    public void setCoastMode() {
+        this.driveMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        this.rotateMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
+    }
+
+    /****************************************************************************************** 
+    *
     *    testWheelAngle()
     *    Returns the direct reading of the rotate motor sensor
     * 

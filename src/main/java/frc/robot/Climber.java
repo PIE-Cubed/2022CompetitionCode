@@ -147,6 +147,7 @@ public class Climber {
      */
     public void climberRotate(double rotatePower) {
         climberMotor.set(rotatePower);
+        System.out.println("Climber Encoder: " + getClimberEncoder());
     }
 
     /**

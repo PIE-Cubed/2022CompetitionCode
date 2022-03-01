@@ -181,6 +181,8 @@ public class Robot extends TimedRobot {
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
+    /***TEST ONLY***/
+    SmartDashboard.putNumber("Climber Power", 0);
   }
 
   @Override
@@ -231,7 +233,9 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    cargoTracking.autoCargoTrack();
+    
+    climber.climberRotate(.5);
+    //cargoTracking.autoCargoTrack();
     // System.out.println("Climber encoder: " + climber.getClimberEncoder());
     //shooter.autoShooterControl(ShootLocation.AUTO_RING);
     //shooter.testShootMotors(SmartDashboard.getNumber("Shooter power", 0));
@@ -375,7 +379,7 @@ public class Robot extends TimedRobot {
       //System.out.println("Shooter On");
 
       if (shooter.shooterReady() == true) {
-        System.out.println("Shooter Ready");
+        //System.out.println("Shooter Ready");
         shooter.deployFeeder();
       }
     }
@@ -399,7 +403,10 @@ public class Robot extends TimedRobot {
     if (openClimberLock == true) {
     //  climber.climberLockRetract();
         climber.climberLockToggle();
+        drive.setCoastMode();
     }
+    /***TEST ONLY***/
+    climberPower = SmartDashboard.getNumber("Climber power", 0);
     climber.climberRotate(climberPower);
 
     if (controls.getClimberMoveToBar3()) {

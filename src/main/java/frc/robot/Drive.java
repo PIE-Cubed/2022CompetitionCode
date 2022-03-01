@@ -878,6 +878,12 @@ public class Drive {
         }
     }
 
+    public void setCoastMode() {
+        frontLeftWheel.setCoastMode();
+        frontRightWheel.setCoastMode();
+        rearLeftWheel.setCoastMode();
+        rearRightWheel.setCoastMode();
+    }
 
     /****************************************************************************************** 
     *
