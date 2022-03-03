@@ -195,7 +195,7 @@ public class Controls {
         return xboxController.getBButtonPressed();
     }
 
-    public boolean getClimberMoveToBar3() {
+    public boolean getClimberMoveToBar2() {
         return joystick.getRawButton(7);
     }
 

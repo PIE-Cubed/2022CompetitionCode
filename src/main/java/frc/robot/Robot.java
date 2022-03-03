@@ -401,16 +401,15 @@ public class Robot extends TimedRobot {
       climber.yellowClawToggle();
     }
     if (openClimberLock == true) {
-    //  climber.climberLockRetract();
-        climber.climberLockToggle();
-        drive.setCoastMode();
+      drive.setCoastMode();
+      System.out.println("Wheels are in coast mode \n\n\n\n\n\n\n\n");
     }
     /***TEST ONLY***/
-    climberPower = SmartDashboard.getNumber("Climber power", 0);
+    climberPower = SmartDashboard.getNumber("Climber Power", 0);
     climber.climberRotate(climberPower);
 
-    if (controls.getClimberMoveToBar3()) {
-      climber.moveToBar3();
+    if (controls.getClimberMoveToBar2()) {
+      climber.moveToBar2();
     }
   }
 
