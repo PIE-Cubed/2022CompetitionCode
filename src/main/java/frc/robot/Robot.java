@@ -391,25 +391,30 @@ public class Robot extends TimedRobot {
   private void climberControl() {
     boolean toggleBlueClaw   = controls.toggleBlueClaw();
     boolean toggleYellowClaw = controls.toggleYellowClaw();
-    boolean openClimberLock  = controls.getClimberLock();
     double  climberPower     = controls.getClimberPower();
-    
+
+    boolean moveToBar2 = controls.getClimberMoveToBar2();
+    boolean moveToBar3 = controls.getClimberMoveToBar3();
+    boolean moveToBar4 = controls.getClimberMoveToBar4();
+
     if (toggleBlueClaw == true) {
       climber.blueClawToggle();
     }
     if (toggleYellowClaw == true) {
       climber.yellowClawToggle();
     }
-    if (openClimberLock == true) {
-      drive.setCoastMode();
-      System.out.println("Wheels are in coast mode \n\n\n\n\n\n\n\n");
-    }
-    /***TEST ONLY***/
-    climberPower = SmartDashboard.getNumber("Climber Power", 0);
-    climber.climberRotate(climberPower);
 
-    if (controls.getClimberMoveToBar2()) {
+    if (moveToBar2 == true) {
       climber.moveToBar2();
+    }
+    else if (moveToBar3 == true) {
+      climber.moveToBar3();
+    }
+    else if (moveToBar4 == true) {
+      climber.moveToBar4();
+    }
+    else {
+      climber.climberRotate(climberPower);
     }
   }
 

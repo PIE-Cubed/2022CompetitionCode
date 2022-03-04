@@ -191,16 +191,31 @@ public class Controls {
         return xboxController.getRightBumperPressed(); 
     }
 
-    public boolean getClimberLock() {
-        return xboxController.getBButtonPressed();
-    }
-
     public boolean getClimberMoveToBar2() {
         return joystick.getRawButton(7);
     }
 
+    public boolean getClimberMoveToBar3() {
+        return joystick.getRawButton(9);
+    }
+
+    public boolean getClimberMoveToBar4() {
+        return joystick.getRawButton(11);
+    }
+
     public double getClimberPower() {
-        return -1 * xboxController.getLeftY();
+        final double POWER = 0.3;
+        double leftY = -1 * xboxController.getLeftY();
+        
+        if (leftY >= 0.1) {
+            return POWER;
+        }
+        else if (leftY <= -0.1) {
+            return -1 * POWER;
+        }
+        else {
+            return 0.00;
+        }
     }
      
     //Grabber Direction based off of D-Pad
