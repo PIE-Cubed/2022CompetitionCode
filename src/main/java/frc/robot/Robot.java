@@ -5,6 +5,8 @@ package frc.robot;
  */
 import edu.wpi.first.wpilibj.TimedRobot;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -181,6 +183,7 @@ public class Robot extends TimedRobot {
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
+    climber.setClimberIdleMode(IdleMode.kBrake);
     /***TEST ONLY***/
     SmartDashboard.putNumber("Climber Power", 0);
   }
@@ -195,9 +198,9 @@ public class Robot extends TimedRobot {
   @Override
   /**
    * disabledInit()
-   * Shouldn't ever do anything
    */
   public void disabledInit() {
+    climber.setClimberIdleMode(IdleMode.kCoast);
     //Nothing yet...
   }
 

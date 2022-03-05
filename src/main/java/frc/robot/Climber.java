@@ -41,8 +41,8 @@ public class Climber {
 
     //Constants
     private static final double BAR_TWO_POSITION   =  46.30;
-    private static final double BAR_THREE_POSITION = -38.50;
-    private static final double BAR_FOUR_POSITION  = -120.0;
+    private static final double BAR_THREE_POSITION = -55.50;
+    private static final double BAR_FOUR_POSITION  = -205.39;
 
     //The enum and claw variables
     public enum ClawState {
@@ -58,11 +58,11 @@ public class Climber {
     public Climber() {
         //The Motor
         climberMotor = new CANSparkMax(CLIMBER_SPARKMAX_ID, MotorType.kBrushless);
-        climberMotor.setIdleMode(IdleMode.kCoast);
+        climberMotor.setIdleMode(IdleMode.kBrake);
         climberMotor.setSmartCurrentLimit(CURRENT_LIMIT);
 
         climberFollowMotor = new CANSparkMax(CLIMBER_FOLLOW_SPARKMAX_ID, MotorType.kBrushless);
-        climberFollowMotor.setIdleMode(IdleMode.kCoast);
+        climberFollowMotor.setIdleMode(IdleMode.kBrake);
         climberFollowMotor.setSmartCurrentLimit(CURRENT_LIMIT);
         climberFollowMotor.follow(climberMotor, true);
 
@@ -78,10 +78,6 @@ public class Climber {
         
         blueClawClose();
         yellowClawClose();
-        // blueClaw.set(Value.kReverse);
-        // yellowClaw.set(Value.kReverse);
-        // blueClawState    = ClawState.CLOSE;
-        // yellowClawState  = ClawState.CLOSE;
     }
 
     /**
@@ -138,36 +134,35 @@ public class Climber {
     }
 
     /**
-     * encoder values...
-     *      horizontal  0
-     *      bar1        -15.5
-     *      bar2        
-     *      bar3        
-     * 
-     *  how much does encoder change with small changes in rotation?
-     * 
-     * @return
+     * Moves to the bar two position automatically
+     * @return atPosition
      */
-    public double getClimberEncoder() {
-        return climberEncoder.getPosition();
-    }
-
     public int moveToBar2() {
-        if (climberEncoder.getPosition() >= BAR_TWO_POSITION) {
+        if (getClimberEncoder() >= BAR_TWO_POSITION) {
             climberMotor.set(0);
             return Robot.DONE;
         }
         else {
             yellowClawOpen();
             blueClawOpen();
-            climberMotor.set(0.3);
+            
+            if (getClimberEncoder() >= 0.8 * BAR_TWO_POSITION) {
+                climberMotor.set(0.15);
+            }
+            else {
+                climberMotor.set(0.3);
+            }
             return Robot.CONT;
         }
     }
 
-    //Not tested
+    /**
+     * Moves to the bar three position automatically
+     * <p>NOT TESTED!
+     * @return atPosition
+     */
     public int moveToBar3() {
-        if (climberEncoder.getPosition() <= BAR_THREE_POSITION) {
+        if (getClimberEncoder() <= BAR_THREE_POSITION) {
             climberMotor.set(0);
             blueClawClose();
             return Robot.DONE;
@@ -178,9 +173,13 @@ public class Climber {
         }
     }
 
-    //Not tested
+    /**
+     * Moves to the bar four position automatically
+     * <p>NOT TESTED!
+     * @return atPosition
+     */
     public int moveToBar4() {
-        if (climberEncoder.getPosition() <= BAR_FOUR_POSITION) {
+        if (getClimberEncoder() <= BAR_FOUR_POSITION) {
             climberMotor.set(0);
             yellowClawClose();
             return Robot.DONE;
@@ -189,6 +188,23 @@ public class Climber {
             climberMotor.set(-0.3);
             return Robot.CONT;
         }
+    }
+
+    /**
+     * Sets the climber mode (brake or coast)
+     * @param value
+     */
+    public void setClimberIdleMode(IdleMode value) {
+        climberMotor.setIdleMode(value);
+        climberFollowMotor.setIdleMode(value);
+    }
+
+    /**
+     * Gets the Encoder Value
+     * @return encoderValue
+     */
+    public double getClimberEncoder() {
+        return getClimberEncoder();
     }
 
 }
