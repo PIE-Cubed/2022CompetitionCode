@@ -158,7 +158,6 @@ public class Climber {
 
     /**
      * Moves to the bar three position automatically
-     * <p>NOT TESTED!
      * @return atPosition
      */
     public int moveToBar3() {
@@ -175,7 +174,6 @@ public class Climber {
 
     /**
      * Moves to the bar four position automatically
-     * <p>NOT TESTED!
      * @return atPosition
      */
     public int moveToBar4() {
@@ -204,7 +202,7 @@ public class Climber {
      * @return encoderValue
      */
     public double getClimberEncoder() {
-        return getClimberEncoder();
+        return climberEncoder.getPosition();
     }
 
 }
