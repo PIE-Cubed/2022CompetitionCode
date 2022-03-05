@@ -217,7 +217,7 @@ public class CargoTracking {
 			m_CargoCalculatedPower = -1 * m_CargoCalculatedPower;
 
 			// Prints calculated power
-			System.out.println("Rotate Power: " + m_CargoCalculatedPower);
+			//System.out.println("Rotate Power: " + m_CargoCalculatedPower);
 
 			// Starts rotating
 			drive.teleopRotate(m_CargoCalculatedPower);
@@ -253,7 +253,7 @@ public class CargoTracking {
 
 		if (pipelineEmpty == true) {
 		  // Prints the emptyCount
-		  System.out.println("IsEmpty: " + pipelineEmpty + " Empty Count: " + emptyCount + " Dead Zone " + deadZoneCount);
+		  //System.out.println("IsEmpty: " + pipelineEmpty + " Empty Count: " + emptyCount + " Dead Zone " + deadZoneCount);
 
 		  // Sets turn to 0.00
 		  turn = 0.00;
@@ -263,7 +263,7 @@ public class CargoTracking {
 		  turn = centerX - (IMG_WIDTH_SCALED / 2);
 
 		  // Prints the values
-		  System.out.println("IsEmpty: " + pipelineEmpty + " CenterX: " + centerX + " Turn: " + turn);
+		  //System.out.println("IsEmpty: " + pipelineEmpty + " CenterX: " + centerX + " Turn: " + turn);
 	
 		  // Resets empty counters
 		  emptyCount    = 0;

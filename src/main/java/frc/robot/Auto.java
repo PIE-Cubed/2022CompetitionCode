@@ -3,9 +3,9 @@ package frc.robot;
 /**
  * Imports
  */
+import frc.robot.Drive.TargetPipeline;
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
-import frc.robot.Drive.TargetPipeline;
 
 public class Auto {
     // Object creation
