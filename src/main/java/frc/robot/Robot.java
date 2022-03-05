@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 /**
  * Imports
  */
@@ -33,6 +34,9 @@ public class Robot extends TimedRobot {
   Shooter       shooter;
   CargoTracking cargoTracking;
   Auto          auto;
+  LidarSensor   lidarSensor;
+  DutyCycleEncoder throughboEncoder;
+  int lidarCounter = 0;
 
   // Variables
   private int status = Robot.CONT;
@@ -69,6 +73,8 @@ public class Robot extends TimedRobot {
    */
   public Robot() {
     //Instance Creation
+    lidarSensor   = new LidarSensor();
+    throughboEncoder = new DutyCycleEncoder(6);
     drive         = new Drive();
     grabber       = new Grabber();
     controls      = new Controls();
@@ -229,12 +235,20 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    while (cargoStatus == Robot.CONT) {
-      if (controls.autoKill() == true) {
-        cargoStatus = Robot.FAIL;
-      }
+    //while (cargoStatus == Robot.CONT) {
+    //  if (controls.autoKill() == true) {
+    //    cargoStatus = Robot.FAIL;
+    //  }
 
-      cargoStatus = auto.autoCargoPickup();//cargoTracking.autoCargoTrack();
+    //  cargoStatus = auto.autoCargoPickup();//cargoTracking.autoCargoTrack();
+    //}
+    
+    lidarCounter++;
+    if ((lidarCounter % 5) == 0) {
+      //System.out.println("Distance: " + lidarSensor.getDistance());
+      System.out.println("Ticks: " + throughboEncoder.get());
+      //System.out.println("RawTicks: " + throughboEncoder.getRaw());
+      
     }
     //cargoTracking.faceCargo();
     //System.out.println(shooter.testFlipperSwitch());
