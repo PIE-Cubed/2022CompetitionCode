@@ -217,6 +217,14 @@ public class Controls {
             return 0.00;
         }
     }
+
+    /**
+     * Resets the climber encoder
+     * @return rightStickPressed
+     */
+    public boolean resetClimberEncoder() {
+        return xboxController.getRightStickButtonPressed();
+    }
      
     //Grabber Direction based off of D-Pad
     public GrabberDirection getGrabberDirection() {

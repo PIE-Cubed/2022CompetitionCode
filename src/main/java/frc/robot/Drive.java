@@ -112,7 +112,8 @@ public class Drive {
      */
     public static enum TargetPipeline {
 		ON_TARMAC,
-        OFF_TARMAC;
+        OFF_TARMAC,
+        CAMERA;
 	}
 
     /**
@@ -852,9 +853,13 @@ public class Drive {
             // Configures the limelight for on tarmac targeting
             pipeline.setNumber(1);
         }
+        else if (pipelineName == TargetPipeline.CAMERA) {
+            // Cinfigures the limelight to be a camera
+            pipeline.setNumber(2);
+        }
         else {
             // Configures the limelight to do nothing
-            pipeline.setNumber(2);
+            pipeline.setNumber(3);
         }
     }
 

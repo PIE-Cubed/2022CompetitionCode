@@ -16,6 +16,8 @@ public class Climber {
     Encoder for 1st bar: 46.3
     */
 
+    //Variables
+
     //Spark Max ID for the climber
     private final int CLIMBER_SPARKMAX_ID  = 22;
     private final int CLIMBER_FOLLOW_SPARKMAX_ID = 21;
@@ -33,7 +35,7 @@ public class Climber {
     private DoubleSolenoid yellowClaw;
 
     //Double Solenoid for the claws
-    private final int PCM_CAN_ID1    = 1; 
+    private final int PCM_CAN_ID1       = 1; 
     private final int BLUE_CLAW_OPEN    = 3;//7
     private final int BLUE_CLAW_CLOSE   = 7;//3
     private final int YELLOW_CLAW_OPEN  = 2;//6
@@ -42,7 +44,7 @@ public class Climber {
     //Constants
     private static final double BAR_TWO_POSITION   =  46.30;
     private static final double BAR_THREE_POSITION = -55.50;
-    private static final double BAR_FOUR_POSITION  = -205.39;
+    private static final double BAR_FOUR_POSITION  = -210.39;
 
     //The enum and claw variables
     public enum ClawState {
@@ -130,7 +132,6 @@ public class Climber {
      */
     public void climberRotate(double rotatePower) {
         climberMotor.set(rotatePower);
-        System.out.println("Climber Encoder: " + getClimberEncoder());
     }
 
     /**
@@ -147,10 +148,10 @@ public class Climber {
             blueClawOpen();
             
             if (getClimberEncoder() >= 0.8 * BAR_TWO_POSITION) {
-                climberMotor.set(0.15);
+                climberMotor.set(0.2);
             }
             else {
-                climberMotor.set(0.3);
+                climberMotor.set(0.4);
             }
             return Robot.CONT;
         }
@@ -167,7 +168,7 @@ public class Climber {
             return Robot.DONE;
         }
         else {
-            climberMotor.set(-0.3);
+            climberMotor.set(-0.4);
             return Robot.CONT;
         }
     }
@@ -179,11 +180,16 @@ public class Climber {
     public int moveToBar4() {
         if (getClimberEncoder() <= BAR_FOUR_POSITION) {
             climberMotor.set(0);
-            yellowClawClose();
+            //yellowClawClose();
             return Robot.DONE;
         }
         else {
-            climberMotor.set(-0.3);
+            if (getClimberEncoder() <= 0.9 * BAR_FOUR_POSITION) {
+                climberMotor.set(-0.2);
+            }
+            else {
+                climberMotor.set(-0.4);
+            }
             return Robot.CONT;
         }
     }
@@ -203,6 +209,13 @@ public class Climber {
      */
     public double getClimberEncoder() {
         return climberEncoder.getPosition();
+    }
+
+    /**
+     * Resets the climber encoder
+     */
+    public void resetEncoder() {
+        climberEncoder.setPosition(0.00);
     }
 
 }

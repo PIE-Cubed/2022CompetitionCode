@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Drive.TargetPipeline;
 import frc.robot.Shooter.ShootLocation;
 
 /**
@@ -184,8 +185,6 @@ public class Robot extends TimedRobot {
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
     climber.setClimberIdleMode(IdleMode.kBrake);
-    /***TEST ONLY***/
-    SmartDashboard.putNumber("Climber Power", 0);
   }
 
   @Override
@@ -222,7 +221,6 @@ public class Robot extends TimedRobot {
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
     SmartDashboard.putNumber("Shooter power", 0.55);
-    //SmartDashboard.putNumber("Climber power", 0);
 
     cargoTracking.setRedAlliance( setRedAlliance() );
 
@@ -312,12 +310,7 @@ public class Robot extends TimedRobot {
         driveMode = DriveMode.MANUAL;
       }
       else {
-        if (shootLocation == ShootLocation.LAUNCH_PAD) {
-          targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.OFF_TARMAC);
-        }
-        else {
-          targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
-        }
+        targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
       }
 
       if (targetStatus == Robot.DONE) {
@@ -392,13 +385,18 @@ public class Robot extends TimedRobot {
    * Controls the climber in TeleOp
    */
   private void climberControl() {
+    // Claw toggles
     boolean toggleBlueClaw   = controls.toggleBlueClaw();
     boolean toggleYellowClaw = controls.toggleYellowClaw();
-    double  climberPower     = controls.getClimberPower();
 
-    boolean moveToBar2 = controls.getClimberMoveToBar2();
-    boolean moveToBar3 = controls.getClimberMoveToBar3();
-    boolean moveToBar4 = controls.getClimberMoveToBar4();
+    // Movement functions
+    double  climberPower = controls.getClimberPower();
+    boolean moveToBar2   = controls.getClimberMoveToBar2();
+    boolean moveToBar3   = controls.getClimberMoveToBar3();
+    boolean moveToBar4   = controls.getClimberMoveToBar4();
+
+    // Encoder reset
+    boolean resetEncoder = controls.resetClimberEncoder();
 
     if (toggleBlueClaw == true) {
       climber.blueClawToggle();
@@ -408,6 +406,7 @@ public class Robot extends TimedRobot {
     }
 
     if (moveToBar2 == true) {
+      drive.changePipeline(TargetPipeline.CAMERA);
       climber.moveToBar2();
     }
     else if (moveToBar3 == true) {
@@ -418,6 +417,10 @@ public class Robot extends TimedRobot {
     }
     else {
       climber.climberRotate(climberPower);
+    }
+
+    if (resetEncoder == true) {
+      climber.resetEncoder();
     }
   }
 
