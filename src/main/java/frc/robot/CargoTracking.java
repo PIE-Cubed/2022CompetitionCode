@@ -63,6 +63,8 @@ public class CargoTracking {
 	private static final double MAX_INTEGRATOR =  0.07;               // 0.08
 	private static final double MIN_INTEGRATOR = -1 * MAX_INTEGRATOR; //-0.08
 
+	// Try to do something with exposure and color, should help eliminate the light level issue
+
 	/**
 	 * CONSTRUCTOR
 	 * @param drive

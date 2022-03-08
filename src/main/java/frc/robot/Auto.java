@@ -49,6 +49,16 @@ public class Auto {
     public int centerAuto(int balls, long delayMs) {
         int status = Robot.CONT;
 
+        // Ensures that the values aren't too high
+        if (balls != 1) {
+            balls = 1;
+        }
+
+        // Ensures that the values aren't too high
+        if (delayMs > 6000) {
+            delayMs = 0;
+        }
+
 		if (firstTime == true) {
 			firstTime = false;
 			step = 1;
@@ -142,6 +152,16 @@ public class Auto {
     public int hangerAuto(int balls, long delayMs) {
         int status = Robot.CONT;
 
+        // Ensures that the values aren't too high
+        if (balls != 1) {
+            balls = 1;
+        }
+
+        // Ensures that the values aren't too high
+        if (delayMs > 6000) {
+            delayMs = 0;
+        }
+
 		if (firstTime == true) {
 			firstTime = false;
 			step = 1;
@@ -231,6 +251,16 @@ public class Auto {
      */
     public int wallAuto(int balls, long delayMs) {
         int status = Robot.CONT;
+
+        // Ensures that the values aren't too high
+        if (balls != 1) {
+            balls = 1;
+        }
+
+        // Ensures that the values aren't too high
+        if (delayMs > 6000) {
+            delayMs = 0;
+        }
 
 		if (firstTime == true) {
 			firstTime = false;
