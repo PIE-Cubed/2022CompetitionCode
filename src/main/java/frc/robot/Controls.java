@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
 
@@ -191,18 +192,34 @@ public class Controls {
         return xboxController.getRightBumperPressed(); 
     }
 
+    /**
+     * Button 7 on the Joystick Pressed
+     * @return buttonSevenPressed
+     */
     public boolean getClimberMoveToBar2() {
         return joystick.getRawButton(7);
     }
 
+    /**
+     * Button 9 on the Joystick Pressed
+     * @return buttonNinePressed
+     */
     public boolean getClimberMoveToBar3() {
         return joystick.getRawButton(9);
     }
 
+    /**
+     * Button 11 on the Joystick Pressed
+     * @return buttonElevenPressed
+     */
     public boolean getClimberMoveToBar4() {
         return joystick.getRawButton(11);
     }
 
+    /**
+     * Gets the power for the climber
+     * @return climberPower
+     */
     public double getClimberPower() {
         final double POWER = 0.3;
         double leftY = -1 * xboxController.getLeftY();
