@@ -515,7 +515,7 @@ public class Drive {
             
 			System.out.println("Auto rotate timed out");
             stopWheels();
-            return Robot.FAIL;
+            return Robot.DONE;
 		}
 
 		// Rotate
@@ -612,7 +612,7 @@ public class Drive {
             
 			System.out.println("Timed out");
             stopWheels();
-            return Robot.FAIL;
+            return Robot.DONE;
 		}
 
 		// Rotate
