@@ -59,7 +59,7 @@ public class Auto {
                 status = autoDelay(delayMs);
                 break;
             case 2:
-                status = drive.autoRotate(147);
+                status = drive.autoRotate(145);
                 break;
             case 3:
                 status = cargoTracking.autoCargoTrack();
@@ -152,7 +152,7 @@ public class Auto {
                 status = autoDelay(delayMs);
                 break;
             case 2:
-                status = drive.autoRotate(135);
+                status = drive.autoRotate(-130);
                 break;
             case 3:
                 grabber.deployRetract();
@@ -368,7 +368,7 @@ public class Auto {
             case 5:
                 if (numBalls == 2) {
                     shooter.retractFeeder();
-                    status = autoDelay(1200);
+                    status = autoDelay(2000);
                 }
                 else {
                     status = Robot.DONE;
@@ -377,7 +377,7 @@ public class Auto {
             case 6:
                 if (numBalls == 2) {
                     shooter.deployFeeder();
-                    status = autoDelay(400);
+                    status = autoDelay(1000);
                 }
                 else {
                     status = Robot.DONE;

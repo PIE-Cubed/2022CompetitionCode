@@ -43,7 +43,7 @@ public class Climber {
 
     //Constants
     private static final double BAR_TWO_POSITION   =  46.30;
-    private static final double BAR_THREE_POSITION = -55.50;
+    private static final double BAR_THREE_POSITION = -57.50; //-55.5 too early
     private static final double BAR_FOUR_POSITION  = -210.39;
 
     //The enum and claw variables
@@ -168,7 +168,7 @@ public class Climber {
             return Robot.DONE;
         }
         else {
-            climberMotor.set(-0.4);
+            climberMotor.set(-0.5);
             return Robot.CONT;
         }
     }
@@ -188,7 +188,7 @@ public class Climber {
                 climberMotor.set(-0.2);
             }
             else {
-                climberMotor.set(-0.4);
+                climberMotor.set(-0.5);
             }
             return Robot.CONT;
         }

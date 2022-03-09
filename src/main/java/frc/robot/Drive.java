@@ -42,7 +42,7 @@ public class Drive {
     private static final double kLimeLightToleranceDegrees = 3.0f;
     
     // Turn Controller
-	private static final double kP = 0.01; //0.02
+	private static final double kP = 0.014; //0.02
 	private static final double kI = 0.00;
     private static final double kD = 0.00;
     
