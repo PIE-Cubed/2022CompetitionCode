@@ -3,6 +3,7 @@ package frc.robot;
 /**
  * Imports
  */
+import edu.wpi.first.math.MathUtil;
 import frc.robot.Drive.TargetPipeline;
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
@@ -50,15 +51,13 @@ public class Auto {
         int status = Robot.CONT;
 
         // Ensures that the values aren't too high
-        if (balls != 1) {
-            balls = 1;
+        if (balls > 3 || balls < 2) {
+            balls = 2;
         }
 
         // Ensures that the values aren't too high
-        if (delayMs > 6000) {
-            delayMs = 0;
-        }
-
+        delayMs = (long)MathUtil.clamp((double)delayMs, 0, 6000);
+    
 		if (firstTime == true) {
 			firstTime = false;
 			step = 1;
@@ -66,69 +65,61 @@ public class Auto {
 
         switch(step) {
             case 1:
-                status = autoDelay(delayMs);
-                break;
-            case 2:
-                status = drive.autoRotate(145);
-                break;
-            case 3:
-                status = cargoTracking.autoCargoTrack();
-                break;
-            case 4:
-                grabber.deployRetract();
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
-                status = Robot.DONE;
-                break;
-            case 5:
+                //Adjust wheels as early as possible before driving
                 status = drive.autoAdjustWheels(0);
                 break;
+            case 2:
+                status = autoDelay(delayMs);
+                break;
+            case 3:
+                grabber.deployRetract();
+                //Leave grabber motor on while shooting to help loose balls get in
+                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                //Drive.ahrs.zeroYaw();
+                status = Robot.DONE;
+                break;
+            case 4:
+                status = drive.autoCrabDrive(3.5, 0, 0.25);
+                break;
+            case 5:
+                //Delay for balls to calm down
+                status = autoDelay(1000);
+                break;
             case 6:
-                status = drive.autoCrabDrive(5, 0, 0.25);
+                status = autoDelay(1000);//autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
             case 7:
-                status = autoDelay(2000);
-                break;
+                //If we are only doing 2 ball path, the routine is over
+                if (balls < 3) {
+                    step = 100;
+                }
+                status = Robot.DONE;
+                break;       
             case 8:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                status = drive.autoRotate(-110);
                 break;
             case 9:
                 status = drive.autoAdjustWheels(0);
                 break;
             case 10:
-                status = Robot.DONE;//drive.autoCrabDrive(2, 0);
+                status = drive.autoCrabDrive(6, 0, 0.25); //test this
                 break;
             case 11:
-                //If we are only doing 1 ball path, the routine is over
-                if (balls == 1) {
-                    step = 100;
-                }
-                status = Robot.DONE;
-                break;            
+                //Delay for balls to calm down
+                status = autoDelay(1000);
+                break;
             case 12:
-                status = drive.autoRotate(35);
+                grabber.setGrabberMotor(GrabberDirection.OFF);
+                grabber.deployRetract();
+                status = Robot.DONE;
                 break;
             case 13:
-                status = drive.autoAdjustWheels(0);
+                status = autoDelay(750);
                 break;
             case 14:
-                grabber.deployRetract();
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                status = drive.autoRotate(-30); 
                 break;
             case 15:
-                status = drive.autoCrabDrive(8, 0);
-                break;
-            case 16:
-                status = autoDelay(1500);
-                break;
-            case 17:
-                grabber.deployRetract();
-                grabber.setGrabberMotor(GrabberDirection.OFF);
-                status = Robot.DONE;
-                break;
-            case 18:
-                status = drive.autoRotate(-90);
-                break;
-            case 19:
                 status = autoShoot(ShootLocation.AUTO_RING, 1);
                 break;
             default:
@@ -153,14 +144,12 @@ public class Auto {
         int status = Robot.CONT;
 
         // Ensures that the values aren't too high
-        if (balls != 1) {
-            balls = 1;
+        if (balls > 3 || balls < 2) {
+            balls = 2;
         }
 
         // Ensures that the values aren't too high
-        if (delayMs > 6000) {
-            delayMs = 0;
-        }
+        delayMs = (long)MathUtil.clamp((double)delayMs, 0, 6000);
 
 		if (firstTime == true) {
 			firstTime = false;
@@ -198,7 +187,7 @@ public class Auto {
                 break;
             case 9:
                 //If we are only doing 1 ball path, the routine is over
-                if (balls == 1) {
+                if (balls < 3) {
                     step = 100;
                 }
                 status = Robot.DONE;
@@ -253,14 +242,12 @@ public class Auto {
         int status = Robot.CONT;
 
         // Ensures that the values aren't too high
-        if (balls != 1) {
-            balls = 1;
+        if (balls > 3 || balls < 2) {
+            balls = 2;
         }
 
         // Ensures that the values aren't too high
-        if (delayMs > 6000) {
-            delayMs = 0;
-        }
+        delayMs = (long)MathUtil.clamp((double)delayMs, 0, 6000);
 
 		if (firstTime == true) {
 			firstTime = false;
@@ -301,7 +288,7 @@ public class Auto {
                 break;
             case 9:
                 //If we are only doing 1 ball path, the routine is over
-                if (balls == 1) {
+                if (balls < 3) {
                     step = 100;
                 }
                 status = Robot.DONE;
@@ -383,16 +370,13 @@ public class Auto {
                 }
                 shooter.autoShooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
-                System.out.println("Auto shoot: waiting for shooterReady()");
                 break;
             case 3:
                 shooter.autoShooterControl(location);
                 status = drive.limelightPIDTargeting(targettingLocation);
-                System.out.println("Auto shoot: shooter ready, waiting for limelight");
                 break;
             case 4:
                 shooter.deployFeeder();
-                System.out.println("Auto shoot: deploying feeder");
                 status = autoDelay(400);
                 break;
             case 5:

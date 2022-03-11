@@ -60,8 +60,9 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   //Number of balls
-  private static final int kOneBall = 1;
-  private static final int kTwoBall = 2;
+  private static final int kTwoBall   = 2;
+  private static final int kThreeBall = 3;
+  private static final int kFourBall  = 4;
   private int m_numBalls;
   private final SendableChooser<Integer> m_numBallsChooser = new SendableChooser<>();
 
@@ -102,8 +103,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Auto delay seconds", 0);
 
     //Number of Balls to grab
-    m_numBallsChooser.setDefaultOption("1 ball", kOneBall);
-    m_numBallsChooser.addOption("2 ball", kTwoBall);
+    m_numBallsChooser.setDefaultOption("2 ball", kTwoBall);
+    m_numBallsChooser.addOption("3 ball", kThreeBall);
+    //m_numBallsChooser.addOption("4 ball", kFourBall);
     SmartDashboard.putData("Number of Balls", m_numBallsChooser);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking

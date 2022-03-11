@@ -42,7 +42,7 @@ public class Drive {
     private static final double kLimeLightToleranceDegrees = 3.0f;
     
     // Turn Controller
-	private static final double kP = 0.014; //0.02
+	private static final double kP = 0.01; //0.02
 	private static final double kI = 0.00;
     private static final double kD = 0.00;
     
@@ -63,6 +63,7 @@ public class Drive {
 	//Variables
     private boolean firstTime         = true;
     private boolean rotateFirstTime   = true;
+    private boolean adjustFirstTime   = true;
     private int     count             = 0;
     private double  encoderTarget     = 0;
     private double  targetOrientation = 0;
@@ -429,7 +430,7 @@ public class Drive {
     *    <p> Drives robot for certain distance at a given heading and speed
     *    <p> Distance has to be positive
     *    <p> Initial orientation of robot is maintained throughout function
-    *    @param distanceInFeet
+    *    @param distance
     *    @param targetHeading
     *    @param power
     *    @return Robot Status
@@ -600,15 +601,15 @@ public class Drive {
 
         long currentMs = System.currentTimeMillis();
 
-        if (rotateFirstTime == true) {
-            rotateFirstTime = false;
+        if (adjustFirstTime == true) {
+            adjustFirstTime = false;
             count = 0;
             timeOut = currentMs + 2500; //Originally 500ms
         }
 
         if (currentMs > timeOut) {
 			count = 0;
-            rotateFirstTime = true;
+            adjustFirstTime = true;
             
 			System.out.println("Timed out");
             stopWheels();
@@ -624,6 +625,7 @@ public class Drive {
         //Checks if all wheels are at target angle
         if (FR == Robot.DONE && FL == Robot.DONE && BR == Robot.DONE && BL == Robot.DONE) {
             stopWheels();
+            adjustFirstTime = true;
             return Robot.DONE;
         }
         else {
@@ -778,7 +780,6 @@ public class Drive {
             //Stops the robot
 			stopWheels();
 
-            System.out.println("Limelight on target");
             //Returns the error code for success
 			return Robot.DONE;
         }
