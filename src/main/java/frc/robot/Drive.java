@@ -212,10 +212,10 @@ public class Drive {
     private static final double rotateMotorAngleDeg = Math.toDegrees(rotateMotorAngleRad);
  
     // These numbers were selected to make the angles between -180 and +180
-    private static final double rotateRightFrontMotorAngle = -1 * rotateMotorAngleDeg; //-1 * rotateMotorAngleDeg;
-    private static final double rotateLeftFrontMotorAngle = -180 + rotateMotorAngleDeg; //rotateRightFrontMotorAngle - 90;
-    private static final double rotateRightRearMotorAngle = rotateMotorAngleDeg; //rotateRightFrontMotorAngle + 90;
-    private static final double rotateLeftRearMotorAngle =  180 -rotateMotorAngleDeg;       //rotateRightFrontMotorAngle + 180;
+    private static final double rotateRightFrontMotorAngle = -1 * rotateMotorAngleDeg;
+    private static final double rotateLeftFrontMotorAngle = -180 + rotateMotorAngleDeg;
+    private static final double rotateRightRearMotorAngle = rotateMotorAngleDeg;
+    private static final double rotateLeftRearMotorAngle =  180 -rotateMotorAngleDeg;
 
 
     /****************************************************************************************** 

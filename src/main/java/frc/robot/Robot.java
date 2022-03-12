@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
   //Number of balls
   private static final int kTwoBall   = 2;
   private static final int kThreeBall = 3;
-  private static final int kFourBall  = 4;
+  //private static final int kFourBall  = 4;
   private int m_numBalls;
   private final SendableChooser<Integer> m_numBallsChooser = new SendableChooser<>();
 
@@ -173,9 +173,6 @@ public class Robot extends TimedRobot {
           break;
       }
     }
-    else if (status == DONE) {
-      //
-    }
   }
 
   @Override
@@ -204,8 +201,8 @@ public class Robot extends TimedRobot {
    * disabledInit()
    */
   public void disabledInit() {
+    // Sets the climber motors to coast
     climber.setClimberIdleMode(IdleMode.kCoast);
-    //Nothing yet...
   }
 
   @Override
@@ -214,8 +211,7 @@ public class Robot extends TimedRobot {
    * Shouldn't ever do anything
    */
   public void disabledPeriodic() {
-    //Turns off the limelight LEDs when the robot is disabled, saves our eyes
-    //drive.changeledMode(Drive.LEDState.OFF);
+    // Nothing yet...
   }
 
   @Override
@@ -242,8 +238,8 @@ public class Robot extends TimedRobot {
     
     climber.climberRotate(.5);
     //cargoTracking.autoCargoTrack();
-    // System.out.println("Climber encoder: " + climber.getClimberEncoder());
-    //shooter.autoShooterControl(ShootLocation.AUTO_RING);
+    //System.out.println("Climber encoder: " + climber.getClimberEncoder());
+    //shooter.shooterControl(ShootLocation.AUTO_RING);
     //shooter.testShootMotors(SmartDashboard.getNumber("Shooter power", 0));
     //drive.testWheelAngle();
     /*
@@ -254,7 +250,7 @@ public class Robot extends TimedRobot {
       shooter.retractFeeder();
     }*/
     /*
-    shooter.autoShooterControl(ShootLocation.LOW_SHOT);
+    shooter.shooterControl(ShootLocation.LOW_SHOT);
     SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());
     SmartDashboard.putNumber("Test front rpm", shooter.getabsRPM(19));
     SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
@@ -357,8 +353,8 @@ public class Robot extends TimedRobot {
    * Controls the ball in TeleOp
    */
   private void ballControl() {
-    /*
-      Grabber control
+    /**
+     * Grabber control
      */
     boolean deployRetract               = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
@@ -368,19 +364,17 @@ public class Robot extends TimedRobot {
       grabber.deployRetract();
     }
     grabber.setGrabberMotor(grabberDir);
-
-    /*
-      Shooter control
+    
+    /**
+     * Shooter control
      */
     if (shootLocation == Shooter.ShootLocation.OFF) {
       shooter.disableShooter();
     }
     else {
-      shooter.autoShooterControl(shootLocation);
-      //System.out.println("Shooter On");
+      shooter.shooterControl(shootLocation);
 
       if (shooter.shooterReady() == true) {
-        //System.out.println("Shooter Ready");
         shooter.deployFeeder();
       }
     }

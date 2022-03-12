@@ -36,14 +36,14 @@ public class Climber {
 
     //Double Solenoid for the claws
     private final int PCM_CAN_ID1       = 1; 
-    private final int BLUE_CLAW_OPEN    = 3;//7
-    private final int BLUE_CLAW_CLOSE   = 7;//3
-    private final int YELLOW_CLAW_OPEN  = 2;//6
-    private final int YELLOW_CLAW_CLOSE = 6;//2
+    private final int BLUE_CLAW_OPEN    = 3;
+    private final int BLUE_CLAW_CLOSE   = 7;
+    private final int YELLOW_CLAW_OPEN  = 2;
+    private final int YELLOW_CLAW_CLOSE = 6;
 
     //Constants
     private static final double BAR_TWO_POSITION   =  46.30;
-    private static final double BAR_THREE_POSITION = -57.50; //-55.5 too early
+    private static final double BAR_THREE_POSITION = -57.50;
     private static final double BAR_FOUR_POSITION  = -210.39;
 
     //The enum and claw variables
@@ -77,13 +77,14 @@ public class Climber {
         //The Claws
         blueClaw    = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, BLUE_CLAW_OPEN, BLUE_CLAW_CLOSE); 
         yellowClaw  = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, YELLOW_CLAW_OPEN, YELLOW_CLAW_CLOSE); 
-        
+
+        // Closes the claws
         blueClawClose();
         yellowClawClose();
     }
 
     /**
-     * blue claw toggle
+     * Blue claw toggle
      */
     public void blueClawToggle() {
         if (blueClawState == ClawState.OPEN) {
@@ -95,7 +96,7 @@ public class Climber {
     }
 
     /**
-     * yellow claw toggle
+     * Yellow claw toggle
      */
     public void yellowClawToggle() {
         if (yellowClawState == ClawState.OPEN) {

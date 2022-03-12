@@ -101,7 +101,7 @@ public class Auto {
                 status = drive.autoAdjustWheels(-90);
                 break;
             case 10:
-                status = drive.autoCrabDrive(7, -90, 0.32); //test this
+                status = drive.autoCrabDrive(7, -90, 0.32);
                 break;
             case 11:
                 status = drive.autoAdjustWheels(0);
@@ -138,6 +138,7 @@ public class Auto {
         if (status == Robot.DONE) {
             step++;
         }
+        
         return Robot.CONT;
     }
 
@@ -275,15 +276,15 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 5:
-                shooter.autoShooterControl(ShootLocation.AUTO_RING);
+                shooter.shooterControl(ShootLocation.AUTO_RING);
                 status = drive.autoCrabDrive(3.0, 0, 0.25);
                 break;
             case 6:
-                shooter.autoShooterControl(ShootLocation.AUTO_RING);
+                shooter.shooterControl(ShootLocation.AUTO_RING);
                 status = autoDelay(1500);
                 break;
             case 7:
-                shooter.autoShooterControl(ShootLocation.AUTO_RING);
+                shooter.shooterControl(ShootLocation.AUTO_RING);
                 grabber.deployRetract();
                 grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
                 status = Robot.DONE;
@@ -362,7 +363,7 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
-                shooter.autoShooterControl(location);
+                shooter.shooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
                 status = Robot.DONE;
                 break;
@@ -373,11 +374,11 @@ public class Auto {
                 else {
                     status = Robot.CONT;
                 }
-                shooter.autoShooterControl(location);
+                shooter.shooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
                 break;
             case 3:
-                shooter.autoShooterControl(location);
+                shooter.shooterControl(location);
                 status = drive.limelightPIDTargeting(targettingLocation);
                 break;
             case 4:
@@ -453,8 +454,8 @@ public class Auto {
                 break;
             default:
                 // Finishes the routine
-                shootStep = 1;
-                shootFirstTime = true;
+                cargoStep = 1;
+                cargoFirstTime = true;
 
                 // Resets applicable motors
                 grabber.retract();
@@ -472,8 +473,8 @@ public class Auto {
         // If a step fails, exits the routine
         if (status == Robot.FAIL) {
             // Resets variables
-            shootStep = 1;
-            shootFirstTime = true;
+            cargoStep = 1;
+            cargoFirstTime = true;
 
             // Stops applicable motors
             grabber.retract();
