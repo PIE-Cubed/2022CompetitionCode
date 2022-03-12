@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 /**
  * Imports
  */
@@ -34,8 +33,6 @@ public class Robot extends TimedRobot {
   Shooter       shooter;
   CargoTracking cargoTracking;
   Auto          auto;
-  LidarSensor   lidarSensor;
-  DutyCycleEncoder throughboEncoder;
   int lidarCounter = 0;
 
   // Variables
@@ -73,8 +70,6 @@ public class Robot extends TimedRobot {
    */
   public Robot() {
     //Instance Creation
-    lidarSensor   = new LidarSensor();
-    throughboEncoder = new DutyCycleEncoder(6);
     drive         = new Drive();
     grabber       = new Grabber();
     controls      = new Controls();
