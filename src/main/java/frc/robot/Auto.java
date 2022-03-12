@@ -75,7 +75,6 @@ public class Auto {
                 grabber.deployRetract();
                 //Leave grabber motor on while shooting to help loose balls get in
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
-                //Drive.ahrs.zeroYaw();
                 status = Robot.DONE;
                 break;
             case 4:
@@ -96,30 +95,36 @@ public class Auto {
                 status = Robot.DONE;
                 break;       
             case 8:
-                status = drive.autoRotate(-110);
+                status = drive.autoRotate(-44);
                 break;
             case 9:
-                status = drive.autoAdjustWheels(0);
+                status = drive.autoAdjustWheels(-90);
                 break;
             case 10:
-                status = drive.autoCrabDrive(6, 0, 0.25); //test this
+                status = drive.autoCrabDrive(7, -90, 0.32); //test this
                 break;
             case 11:
+                status = drive.autoAdjustWheels(0);
+                break;
+            case 12:
+                status = drive.autoCrabDrive(1, 0, 0.2);
+                break;
+            case 13:
                 //Delay for balls to calm down
                 status = autoDelay(1000);
                 break;
-            case 12:
+            case 14:
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 grabber.deployRetract();
                 status = Robot.DONE;
                 break;
-            case 13:
+            case 15:
                 status = autoDelay(750);
                 break;
-            case 14:
-                status = drive.autoRotate(-30); 
+            case 16:
+                status = drive.autoRotate(-45); 
                 break;
-            case 15:
+            case 17:
                 status = autoShoot(ShootLocation.AUTO_RING, 1);
                 break;
             default:
