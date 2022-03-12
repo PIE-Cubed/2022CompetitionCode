@@ -16,7 +16,6 @@ import frc.robot.Shooter.ShootLocation;
  * Start of class
  */
 public class Controls {
-    
     /**
      * Enumerator for controller ID's
      */
@@ -35,7 +34,6 @@ public class Controls {
             return this.id;
         }
     }
-
     // Controller Object Declaration
     private Joystick joystick;
     private XboxController xboxController;
@@ -89,9 +87,10 @@ public class Controls {
             power = Math.pow(power, 3);
         }
         //If we are in deadzone or rotatelock is on, x is 0
-        if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
+        if ((Math.abs(power) < 0.01) || (getRotateLock() == true)) {
             power = 0;
         }
+
         return power;
     }
 
@@ -107,7 +106,7 @@ public class Controls {
             power = Math.pow(power, 3);
         }
         //If we are in deadzone or rotatelock is on, y is 0
-        else if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
+        else if ((Math.abs(power) < 0.01) || (getRotateLock() == true)) {
             power = 0;
         }
         return power;

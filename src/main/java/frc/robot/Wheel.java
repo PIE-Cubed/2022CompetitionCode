@@ -75,7 +75,15 @@ public class Wheel {
         double currWheelAngle;
         double rotatePower;
 
+        //System.out.println("TargetWheelAngle: " + targetWheelAngle + " mod: " + targetWheelAngle % 360);
+
         currWheelAngle = getRotateMotorPosition();
+        
+        if (Math.abs(currWheelAngle-targetWheelAngle) > 90) {
+            targetWheelAngle = targetWheelAngle + 180;
+            drivePower = -1 * drivePower;
+        }
+
         rotatePower = rotationPID.calculate(currWheelAngle, targetWheelAngle);
 
         /** FOR OLD ROBOT (victor SP):

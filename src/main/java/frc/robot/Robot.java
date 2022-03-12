@@ -229,20 +229,20 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    while (cargoStatus == Robot.CONT) {
-      if (controls.autoKill() == true) {
-        cargoStatus = Robot.FAIL;
-      }
+    // while (cargoStatus == Robot.CONT) {
+    //   if (controls.autoKill() == true) {
+    //     cargoStatus = Robot.FAIL;
+    //   }
 
-      cargoStatus = auto.autoCargoPickup();//cargoTracking.autoCargoTrack();
-    }
+    //   cargoStatus = auto.autoCargoPickup();//cargoTracking.autoCargoTrack();
+    // }
     //cargoTracking.faceCargo();
     //System.out.println(shooter.testFlipperSwitch());
     //shooter.powerFeeder(controls.getFeedPower());
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //shooter.testShooter(.60);
-    //drive.testWheelAngle();
+    drive.testWheelAngle();
   }
 
   /**
