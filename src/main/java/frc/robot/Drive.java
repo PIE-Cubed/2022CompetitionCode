@@ -6,10 +6,11 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+
+import edu.wpi.first.networktables.*;
 
 import java.util.stream.DoubleStream;
 
@@ -35,8 +36,9 @@ public class Drive {
 
     //PID controllers
     private PIDController rotateController;
-    private PIDController autoCrabDriveController;
     private PIDController targetController;
+    private PIDController autoCrabDriveController;
+    private PIDController autoSwerveController;
 
     private static final double rotateToleranceDegrees = 2.0f;
     private static final double kLimeLightToleranceDegrees = 3.0f;
@@ -45,44 +47,52 @@ public class Drive {
 	private static final double kP = 0.01; //0.02
 	private static final double kI = 0.00;
     private static final double kD = 0.00;
+
+    //Target Controller
+	private static final double tP = 0.015; //0.033
+	private static final double tI = 0.002;
+    private static final double tD = 0.00;
     
     //Auto crab drive controller
     private static final double acdP = 0.02; //0.03
     private static final double acdI = 0.00;
     private static final double acdD = 0.00;
 
-	//Target Controller
-	private static final double tP = 0.015; //0.033
-	private static final double tI = 0.002;
-    private static final double tD = 0.00;
+    //Swerve Controller
+    private static final double sP = 0.003; //0.002
+    private static final double sI = 0.00;
+    private static final double sD = 0.00;
 
     //Integrator Range
     private static final double TARGET_I_MAX = 0.06;
     private static final double TARGET_I_MIN = -1 * TARGET_I_MAX;
 
 	//Variables
-    private boolean firstTime         = true;
-    private boolean rotateFirstTime   = true;
-    private boolean adjustFirstTime   = true;
-    private int     count             = 0;
-    private double  encoderTarget     = 0;
-    private double  targetOrientation = 0;
+    private boolean crabFirstTime            = true;
+    private boolean swerveFirstTime      = true;
+    private boolean rotateFirstTime      = true;
+    private boolean adjustFirstTime      = true;
+    private int     count                = 0;
+    private double  encoderTarget        = 0;
+    private double  swerveEncoderTarget  = 0;
+    private double  targetOrientation    = 0;
+    private double  autoSwerveStartAngle = 0;
     
     //CONSTANTS
     private final int    FAIL_DELAY   = 5;
     private final double ticksPerFoot = 5.65;
 
     //BLUE ROBOT
-    // private static final double FL_OFFSET = 309.8;
-    // private static final double FR_OFFSET = 248;
-    // private static final double BL_OFFSET = 165.7;
-    // private static final double BR_OFFSET = -33.2;
+    private static final double FL_OFFSET = 309.8;
+    private static final double FR_OFFSET = 248;
+    private static final double BL_OFFSET = 165.7;
+    private static final double BR_OFFSET = -33.2;
 
     //Yellow ROBOT
-    private static final double FL_OFFSET = -151.21;
-    private static final double FR_OFFSET = -150.36;
-    private static final double BL_OFFSET = -103.64;
-    private static final double BR_OFFSET =  146.41; //93.10
+    // private static final double FL_OFFSET = -151.21;
+    // private static final double FR_OFFSET = -150.36;
+    // private static final double BL_OFFSET = -103.64;
+    // private static final double BR_OFFSET =  146.41; //93.10
 
 	//Limelight Variables
     private int     noTargetCount      = 0;
@@ -283,6 +293,11 @@ public class Drive {
 
         autoCrabDriveController = new PIDController(acdP, acdI, acdD);
         autoCrabDriveController.enableContinuousInput(-180.0, 180.0);
+        autoCrabDriveController.setTolerance(2);
+
+        autoSwerveController = new PIDController(sP, sI, sD);
+        autoSwerveController.enableContinuousInput(-180, 180);
+        autoSwerveController.setTolerance(2.5);
 
         targetController = new PIDController(tP, tI, tD);
         targetController.setTolerance(kLimeLightToleranceDegrees);
@@ -361,10 +376,10 @@ public class Drive {
 
         //If we are rotating CCW, and we are not crab driving, then the robot will flip the wheel angles and powers
         //This keeps the wheels in the same position when turning both ways, making small rotations easier
-        if ((rotatePower < 0) && (crabX == 0 && crabY == 0)) {
+        /*if ((rotatePower < 0) && (crabX == 0 && crabY == 0)) {
             swervePower *= -1;
             swerveAngle += 180;
-        }
+        }*/
 
         PowerAndAngle swerveNums = new PowerAndAngle(swervePower, swerveAngle);
 
@@ -378,20 +393,20 @@ public class Drive {
     *    <p> Takes X, Y, and Z and rotates each wheel to proper angle and sets correct power
     * 
     ******************************************************************************************/
-    public void teleopSwerve(double driveX, double driveY, double rotatePower, boolean fieldDriveEnabled) {
+    public void teleopSwerve(double driveX, double driveY, double rotatePower, boolean fieldDriveEnabled, boolean teleop) {
         PowerAndAngle coor;
 
         coor = calcSwerve(driveX, driveY, rotatePower, rotateRightFrontMotorAngle, fieldDriveEnabled);
-        frontRightWheel.rotateAndDrive(coor.getAngle(), coor.getPower());
+        frontRightWheel.rotateAndDrive(coor.getAngle(), coor.getPower(), teleop);
 
         coor = calcSwerve(driveX, driveY, rotatePower, rotateLeftFrontMotorAngle, fieldDriveEnabled);
-        frontLeftWheel.rotateAndDrive(coor.getAngle(), coor.getPower());
+        frontLeftWheel.rotateAndDrive(coor.getAngle(), coor.getPower(), teleop);
 
         coor = calcSwerve(driveX, driveY, rotatePower, rotateRightRearMotorAngle, fieldDriveEnabled);
-        rearRightWheel.rotateAndDrive(coor.getAngle(), coor.getPower());
+        rearRightWheel.rotateAndDrive(coor.getAngle(), coor.getPower(), teleop);
 
         coor = calcSwerve(driveX, driveY, rotatePower, rotateLeftRearMotorAngle, fieldDriveEnabled);
-        rearLeftWheel.rotateAndDrive(coor.getAngle(), coor.getPower());
+        rearLeftWheel.rotateAndDrive(coor.getAngle(), coor.getPower(), teleop);
     }
 
 
@@ -401,11 +416,11 @@ public class Drive {
     *    <p> Only uses X and Y to crab drive the robot
     * 
     ******************************************************************************************/
-    public void teleopCrabDrive(double wheelAngle, double drivePower){
-        frontLeftWheel.rotateAndDrive(wheelAngle, drivePower);
-        frontRightWheel.rotateAndDrive(wheelAngle, drivePower);
-        rearLeftWheel.rotateAndDrive(wheelAngle, drivePower);
-        rearRightWheel.rotateAndDrive(wheelAngle, drivePower);
+    public void teleopCrabDrive(double wheelAngle, double drivePower, boolean teleop){
+        frontLeftWheel.rotateAndDrive(wheelAngle, drivePower, teleop);
+        frontRightWheel.rotateAndDrive(wheelAngle, drivePower, teleop);
+        rearLeftWheel.rotateAndDrive(wheelAngle, drivePower, teleop);
+        rearRightWheel.rotateAndDrive(wheelAngle, drivePower, teleop);
     }
 
    
@@ -441,8 +456,8 @@ public class Drive {
         double encoderCurrent = getAverageEncoder(); //Average of 4 wheels
 
         //First time through initializes target values
-        if (firstTime == true) {
-            firstTime = false;
+        if (crabFirstTime == true) {
+            crabFirstTime = false;
             targetOrientation = ahrs.getYaw();
             encoderTarget = encoderCurrent + (ticksPerFoot * distance);
         }
@@ -463,11 +478,11 @@ public class Drive {
         
         //Adjusts wheel angles
         orientationError = autoCrabDriveController.calculate(ahrs.getYaw(), targetOrientation); 
-        teleopSwerve(x, y, orientationError, false);
+        teleopSwerve(x, y, orientationError, false, false);
 
         //Checks if target distance has been reached, then ends function if so
         if (encoderCurrent >= encoderTarget) {
-            firstTime = true;
+            crabFirstTime = true;
             stopWheels();
             rotateController.reset();
             return Robot.DONE;
@@ -476,6 +491,58 @@ public class Drive {
             return Robot.CONT;
         }
 
+    }
+
+    /**
+     * Drives and rotates at same time (untested)
+     * @param distance
+     * @param startHeading
+     * @param endOrientation
+     * @param power
+     * @return status
+     */
+    public int autoSwerve(double distance, double startHeading, double endOrientation, double power) {
+        double encoderCurrent = getAverageEncoder(); //Average of 4 wheels
+        double ticksPerDegree = 7/45;
+
+        //First time through initializes target values
+        if (swerveFirstTime == true) {
+            swerveFirstTime = false;
+            autoSwerveStartAngle = ahrs.getYaw();
+            swerveEncoderTarget = encoderCurrent + (ticksPerFoot * distance) + (ticksPerDegree * Math.abs(endOrientation - ahrs.getYaw()));
+        }
+
+        double orientationChange = ahrs.getYaw() - autoSwerveStartAngle;
+
+        //Finds our x and y power based off the heading we want to go
+        double x = power * Math.sin(Math.toRadians(startHeading - orientationChange));
+        double y = power * Math.cos(Math.toRadians(startHeading - orientationChange));
+        x = MathUtil.clamp(x, -0.3, 0.3);
+        y = MathUtil.clamp(y, -0.3, 0.3);
+
+        if (distance < 0){
+            System.out.println("Error from autoSwerve(), negative distance not allowed");
+            swerveFirstTime = true;
+            return Robot.DONE;
+        }
+        
+        //Adjusts wheel angles
+        double orientationError = autoSwerveController.calculate(ahrs.getYaw(), endOrientation);
+        orientationError = MathUtil.clamp(orientationError, -0.4, 0.4);
+        teleopSwerve(x, y, orientationError, false, false);
+
+        //System.out.println("Current: " + encoderCurrent + " Target: " + swerveEncoderTarget);
+
+        //Checks if target distance has been reached, then ends function if so
+        if (encoderCurrent >= swerveEncoderTarget && autoSwerveController.atSetpoint()) {
+            swerveFirstTime = true;
+            stopWheels();
+            rotateController.reset();
+            return Robot.DONE;
+        } 
+        else {
+            return Robot.CONT;
+        }
     }
 
 
@@ -487,10 +554,10 @@ public class Drive {
     * 
     ******************************************************************************************/
     public void teleopRotate(double rotatePower) {
-        frontRightWheel.rotateAndDrive(rotateRightFrontMotorAngle, rotatePower * -1);
-        frontLeftWheel.rotateAndDrive(rotateLeftFrontMotorAngle, rotatePower * -1);
-        rearRightWheel.rotateAndDrive(rotateRightRearMotorAngle, rotatePower * -1);
-        rearLeftWheel.rotateAndDrive(rotateLeftRearMotorAngle, rotatePower * -1);
+        frontRightWheel.rotateAndDrive(rotateRightFrontMotorAngle, rotatePower * -1, false);
+        frontLeftWheel.rotateAndDrive(rotateLeftFrontMotorAngle, rotatePower * -1, false);
+        rearRightWheel.rotateAndDrive(rotateRightRearMotorAngle, rotatePower * -1, false);
+        rearLeftWheel.rotateAndDrive(rotateLeftRearMotorAngle, rotatePower * -1, false);
     }
 
 
@@ -568,11 +635,11 @@ public class Drive {
         double outerSpeed = 0.25; //Sets basis for speed of turning
         double innerSpeed = outerSpeed * (innerDist/outerDist);
 
-        frontLeftWheel.rotateAndDrive(innerAngle + 90, innerSpeed);
-        frontRightWheel.rotateAndDrive(-90 - innerAngle, -1*innerSpeed);
+        frontLeftWheel.rotateAndDrive(innerAngle + 90, innerSpeed, false);
+        frontRightWheel.rotateAndDrive(-90 - innerAngle, -1*innerSpeed, false);
 
-        rearLeftWheel.rotateAndDrive(outerAngle + 90, outerSpeed);
-        rearRightWheel.rotateAndDrive(-90 - outerAngle, -1*outerSpeed);
+        rearLeftWheel.rotateAndDrive(outerAngle + 90, outerSpeed, false);
+        rearRightWheel.rotateAndDrive(-90 - outerAngle, -1*outerSpeed, false);
     }
 
 
@@ -583,7 +650,7 @@ public class Drive {
     * 
     ******************************************************************************************/
     public void spiral() {
-        teleopSwerve(0, 0.3, 0.3, true);
+        teleopSwerve(0, 0.3, 0.3, true, false);
     }
 
 
@@ -617,10 +684,10 @@ public class Drive {
 		}
 
 		// Rotate
-        int FR = frontRightWheel.rotateAndDrive(degrees, 0);
-        int FL = frontLeftWheel.rotateAndDrive(degrees, 0);
-        int BR = rearRightWheel.rotateAndDrive(degrees, 0);
-        int BL = rearLeftWheel.rotateAndDrive(degrees, 0);
+        int FR = frontRightWheel.rotateAndDrive(degrees, 0, false);
+        int FL = frontLeftWheel.rotateAndDrive(degrees, 0, false);
+        int BR = rearRightWheel.rotateAndDrive(degrees, 0, false);
+        int BL = rearLeftWheel.rotateAndDrive(degrees, 0, false);
 
         //Checks if all wheels are at target angle
         if (FR == Robot.DONE && FL == Robot.DONE && BR == Robot.DONE && BL == Robot.DONE) {
@@ -910,7 +977,7 @@ public class Drive {
     }
 
     public void testPID() {
-        frontLeftWheel.rotateAndDrive(0, 0);
+        frontLeftWheel.rotateAndDrive(0, 0, false);
     }
 
     public void testEncoder(){

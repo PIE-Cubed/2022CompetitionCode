@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
 	//2 holes above marked one
@@ -45,12 +45,11 @@ public class Shooter {
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
 
-	// Safe shot
+	public final double LOW_SHOT_REAR_POWER    = 0.31; //0.28
+	public final double LOW_SHOT_FRONT_POWER   = -0.27; //-0.27
+
 	public final double HIGH_SHOT_REAR_POWER   = 0.495; //0.475
 	public final double HIGH_SHOT_FRONT_POWER  = -0.475; //0.445 //Untested
-
-	public final double LOW_SHOT_REAR_POWER    = 0.28; //0.21
-	public final double LOW_SHOT_FRONT_POWER   = -0.27; //-0.21
 
 	public final double LAUNCH_PAD_REAR_POWER  = 0.5; //0.46
 	public final double LAUNCH_PAD_FRONT_POWER = -0.5; //0.46
@@ -61,17 +60,20 @@ public class Shooter {
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
 
-	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2750; //2650
-	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2750; //2580
-
 	public final double LOW_SHOT_REAR_TARGET_RPM    = 1650; //1650
 	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1650; //1650
+
+	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2750; //2650
+	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2750; //2580
 
 	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 2870;
 	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 2970;
 
 	public final double AUTO_RING_REAR_TARGET_RPM   = 2780;
 	public final double AUTO_RING_FRONT_TARGET_RPM  = 2880; //Front moves faster, so it needs faster target rpm
+
+	// RPM OFFSET
+	private final int RPM_OFFSET = 80;
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
@@ -222,17 +224,18 @@ public class Shooter {
 			}
 			else {
 				rearPower *= 1.15;
-			}		}
+			}
+		}
 		else {
 			rearPower  = rearPower + rearPowerError;
 			rearPower  = MathUtil.clamp(rearPower, 0.0, 1.0);
 		}
 
 		//Displays powers and rpms to smartdashboard
-		// SmartDashboard.putNumber("Front power", frontPower);
-		// SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
-		// SmartDashboard.putNumber("Rear power", rearPower);
-		// SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+		SmartDashboard.putNumber("Front power", frontPower);
+		SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
+		SmartDashboard.putNumber("Rear power", rearPower);
+		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
 
 		frontShooter.set(frontPower);
 		rearShooter.set(rearPower);
@@ -248,7 +251,6 @@ public class Shooter {
 		//Variables
 		double rearRpm;
 		double frontRpm;
-		final int RPM_OFFSET = 80;
 		final int ON_TRAGET_DELAY = 10;
 
 		//Gets rpm values

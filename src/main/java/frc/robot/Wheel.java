@@ -71,17 +71,17 @@ public class Wheel {
     *    Indivudally rotates each wheel to a set target angle and powers the drive motor 
     * 
     ******************************************************************************************/
-    public int rotateAndDrive(double targetWheelAngle, double drivePower) {
+    public int rotateAndDrive(double targetWheelAngle, double drivePower, boolean teleop) {
         double currWheelAngle;
         double rotatePower;
 
         currWheelAngle = getRotateMotorPosition();
 
-        if (Math.abs(currWheelAngle-targetWheelAngle) > 90) {
+        if ((Math.abs(currWheelAngle - targetWheelAngle) > 90) && teleop == true) {
             targetWheelAngle = targetWheelAngle + 180;
             drivePower = -1 * drivePower;
         }
-        
+
         rotatePower = rotationPID.calculate(currWheelAngle, targetWheelAngle);
 
         /** FOR OLD ROBOT (victor SP):
@@ -89,14 +89,14 @@ public class Wheel {
          * In order to rotate clockwise, a negative power is required
          * And vise-versa.
          * 
-         * THE NEW ROBOT USES SPARKMAXES FOR ROTATE MOTORS
+         * THE NEW ROBOT USES SPARK MAXES FOR THE ROTATE MOTORS
          * Positive power --> clockwise
          */
         setRotateMotorPower(rotatePower);
         setDriveMotorPower(drivePower);
 
         //Are we within 2 degrees of target wheel angle? 
-        //The return values do not need to be used 
+        //The return values does not need to be used 
         if (rotatePower < 0.06) {
             return Robot.DONE;
         }

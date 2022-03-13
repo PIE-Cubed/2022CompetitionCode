@@ -233,8 +233,9 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    //test1.set(SmartDashboard.getNumber("Test power", 0));
-    //test2.set(SmartDashboard.getNumber("Test power", 0));
+    // if (status == Robot.CONT) {
+    //   status = drive.autoSwerve(3.0, 0, -90, 0.1);
+    // }
 
     //climber.climberRotate(.5);
     //cargoTracking.autoCargoTrack();
@@ -288,7 +289,7 @@ public class Robot extends TimedRobot {
       if ((Math.abs(driveX) > 0) ||
           (Math.abs(driveY) > 0) || 
           (Math.abs(rotatePower) > 0)) {
-        drive.teleopSwerve(driveX, driveY, rotatePower, false);
+        drive.teleopSwerve(driveX, driveY, rotatePower, false, true);
       }
       else {
         //Robot is in dead zone, doesn't drive
