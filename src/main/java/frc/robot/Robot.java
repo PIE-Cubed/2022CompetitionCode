@@ -221,8 +221,6 @@ public class Robot extends TimedRobot {
    */
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    SmartDashboard.putNumber("Shooter power", 0.55);
-
     cargoTracking.setRedAlliance( setRedAlliance() );
 
     //Sets the limelight LED mode
@@ -235,8 +233,10 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    
-    climber.climberRotate(.5);
+    //test1.set(SmartDashboard.getNumber("Test power", 0));
+    //test2.set(SmartDashboard.getNumber("Test power", 0));
+
+    //climber.climberRotate(.5);
     //cargoTracking.autoCargoTrack();
     //System.out.println("Climber encoder: " + climber.getClimberEncoder());
     //shooter.shooterControl(ShootLocation.AUTO_RING);

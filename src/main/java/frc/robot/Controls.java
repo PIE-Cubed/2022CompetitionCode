@@ -15,7 +15,6 @@ import frc.robot.Shooter.ShootLocation;
  * Start of class
  */
 public class Controls {
-    
     /**
      * Enumerator for controller ID's
      */
@@ -34,6 +33,9 @@ public class Controls {
             return this.id;
         }
     }
+
+    // Variables
+    private double prevXPower = 0;
 
     // Controller Object Declaration
     private Joystick joystick;
@@ -91,6 +93,16 @@ public class Controls {
         if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
             power = 0;
         }
+
+        //Prevents us from accelerating sideways too quickly
+        if (power - prevXPower > 0.02) {
+            power = prevXPower + 0.02;
+        }
+        else if (power - prevXPower < -0.02) {
+            power = prevXPower - 0.02;
+        }
+        prevXPower = power;
+ 
         return power;
     }
 
@@ -114,10 +126,10 @@ public class Controls {
 
     /**
      * Checks if we are in strafe lock mode
-     * @return joystick button 2
+     * @return joystick button 5
      */
     private boolean getStrafeLock() {
-        return joystick.getRawButton(2);
+        return joystick.getRawButton(5);
     }
 
     /**

@@ -73,16 +73,16 @@ public class Drive {
     private final double ticksPerFoot = 5.65;
 
     //BLUE ROBOT
-    private static final double FL_OFFSET = 309.8;
-    private static final double FR_OFFSET = 248;
-    private static final double BL_OFFSET = 165.7;
-    private static final double BR_OFFSET = -33.2;
+    // private static final double FL_OFFSET = 309.8;
+    // private static final double FR_OFFSET = 248;
+    // private static final double BL_OFFSET = 165.7;
+    // private static final double BR_OFFSET = -33.2;
 
     //Yellow ROBOT
-    //private static final double FL_OFFSET = -151.21;
-    //private static final double FR_OFFSET = -150.36;
-    //private static final double BL_OFFSET = -103.64;
-    //private static final double BR_OFFSET =  146.41; //93.10
+    private static final double FL_OFFSET = -151.21;
+    private static final double FR_OFFSET = -150.36;
+    private static final double BL_OFFSET = -103.64;
+    private static final double BR_OFFSET =  146.41; //93.10
 
 	//Limelight Variables
     private int     noTargetCount      = 0;
