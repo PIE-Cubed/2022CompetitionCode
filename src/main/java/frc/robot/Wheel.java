@@ -50,9 +50,11 @@ public class Wheel {
         this.rotateMotor  = new CANSparkMax(rotateMotorID, MotorType.kBrushed);
         this.name         = motorName;
 
-        // Adds a current limit and sets the motor mode
+        // Creates the drive motors
         this.driveMotor.setSmartCurrentLimit(WHEEL_CURRENT_LIMIT);
         this.driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+        // Creates the rotate motors
         this.rotateMotor.setSmartCurrentLimit(WHEEL_CURRENT_LIMIT);
         this.rotateMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
@@ -74,8 +76,6 @@ public class Wheel {
     public int rotateAndDrive(double targetWheelAngle, double drivePower) {
         double currWheelAngle;
         double rotatePower;
-
-        //System.out.println("TargetWheelAngle: " + targetWheelAngle + " mod: " + targetWheelAngle % 360);
 
         currWheelAngle = getRotateMotorPosition();
         

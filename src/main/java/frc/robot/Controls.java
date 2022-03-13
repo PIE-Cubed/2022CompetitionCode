@@ -38,6 +38,9 @@ public class Controls {
     private Joystick joystick;
     private XboxController xboxController;
 
+    //Variables
+    private double prevPower = 0;
+
     //Constructor
     public Controls() {
         //Instance Creation
@@ -87,10 +90,19 @@ public class Controls {
             power = Math.pow(power, 3);
         }
         //If we are in deadzone or rotatelock is on, x is 0
-        if ((Math.abs(power) < 0.01) || (getRotateLock() == true)) {
+        if ((Math.abs(power) < 0.1) || (getRotateLock() == true)) {
             power = 0;
         }
 
+        //Prevents us from accelerating sideways too quickly
+        if (power - prevPower > 0.02) {
+            power = prevPower + 0.02;
+        }
+        else if (power - prevPower < -0.02) {
+            power = prevPower - 0.02;
+        }
+        prevPower = power;
+ 
         return power;
     }
 
@@ -106,7 +118,7 @@ public class Controls {
             power = Math.pow(power, 3);
         }
         //If we are in deadzone or rotatelock is on, y is 0
-        else if ((Math.abs(power) < 0.01) || (getRotateLock() == true)) {
+        else if ((Math.abs(power) < 0.1) || (getRotateLock() == true)) {
             power = 0;
         }
         return power;
@@ -114,10 +126,10 @@ public class Controls {
 
     /**
      * Checks if we are in strafe lock mode
-     * @return joystick button 2
+     * @return joystick button 5
      */
     private boolean getStrafeLock() {
-        return joystick.getRawButton(2);
+        return joystick.getRawButton(5);
     }
 
     /**
@@ -148,7 +160,7 @@ public class Controls {
     }
 
     public boolean getCargoTargeting() {
-        return joystick.getRawButton(5);
+        return joystick.getRawButton(2);
     }
 
 
