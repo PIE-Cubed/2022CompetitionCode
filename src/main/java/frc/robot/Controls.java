@@ -3,13 +3,14 @@ package frc.robot;
 /**
  * Imports
  */
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
+
+import edu.wpi.first.math.MathUtil;
 
 /**
  * Start of class
@@ -121,6 +122,7 @@ public class Controls {
         else if ((Math.abs(power) < 0.05) || (getRotateLock() == true)) {
             power = 0;
         }
+        
         return power;
     }
 
@@ -157,6 +159,10 @@ public class Controls {
         else {
             return ShootLocation.OFF;
         }
+    }
+
+    public boolean toggleFieldDrive() {
+        return joystick.getRawButton(8);
     }
 
 

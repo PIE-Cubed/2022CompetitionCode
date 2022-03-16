@@ -3,10 +3,27 @@ package frc.robot;
 /**
  * Imports
  */
-import edu.wpi.first.math.MathUtil;
+import java.util.List;
+
 import frc.robot.Drive.TargetPipeline;
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class Auto {
     // Object creation
@@ -14,6 +31,8 @@ public class Auto {
     Grabber grabber;
     Shooter shooter;
     CargoTracking cargoTracking;
+    // Kinematics
+    SwerveDrive swerveDrive;
 
     // Step Variables
     private int step = 1;
@@ -30,6 +49,32 @@ public class Auto {
     private long   autoDelayTargetMs = 0;
     //private int    noTargetCount     = 0;
     private double cargoHeading      = 0;
+    
+    // Defines PID controllers
+    PIDController xController;
+    PIDController yController;
+    ProfiledPIDController rotationController;
+
+    // xController
+    private final double xP = 0.00;
+    private final double xI = 0.00;
+    private final double xD = 0.00;
+
+    // yController
+    private final double yP = 0.00;
+    private final double yI = 0.00;
+    private final double yD = 0.00;
+
+    // rotationController
+    private final double rP = 0.00;
+    private final double rI = 0.00;
+    private final double rD = 0.00;
+
+    // Creates the rotation constraints
+    private final double MAX_ANGULAR_SPEED        = 1; // in m/s
+    private final double MAX_ANGULAR_ACCELERATION = 1; // in m/s/s
+    private final TrapezoidProfile.Constraints rotationControllerConstraints = //
+                new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
 
     /**
      * CONSTRUCTOR
@@ -41,6 +86,44 @@ public class Auto {
 		this.grabber       = grabber;
         this.shooter       = shooter;
         this.cargoTracking = cargoTracking;
+        swerveDrive        = SwerveDrive.getInstance();
+
+        // Initializes PID Controllers
+        xController = new PIDController(xP, xI, xD);
+        yController = new PIDController(yP, yI, yD);
+        rotationController = new ProfiledPIDController(rP, rI, rD, rotationControllerConstraints);
+        rotationController.enableContinuousInput(-Math.PI, Math.PI);
+    }
+
+    public Command tragectoryFollow() {
+        // Creates trajectory settings
+        TrajectoryConfig trajectoryConfig =
+                new TrajectoryConfig(SwerveModule.MAX_MOVE_SPEED,SwerveModule.MAX_ACCELERATION).setKinematics(SwerveDrive.driveKinematics);
+
+        // Generates trajectory
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+                new Pose2d(0, 0, new Rotation2d(0)),
+                List.of(
+                        new Translation2d(1, 0),
+                        new Translation2d(1, -1)),
+                new Pose2d(2, -1, Rotation2d.fromDegrees(180)),
+                trajectoryConfig);
+
+        // Construct command to follow trajectory
+        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+                trajectory,
+                swerveDrive::getPose,
+                SwerveDrive.driveKinematics,
+                xController,
+                yController,
+                rotationController,
+                swerveDrive::setModuleStates,
+                swerveDrive);
+
+        // Add some init and wrap-up, and return everything
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> swerveDrive.resetOdometry(trajectory.getInitialPose())), swerveControllerCommand,
+                new InstantCommand(() -> swerveDrive.stopModules()));
     }
 
     /**

@@ -142,22 +142,18 @@ public class Drive {
         FRONT_RIGHT_WHEEL(16, // DRIVE MOTOR ID
                         17, // ROTATE MOTOR ID
                         3, // ROTATE SENSOR ID
-                        (-1 * rotateMotorAngleRad), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         FR_OFFSET), //Offset
         FRONT_LEFT_WHEEL(10, // DRIVE MOTOR ID
                         11, // ROTATE MOTOR ID
                         0, // ROTATE SENSOR ID
-                        (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         FL_OFFSET), //Offset
         REAR_RIGHT_WHEEL(14, // DRIVE MOTOR ID
                         15, // ROTATE MOTOR ID
                         2, // ROTATE SENSOR ID
-                        (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         BR_OFFSET), //Offset
         REAR_LEFT_WHEEL(12, // DRIVE MOTOR ID
                         13, // ROTATE MOTOR ID
                         1, // ROTATE SENSOR ID
-                        (-1 * rotateMotorAngleRad + (Math.PI)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         BL_OFFSET); //Offset
 
         private int    driveMotorId;
@@ -166,7 +162,7 @@ public class Drive {
         private double offsetDegrees; //Inverse of the reading when wheel is physically at 0 degrees
 
         // Each item in the enum will now have to be instantiated with a constructor with the all of the ids and the motor type constants. Look few lines above, where FRONT_RIGHT_WHEEL(int driveMotorId, MotorType driveMotorType, int rotateMotorId, int rotateSensorId, double targetRadians, double targetVoltage), REAR_LEFT_WHEEL(int driveMotorId, MotorType driveMotorType, int rotateMotorId, int rotateSensorId, double targetRadians, double targetVoltage), etc... are. These are what the constructor is for.
-        private WheelProperties(int driveMotorId, int rotateMotorId, int rotateSensorId, double targetRadians, double offsetDegrees) {
+        private WheelProperties(int driveMotorId, int rotateMotorId, int rotateSensorId, double offsetDegrees) {
             this.driveMotorId = driveMotorId;
             this.rotateMotorId = rotateMotorId;
             this.rotateSensorId = rotateSensorId;

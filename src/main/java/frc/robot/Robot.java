@@ -9,8 +9,15 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.networktables.*;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import frc.robot.Drive.TargetPipeline;
 import frc.robot.Shooter.ShootLocation;
@@ -37,12 +44,22 @@ public class Robot extends TimedRobot {
   Shooter       shooter;
   CargoTracking cargoTracking;
   Auto          auto;
+  SwerveDrive   swerveDrive;
 
   // Variables
-  private int status = Robot.CONT;
-  private int targetStatus = 0;
+  //private int status = Robot.CONT;
+  private int targetStatus = Robot.CONT;
+  private Command autonomousCommand;
 
-  //Enumeration for manual or limelight control
+  // CONSTANTS
+  private final double DEAD_ZONE = 0.1;
+
+  // Rate limiters
+  private final SlewRateLimiter xLimiter;
+  private final SlewRateLimiter yLimiter;
+  private final SlewRateLimiter turnLimiter;
+
+  // Enumeration for manual or limelight control
   public static enum DriveMode {
     MANUAL,
     LIMELIGHT_TARGETING,
@@ -52,27 +69,17 @@ public class Robot extends TimedRobot {
   }
   private DriveMode driveMode = DriveMode.MANUAL;
 
-  //Auto path
-  private static final String kCenterAuto = "Center";
-  private static final String kWallAuto   = "Wall";
-  private static final String kHangarAuto = "Hangar";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-  //Number of balls
-  private static final int kTwoBall   = 2;
-  private static final int kThreeBall = 3;
-  //private static final int kFourBall  = 4;
-  private int m_numBalls;
-  private final SendableChooser<Integer> m_numBallsChooser = new SendableChooser<>();
-
-  //Auto Delay
-  private int delaySec = 0;
+  // Enumeration for field drive
+  public static enum FieldDrive {
+    ENABLED,
+    DISABLED;
+  }
+  private FieldDrive fieldDrive = FieldDrive.DISABLED;
 
   /**
    * Constructor
    */
-  public Robot() {
+  public Robot() {    
     //Instance Creation
     drive         = new Drive();
     grabber       = new Grabber();
@@ -81,6 +88,12 @@ public class Robot extends TimedRobot {
     shooter       = new Shooter();
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber, shooter, cargoTracking);
+    swerveDrive = SwerveDrive.getInstance();
+
+    // Creates rate limiters
+    xLimiter = new SlewRateLimiter(.5);
+    yLimiter = new SlewRateLimiter(.5);
+    turnLimiter = new SlewRateLimiter(.5);
 
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -95,19 +108,6 @@ public class Robot extends TimedRobot {
    * Runs once when the robot is started
    */
   public void robotInit() {
-    //Auto selection
-    m_chooser.setDefaultOption("Center Auto", kCenterAuto);
-    m_chooser.addOption("Wall Auto", kWallAuto);
-    m_chooser.addOption("Hangar Auto", kHangarAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-    SmartDashboard.putNumber("Auto delay seconds", 0);
-
-    //Number of Balls to grab
-    m_numBallsChooser.setDefaultOption("2 ball", kTwoBall);
-    m_numBallsChooser.addOption("3 ball", kThreeBall);
-    //m_numBallsChooser.addOption("4 ball", kFourBall);
-    SmartDashboard.putData("Number of Balls", m_numBallsChooser);
-
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
     
@@ -121,7 +121,8 @@ public class Robot extends TimedRobot {
    * Always runs on the robot
    */
   public void robotPeriodic() {
-    //Nothing yet...
+    // Runs the command scheduler
+    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -130,14 +131,13 @@ public class Robot extends TimedRobot {
    * Runs once when Auto starts
    */
   public void autonomousInit() {
-    //Choses start position
-    m_autoSelected = m_chooser.getSelected();
-    System.out.println("Auto selected: " + m_autoSelected);
+    // Get the command we want to run
+    autonomousCommand = auto.tragectoryFollow();
 
-    m_numBalls = m_numBallsChooser.getSelected();
-    System.out.println("Auto path: " + m_numBalls);
-
-    delaySec = (int)SmartDashboard.getNumber("Auto delay seconds", 0);
+    // Schedules the command to run
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
+    }
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
@@ -154,25 +154,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during Autonomous
    */
   public void autonomousPeriodic() {
-    int balls = m_numBalls;
-    long autoDelayMSec = delaySec * 1000;
-
-    if (status == Robot.CONT) {
-      switch (m_autoSelected) {
-        case kCenterAuto:
-          status = auto.centerAuto(balls, autoDelayMSec);
-          break;
-        case kHangarAuto:
-          status = auto.hangerAuto(balls, autoDelayMSec);
-          break;
-        case kWallAuto:
-          status = auto.wallAuto(balls, autoDelayMSec);
-          break;
-        default:
-          status = DONE;
-          break;
-      }
-    }
+    // Handled in the init funciton
   }
 
   @Override
@@ -181,6 +163,11 @@ public class Robot extends TimedRobot {
    * Runs once at the start of TeleOp
    */
   public void teleopInit() {
+    // Cancels the autonomous command
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
+    }
+
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
 
@@ -233,27 +220,61 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    // if (status == Robot.CONT) {
-    //   status = drive.autoSwerve(3.0, 0, -90, 0.1);
-    // }
-
-    //climber.climberRotate(.5);
-    //cargoTracking.autoCargoTrack();
-    //System.out.println("Climber encoder: " + climber.getClimberEncoder());
-    //shooter.shooterControl(ShootLocation.AUTO_RING);
-    //shooter.testShootMotors(SmartDashboard.getNumber("Shooter power", 0));
-    //drive.testWheelAngle();
-    /*
-    shooter.shooterControl(ShootLocation.LOW_SHOT);
-    SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());
-    SmartDashboard.putNumber("Test front rpm", shooter.getabsRPM(19));
-    SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
-    SmartDashboard.putNumber("Target RPM", 1450);
-    SmartDashboard.putNumber("80% RPM", 1450 * 0.8);*/
-    //drive.testLimelightTargeting();
-    //drive.testRotate();
-    //drive.testWheelAngle();
+    //
   }
+
+  public void chassisMovement() {
+    // Input variables
+    double  xSpeed           = controls.getDriveX();
+    double  ySpeed           = controls.getDriveY();
+    double  turnSpeed        = controls.getRotatePower();
+    boolean fieldDriveToggle = controls.toggleFieldDrive();
+
+    // Dead Zone
+    xSpeed    = (Math.abs(xSpeed) > DEAD_ZONE)    ? xSpeed : 0.0;
+    ySpeed    = (Math.abs(ySpeed) > DEAD_ZONE)    ? ySpeed : 0.0;
+    turnSpeed = (Math.abs(turnSpeed) > DEAD_ZONE) ? turnSpeed : 0.0;
+
+    // Makes driving smoother
+    xSpeed    = xLimiter   .calculate(xSpeed)    * SwerveModule.MAX_MOVE_SPEED;
+    ySpeed    = yLimiter   .calculate(ySpeed)    * SwerveModule.MAX_MOVE_SPEED;
+    turnSpeed = turnLimiter.calculate(turnSpeed) * SwerveModule.MAX_ROTATION_SPEED;
+
+    // Toggles field drive
+    if (fieldDriveToggle == true) {
+      if (fieldDrive == FieldDrive.DISABLED) {
+        fieldDrive = FieldDrive.ENABLED;
+      }
+      else if (fieldDrive == FieldDrive.ENABLED) {
+        fieldDrive = FieldDrive.DISABLED;
+      }
+      else {
+        fieldDrive = FieldDrive.DISABLED;
+      }
+    }
+
+    // Creates desired chassis speeds
+    ChassisSpeeds chassisSpeeds;
+    if (fieldDrive == FieldDrive.ENABLED) {
+      // Relative to field
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+              xSpeed, ySpeed, turnSpeed, swerveDrive.getRotation2d());
+    }
+    else if (fieldDrive == FieldDrive.DISABLED) {
+      // Relative to robot
+      chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
+    }
+    else {
+      // Should never occur
+      chassisSpeeds = new ChassisSpeeds(0, 0, 0);
+    }
+
+    // Convert chassis speeds to individual module states
+    SwerveModuleState[] moduleStates = SwerveDrive.driveKinematics.toSwerveModuleStates(chassisSpeeds);
+    
+    // Output each module states to wheels
+    swerveDrive.setModuleStates(moduleStates);
+}
 
   /**
    * Controls the wheels in TeleOp
