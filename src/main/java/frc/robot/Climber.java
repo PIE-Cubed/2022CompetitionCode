@@ -127,15 +127,6 @@ public class Climber {
     }
 
     /**
-     * Rotates the climber arms
-     * @param rotatePower
-     * neagtive power raises arm from horizontal start position at bar 1
-     */
-    public void climberRotate(double rotatePower) {
-        climberMotor.set(rotatePower);
-    }
-
-    /**
      * Moves to the bar two position automatically
      * @return atPosition
      */
@@ -196,6 +187,31 @@ public class Climber {
     }
 
     /**
+     * TEST FUNCTIONS
+     */
+    /**
+     * Rotates the main climber motor
+     * @param rotatePower
+     * <p>Positive raises motor 22
+     * <p>Positive lowers motor 21
+     * <p>Positive power raises arm from horizontal start position at bar 1
+     */
+    public void climberRotate(double rotatePower) {
+        climberMotor.set(rotatePower);
+    }
+
+    /**
+     * Rotates the following climber motor (you have to remove it from follow though)
+     * @param rotatePower
+     * <p>Positive raises motor 22
+     * <p>Positive lowers motor 21
+     * <p>Positive power raises arm from horizontal start position at bar 1
+     */
+    public void climberFollowerRotate(double rotatePower) {
+        climberFollowMotor.set(rotatePower);
+    }
+
+    /**
      * Sets the climber mode (brake or coast)
      * @param value
      */
@@ -216,6 +232,7 @@ public class Climber {
      * Resets the climber encoder
      */
     public void resetEncoder() {
+        System.out.println("Resetting climber encoders");
         climberEncoder.setPosition(0.00);
     }
 

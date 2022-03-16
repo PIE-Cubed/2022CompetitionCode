@@ -244,13 +244,6 @@ public class Robot extends TimedRobot {
     //shooter.testShootMotors(SmartDashboard.getNumber("Shooter power", 0));
     //drive.testWheelAngle();
     /*
-    if (controls.grabberDeployRetract()) {
-      shooter.deployFeeder();
-    }
-    if (controls.testButtonB()) {
-      shooter.retractFeeder();
-    }*/
-    /*
     shooter.shooterControl(ShootLocation.LOW_SHOT);
     SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());
     SmartDashboard.putNumber("Test front rpm", shooter.getabsRPM(19));

@@ -478,7 +478,7 @@ public class Drive {
         
         //Adjusts wheel angles
         orientationError = autoCrabDriveController.calculate(ahrs.getYaw(), targetOrientation); 
-        teleopSwerve(x, y, orientationError, false, false);
+        teleopSwerve(x, y, orientationError, false, false); 
 
         //Checks if target distance has been reached, then ends function if so
         if (encoderCurrent >= encoderTarget) {
@@ -589,7 +589,7 @@ public class Drive {
 		// Rotate
         rotateError = rotateController.calculate(ahrs.getYaw(), degrees);
         rotateError = MathUtil.clamp(rotateError, -0.5, 0.5);
-        System.out.println(rotateError + " " + ahrs.getYaw());
+        //System.out.println(rotateError + " " + ahrs.getYaw());
 		teleopRotate(rotateError);
 
 		// CHECK: Routine Complete
@@ -997,7 +997,8 @@ public class Drive {
         System.out.print("tv: " + get_tv() + "      |     ");
         System.out.println("tx: " + get_tx());
     }
-
+    //yay line 1000
+    
 }
 
 // End of the Drive Class

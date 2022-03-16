@@ -65,27 +65,25 @@ public class Auto {
 
         switch(step) {
             case 1:
-                //Adjust wheels as early as possible before driving
-                status = drive.autoAdjustWheels(0);
-                break;
-            case 2:
-                status = autoDelay(delayMs);
-                break;
-            case 3:
                 grabber.deployRetract();
                 //Leave grabber motor on while shooting to help loose balls get in
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
+            case 2:
+                status = drive.autoAdjustWheels(0);
+                break;
+            case 3:
+                status = autoDelay(delayMs);
+                break;                
             case 4:
-                status = drive.autoCrabDrive(3.5, 0, 0.25);
+                status = drive.autoCrabDrive(3.5, 0, 0.4);
                 break;
             case 5:
-                //Delay for balls to calm down
-                status = autoDelay(1000);
+                status = autoDelay(250);
                 break;
             case 6:
-                status = autoDelay(1000);//autoShoot(ShootLocation.AUTO_RING, 2);
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
             case 7:
                 //If we are only doing 2 ball path, the routine is over
@@ -101,25 +99,25 @@ public class Auto {
                 status = drive.autoAdjustWheels(-90);
                 break;
             case 10:
-                status = drive.autoCrabDrive(7, -90, 0.32);
+                status = drive.autoCrabDrive(7, -90, 0.7);
                 break;
             case 11:
-                status = drive.autoAdjustWheels(0);
+                status = Robot.DONE;//drive.autoAdjustWheels(0);
                 break;
             case 12:
-                status = drive.autoCrabDrive(1, 0, 0.2);
+                status = drive.autoCrabDrive(1.5, 0, 0.5);
                 break;
             case 13:
                 //Delay for balls to calm down
-                status = autoDelay(1000);
+                status = Robot.DONE;//autoDelay(1000);
                 break;
             case 14:
-                grabber.setGrabberMotor(GrabberDirection.OFF);
-                grabber.deployRetract();
+                //grabber.setGrabberMotor(GrabberDirection.OFF);
+                //grabber.deployRetract();
                 status = Robot.DONE;
                 break;
             case 15:
-                status = autoDelay(750);
+                status = Robot.DONE;//autoDelay(750);
                 break;
             case 16:
                 status = drive.autoRotate(-45); 
@@ -388,7 +386,7 @@ public class Auto {
             case 5:
                 if (numBalls == 2) {
                     shooter.retractFeeder();
-                    status = autoDelay(2000);
+                    status = autoDelay(1000);
                 }
                 else {
                     status = Robot.DONE;
@@ -397,7 +395,7 @@ public class Auto {
             case 6:
                 if (numBalls == 2) {
                     shooter.deployFeeder();
-                    status = autoDelay(1000);
+                    status = autoDelay(400);
                 }
                 else {
                     status = Robot.DONE;
