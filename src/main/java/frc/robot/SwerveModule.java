@@ -60,7 +60,6 @@ public class SwerveModule {
 	private static final double kD = 0.00;
 
     public SwerveModule(int driveMotorId, int turningMotorId, int analogId, double absoluteEncoderOffset) {
-
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         rotateMotorSensor = new AnalogInput(analogId);
 
