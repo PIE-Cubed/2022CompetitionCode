@@ -121,7 +121,8 @@ public class Robot extends TimedRobot {
    * Always runs on the robot
    */
   public void robotPeriodic() {
-    //Nothing yet...
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance( setRedAlliance() );
   }
 
   @Override
@@ -233,10 +234,6 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    // if (status == Robot.CONT) {
-    //   status = drive.autoSwerve(3.0, 0, -90, 0.1);
-    // }
-
     //climber.climberRotate(.5);
     //cargoTracking.autoCargoTrack();
     //System.out.println("Climber encoder: " + climber.getClimberEncoder());
@@ -250,7 +247,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
     SmartDashboard.putNumber("Target RPM", 1450);
     SmartDashboard.putNumber("80% RPM", 1450 * 0.8);*/
-    //drive.testLimelightTargeting();
     //drive.testRotate();
     //drive.testWheelAngle();
   }
@@ -263,8 +259,8 @@ public class Robot extends TimedRobot {
     double driveX               = controls.getDriveX();
     double driveY               = controls.getDriveY();
     double rotatePower          = controls.getRotatePower();
-    ShootLocation shootLocation = controls.getShootLocation();
     boolean enableCargoTracking = controls.enableCargoTracking();
+    ShootLocation shootLocation = controls.getShootLocation();
 
     //Kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
@@ -324,10 +320,7 @@ public class Robot extends TimedRobot {
     else if (driveMode == DriveMode.CARGO_TARGETING) {
       int cargoStatus = cargoTracking.autoCargoTrack();
 
-      if (cargoStatus == Robot.CONT) {
-        // Doesn't do anything
-      }
-      else if (cargoStatus == Robot.DONE) {
+      if (cargoStatus == Robot.DONE) {
         driveMode = DriveMode.CARGO_TARGETED;
       }
       else if (cargoStatus == Robot.FAIL) {

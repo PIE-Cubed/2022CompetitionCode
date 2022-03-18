@@ -213,9 +213,9 @@ public class CargoTracking {
 			m_CargoCalculatedPower = cargoController.calculate(turnAngle, 0.00);
 			// Scales the power down to account for the image being resized
 			m_CargoCalculatedPower = m_CargoCalculatedPower / IMG_SCALE_FACTOR;
-			// Clamps the power so the robot doesn't go flying
+			// Clamps the power so the robot doesn't go spinning
 			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
-			// Negates the powwer to make it go in the right direction
+			// Negates the power to make it go in the right direction
 			m_CargoCalculatedPower = -1 * m_CargoCalculatedPower;
 
 			// Prints calculated power

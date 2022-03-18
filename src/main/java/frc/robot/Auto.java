@@ -45,6 +45,8 @@ public class Auto {
 
     /**
      * Autonomous program for the position closest to the center
+     * @param balls
+     * @param delayMs
      * @return status
      */
     public int centerAuto(int balls, long delayMs) {
@@ -142,7 +144,9 @@ public class Auto {
 
     /**
      * Autonomous program for the position closest to the hanger
-     * @return
+     * @param balls
+     * @param delayMs
+     * @return status
      */
     public int hangerAuto(int balls, long delayMs) {
         int status = Robot.CONT;
@@ -242,7 +246,7 @@ public class Auto {
      * Autonomous program for the position closest to the wall
      * @param balls
      * @param delayMs
-     * @return
+     * @return status
      */
     public int wallAuto(int balls, long delayMs) {
         int status = Robot.CONT;
@@ -336,6 +340,7 @@ public class Auto {
     /**
      * An auto program to shoot balls
      * @param location
+     * @param numBalls
      * @return status
      */
     private int autoShoot(ShootLocation location, int numBalls) {
@@ -484,7 +489,7 @@ public class Auto {
     /**
      * A program to return a value after a certain number of miliseconds has passed 
      * @param miliseconds
-     * @return
+     * @return status
      */
     public int autoDelay(long ms) {
         long currentMs = System.currentTimeMillis();
