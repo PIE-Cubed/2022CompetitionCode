@@ -17,6 +17,7 @@ public class Climber {
     */
 
     //Variables
+    private boolean barFourFirstTime = true;
 
     //Spark Max ID for the climber
     private final int CLIMBER_SPARKMAX_ID  = 22;
@@ -176,10 +177,17 @@ public class Climber {
             return Robot.DONE;
         }
         else {
-            if (getClimberEncoder() <= 0.9 * BAR_FOUR_POSITION) {
-                climberMotor.set(-0.2);
+            if (getClimberEncoder() <= 0.85 * BAR_FOUR_POSITION) {
+                if (barFourFirstTime == true) {
+                    yellowClawOpen();
+                    barFourFirstTime = false;
+                }
+
+                climberMotor.set(-0.3);
             }
             else {
+                barFourFirstTime = true;
+                yellowClawClose();
                 climberMotor.set(-0.5);
             }
             return Robot.CONT;

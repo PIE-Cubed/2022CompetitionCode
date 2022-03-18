@@ -62,7 +62,7 @@ public class Wheel {
         //PID Controller
         rotationPID = new PIDController(kP, kI, kD);
         rotationPID.enableContinuousInput(-180, 180);
-        rotationPID.setTolerance(2);
+        rotationPID.setTolerance(4);
     }
 
     /****************************************************************************************** 

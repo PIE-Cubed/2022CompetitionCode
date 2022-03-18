@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
+
 import frc.robot.Grabber.GrabberDirection;
 import frc.robot.Shooter.ShootLocation;
 
@@ -15,37 +17,27 @@ import frc.robot.Shooter.ShootLocation;
  * Start of class
  */
 public class Controls {
-    /**
-     * Enumerator for controller ID's
-     */
-    private enum ControllerIDs {
-        JOYSTICK(1),
-        XBOX_MANIP_CONTROLLER(0);
-        
-        private int id;
-
-        // Each item in the enum will now have to be instantiated with a constructor with the integer id. Look few lines above, where JOYSTICK(int id) and XBOXCONTROLLER(int id) are. These are what the constructor is for.
-        private ControllerIDs(int id) {
-            this.id = id;
-        }
-
-        private int getId() {
-            return this.id;
-        }
-    }
-
     // Variables
-    private double prevXPower = 0;
+
+    // CONSTANTS
+    private final int JOYSTICK_ID = 1;
+    private final int XBOX_ID     = 0;
 
     // Controller Object Declaration
     private Joystick joystick;
     private XboxController xboxController;
 
+    // Rate limiters
+    private SlewRateLimiter xLimiter;
+
     //Constructor
     public Controls() {
-        //Instance Creation
-        joystick       = new Joystick(ControllerIDs.JOYSTICK.getId());
-        xboxController = new XboxController(ControllerIDs.XBOX_MANIP_CONTROLLER.getId());
+        // Instance Creation
+        joystick       = new Joystick(JOYSTICK_ID);
+        xboxController = new XboxController(XBOX_ID);
+
+        // Rate limiter
+        xLimiter = new SlewRateLimiter(0.04);
     }
 
     /**
@@ -95,13 +87,7 @@ public class Controls {
         }
 
         //Prevents us from accelerating sideways too quickly
-        if (power - prevXPower > 0.02) {
-            power = prevXPower + 0.02;
-        }
-        else if (power - prevXPower < -0.02) {
-            power = prevXPower - 0.02;
-        }
-        prevXPower = power;
+        power = xLimiter.calculate(power);
  
         return power;
     }

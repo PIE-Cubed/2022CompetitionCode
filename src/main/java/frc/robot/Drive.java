@@ -452,7 +452,6 @@ public class Drive {
     * 
     ******************************************************************************************/
     public int autoCrabDrive(double distance, double targetHeading, double power) {
-
         double encoderCurrent = getAverageEncoder(); //Average of 4 wheels
 
         //First time through initializes target values

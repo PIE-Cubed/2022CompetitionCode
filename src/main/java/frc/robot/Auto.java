@@ -260,66 +260,54 @@ public class Auto {
 
         switch(step) {
             case 1:
+                Drive.ahrs.zeroYaw();
                 status = autoDelay(delayMs);
                 break;
             case 2:
-                status = drive.autoRotate(90);
-                break;
-            case 3:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
-            case 4:
+            case 3:
                 status = drive.autoAdjustWheels(0);
                 break;
+            case 4:
+                shooter.shooterControl(ShootLocation.AUTO_RING);
+                status = drive.autoCrabDrive(3.0, 0, 0.4);
+                break;
             case 5:
-                shooter.shooterControl(ShootLocation.AUTO_RING);
-                status = drive.autoCrabDrive(3.0, 0, 0.25);
-                break;
-            case 6:
-                shooter.shooterControl(ShootLocation.AUTO_RING);
-                status = autoDelay(1500);
-                break;
-            case 7:
-                shooter.shooterControl(ShootLocation.AUTO_RING);
-                grabber.deployRetract();
-                grabber.setGrabberMotor(Grabber.GrabberDirection.OFF);
-                status = Robot.DONE;
-                break;
-            case 8:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
-            case 9:
-                //If we are only doing 1 ball path, the routine is over
+            case 6:
+                //If we are only doing 2 ball path, the routine is over
                 if (balls < 3) {
                     step = 100;
                 }
                 status = Robot.DONE;
                 break;
-            case 10:
+            case 7:
                 status = drive.autoRotate(-140);
                 break;
-            case 11:
+            case 8:
                 status = drive.autoAdjustWheels(0);
                 break;
-            case 12:
+            case 9:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD); 
                 status = Robot.DONE;
                 break;
-            case 13:
+            case 10:
                 status = drive.autoCrabDrive(8, 0);
                 break;
-            case 14:
+            case 11:
                 grabber.deployRetract();
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 status = Robot.DONE;
                 break;
-            case 15:
+            case 12:
                 status = drive.autoRotate(-45);
                 break;
-            case 16:
+            case 13:
                 status = autoShoot(ShootLocation.AUTO_RING, 1);
                 break;
             default:
