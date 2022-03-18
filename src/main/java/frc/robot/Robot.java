@@ -264,9 +264,7 @@ public class Robot extends TimedRobot {
     double driveY               = controls.getDriveY();
     double rotatePower          = controls.getRotatePower();
     ShootLocation shootLocation = controls.getShootLocation();
-
-    //Gets Xbox Values
-    boolean cargoTrackingActive = false;
+    boolean enableCargoTracking = controls.enableCargoTracking();
 
     //Kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
@@ -295,7 +293,7 @@ public class Robot extends TimedRobot {
       }
 
       //Exit coditions
-      if (cargoTrackingActive == true) {
+      if (enableCargoTracking == true) {
         driveMode = DriveMode.CARGO_TARGETING;
       }
     } 
@@ -324,11 +322,10 @@ public class Robot extends TimedRobot {
     }
     //Raspberry Pi Targeting
     else if (driveMode == DriveMode.CARGO_TARGETING) {
-      int    cargoStatus = cargoTracking.autoCargoTrack();
-      double error       = cargoTracking.getCenterOffset();
+      int cargoStatus = cargoTracking.autoCargoTrack();
 
       if (cargoStatus == Robot.CONT) {
-        controls.controllerRumble(error);
+        // Doesn't do anything
       }
       else if (cargoStatus == Robot.DONE) {
         driveMode = DriveMode.CARGO_TARGETED;

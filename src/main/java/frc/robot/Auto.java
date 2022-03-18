@@ -275,7 +275,7 @@ public class Auto {
                 break;
             case 4:
                 shooter.shooterControl(ShootLocation.AUTO_RING);
-                status = drive.autoCrabDrive(2.9, 0, 0.2); //DO NOT ADJUST!
+                status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
                 grabber.setGrabberMotor(GrabberDirection.OFF);
@@ -293,7 +293,7 @@ public class Auto {
                 status = Robot.DONE;
                 break;
             case 8:
-                status = drive.autoRotate(110);
+                status = drive.autoRotate(105);
                 break;
             case 9:
                 status = drive.autoAdjustWheels(0);
@@ -304,7 +304,7 @@ public class Auto {
                 status = Robot.DONE;
                 break;
             case 11:
-                status = drive.autoCrabDrive(5.5, 0, 0.5);
+                status = drive.autoCrabDrive(5.6, 0, 0.5);
                 break;
             case 12:
                 status = drive.autoRotate(45);

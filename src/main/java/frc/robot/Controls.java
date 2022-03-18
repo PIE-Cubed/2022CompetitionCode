@@ -145,6 +145,13 @@ public class Controls {
         }
     }
 
+    public boolean enableCargoTracking() {
+        return joystick.getRawButton(8);
+    }
+
+    public boolean toggleFieldDrive() {
+        return joystick.getRawButton(10);
+    }
 
     /**
      * XBOX CONTROLLER FUNCTIONS
