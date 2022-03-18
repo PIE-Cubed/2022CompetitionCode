@@ -37,7 +37,7 @@ public class Controls {
         xboxController = new XboxController(XBOX_ID);
 
         // Rate limiter
-        xLimiter = new SlewRateLimiter(0.04);
+        xLimiter = new SlewRateLimiter(0.85);
     }
 
     /**

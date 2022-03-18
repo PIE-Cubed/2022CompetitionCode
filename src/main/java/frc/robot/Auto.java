@@ -240,6 +240,8 @@ public class Auto {
 
     /**
      * Autonomous program for the position closest to the wall
+     * @param balls
+     * @param delayMs
      * @return
      */
     public int wallAuto(int balls, long delayMs) {
@@ -264,7 +266,7 @@ public class Auto {
                 status = autoDelay(delayMs);
                 break;
             case 2:
-                grabber.deployRetract();
+                grabber.deploy();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
@@ -273,39 +275,39 @@ public class Auto {
                 break;
             case 4:
                 shooter.shooterControl(ShootLocation.AUTO_RING);
-                status = drive.autoCrabDrive(3.0, 0, 0.4);
+                status = drive.autoCrabDrive(2.9, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                grabber.setGrabberMotor(GrabberDirection.OFF);
+                grabber.retract();
+                status = Robot.DONE;
                 break;
             case 6:
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                break;
+            case 7:
                 //If we are only doing 2 ball path, the routine is over
                 if (balls < 3) {
                     step = 100;
                 }
                 status = Robot.DONE;
                 break;
-            case 7:
-                status = drive.autoRotate(-140);
-                break;
             case 8:
-                status = drive.autoAdjustWheels(0);
+                status = drive.autoRotate(110);
                 break;
             case 9:
-                grabber.deployRetract();
-                grabber.setGrabberMotor(GrabberDirection.FORWARD); 
-                status = Robot.DONE;
+                status = drive.autoAdjustWheels(0);
                 break;
             case 10:
-                status = drive.autoCrabDrive(8, 0);
-                break;
-            case 11:
-                grabber.deployRetract();
-                grabber.setGrabberMotor(GrabberDirection.OFF);
+                grabber.deploy();
+                grabber.setGrabberMotor(GrabberDirection.FORWARD);
                 status = Robot.DONE;
                 break;
+            case 11:
+                status = drive.autoCrabDrive(5.5, 0, 0.5);
+                break;
             case 12:
-                status = drive.autoRotate(-45);
+                status = drive.autoRotate(45);
                 break;
             case 13:
                 status = autoShoot(ShootLocation.AUTO_RING, 1);
@@ -314,6 +316,11 @@ public class Auto {
                 //Finished routine
                 step = 1;
                 firstTime = true;
+
+                //Stops applicable motors
+                grabber.setGrabberMotor(GrabberDirection.OFF);
+                drive.stopWheels();
+
                 return Robot.DONE;
         }
 
@@ -369,7 +376,7 @@ public class Auto {
                 break;
             case 4:
                 shooter.deployFeeder();
-                status = autoDelay(400);
+                status = autoDelay(500);
                 break;
             case 5:
                 if (numBalls == 2) {
@@ -383,7 +390,7 @@ public class Auto {
             case 6:
                 if (numBalls == 2) {
                     shooter.deployFeeder();
-                    status = autoDelay(400);
+                    status = autoDelay(500);
                 }
                 else {
                     status = Robot.DONE;
