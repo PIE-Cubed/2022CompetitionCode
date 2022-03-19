@@ -363,11 +363,13 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
+                //Starts speeding up shooter and targetting
                 shooter.shooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
                 status = Robot.DONE;
                 break;
             case 2:
+                //Continues speeding up shooter and targetting until shooter is at correct RPM
                 if (shooter.shooterReady()) {
                     status = Robot.DONE;
                 }
@@ -378,30 +380,35 @@ public class Auto {
                 drive.limelightPIDTargeting(targettingLocation);
                 break;
             case 3:
-                shooter.shooterControl(location);
-                status = drive.limelightPIDTargeting(targettingLocation);
-                break;
-            case 4:
+                //Deploys feeder for 0.5 seconds
                 shooter.deployFeeder();
+                shooter.shooterControl(location);
                 status = autoDelay(500);
                 break;
-            case 5:
+            case 4:
+                //If we are shooting 2 balls, retract feeder and wait 0.5 seconds
                 if (numBalls == 2) {
                     shooter.retractFeeder();
-                    status = autoDelay(1000);
+                    shooter.shooterControl(location);
+                    status = autoDelay(500);
                 }
                 else {
+                    step = 100;
+                    status = Robot.DONE;
+                }
+                break;
+            case 5:
+                //Once the shooter is ready, move on
+                shooter.shooterControl(location);
+                if (shooter.shooterReady()) {
                     status = Robot.DONE;
                 }
                 break;
             case 6:
-                if (numBalls == 2) {
-                    shooter.deployFeeder();
-                    status = autoDelay(500);
-                }
-                else {
-                    status = Robot.DONE;
-                }
+                //Deploys final ball
+                shooter.deployFeeder();
+                shooter.shooterControl(location);
+                status = autoDelay(500);
                 break;                 
             default:
                 //Finished routine
