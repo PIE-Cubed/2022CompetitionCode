@@ -333,7 +333,7 @@ public class Auto {
             step++;
         }
 
-        System.out.println("Case: " + step);
+        //System.out.println("Case: " + step);
 
         return Robot.CONT;
     }
@@ -506,6 +506,25 @@ public class Auto {
             return Robot.DONE;
         }
         return Robot.CONT;
+    }
+
+    /****************************************************************************************** 
+    *
+    *    autoInit()
+    *    Resets auto variables
+    * 
+    ******************************************************************************************/
+    public void autoInit() {
+        // Step Variables
+        step = 1;
+        shootStep = 1;
+        cargoStep = 1;
+
+        // First Time variables 
+        firstTime      = true;
+        shootFirstTime = true;
+        cargoFirstTime = true;
+        delayFirstTime = true;
     }
 }
 

@@ -147,7 +147,11 @@ public class Robot extends TimedRobot {
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
 
-    Drive.ahrs.zeroYaw();    
+    Drive.ahrs.zeroYaw();  
+    
+    //Resets variables
+    drive.driveInit();
+    auto.autoInit();
   }
 
   @Override
