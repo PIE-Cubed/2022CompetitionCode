@@ -6,6 +6,7 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -62,22 +63,25 @@ public class Drive {
     private int     count                   = 0;
     private double  encoderTarget           = 0;
     private double  targetOrientation       = 0;
+    private double  previousXPower          = 0;
+    private double  previousYPower          = 0;
+    private double  previousRotatePower     = 0;
     
     //CONSTANTS
     private final int    FAIL_DELAY   = 5;
     private final double ticksPerFoot = 5.65;
 
     //BLUE ROBOT
-    private static final double FL_OFFSET = 309.8;
-    private static final double FR_OFFSET = 248;
-    private static final double BL_OFFSET = 165.7;
-    private static final double BR_OFFSET = -65.2;
+    // private static final double FL_OFFSET = 309.8;
+    // private static final double FR_OFFSET = 248;
+    // private static final double BL_OFFSET = 165.7;
+    // private static final double BR_OFFSET = -65.2;
 
     //Yellow ROBOT
-    // private static final double FL_OFFSET = -151.28;
-    // private static final double FR_OFFSET = -150.27;
-    // private static final double BL_OFFSET = -105.96;
-    // private static final double BR_OFFSET =  126.93;
+    private static final double FL_OFFSET = -151.28;
+    private static final double FR_OFFSET = -150.27;
+    private static final double BL_OFFSET = -105.96;
+    private static final double BR_OFFSET =  126.93;
 
 	//Limelight Variables
     private int     noTargetCount      = 0;
@@ -877,6 +881,79 @@ public class Drive {
     *    TEST FUNCTIONS
     * 
     ******************************************************************************************/
+    public void testAverageLocation() {
+        double leftX = (frontLeftWheel.getXPosition() + rearLeftWheel.getXPosition())/2;
+        double leftY = (frontLeftWheel.getYPosition() + rearLeftWheel.getYPosition())/2;
+        double rightX = (frontRightWheel.getXPosition() + rearRightWheel.getXPosition())/2;
+        double rightY = (frontRightWheel.getYPosition() + rearRightWheel.getYPosition())/2;
+
+        double rotationAmount = leftY - rightY;
+        double averageX = (leftX + rightX)/2;
+        double averageY = (leftY + rightY)/2;
+
+        SmartDashboard.putNumber("ahrs x", ahrs.getDisplacementX());
+        SmartDashboard.putNumber("ahrs y", ahrs.getDisplacementY());
+        SmartDashboard.putNumber("ahrs z", ahrs.getDisplacementZ());
+
+        SmartDashboard.putNumber("Average X", averageX);
+        SmartDashboard.putNumber("Average Y", averageY);
+        SmartDashboard.putNumber("Est Rotation", rotationAmount);
+    }
+
+    public double testAverageX() {
+        double leftX = (frontLeftWheel.getXPosition() + rearLeftWheel.getXPosition())/2;
+        double rightX = (frontRightWheel.getXPosition() + rearRightWheel.getXPosition())/2;
+
+        return (leftX + rightX)/2;
+    }
+
+    public double testAverageY() {
+        double leftY = (frontLeftWheel.getYPosition() + rearLeftWheel.getYPosition())/2;
+        double rightY = (frontRightWheel.getYPosition() + rearRightWheel.getYPosition())/2;
+
+        return (leftY + rightY)/2;
+    }
+
+    public int goToPoint(double x, double y, double angle) {
+        double xPower = (x - testAverageX())/10;
+        double yPower = (y - testAverageY())/10;
+        double rotationPower = (angle - ahrs.getYaw())/200;
+
+        if (Math.abs(xPower) < 0.04 && Math.abs(yPower) < 0.04 && Math.abs(rotationPower) < 0.04) {
+            //resetKinematics();
+            return Robot.DONE;
+        }
+
+        //Clamps max acceleration
+        // xPower = MathUtil.clamp(xPower, previousXPower - 0.01, previousXPower + 0.01);
+        // yPower = MathUtil.clamp(yPower, previousYPower - 0.01, previousYPower + 0.01);
+        // rotationPower = MathUtil.clamp(rotationPower, previousRotatePower - 0.01, previousRotatePower + 0.01);
+        // System.out.println("Acc. clamped y power: " + yPower);
+
+        //Clamps max power
+        xPower = MathUtil.clamp(xPower, -0.35, 0.35);
+        yPower = MathUtil.clamp(yPower, -0.35, 0.35);
+        rotationPower = MathUtil.clamp(rotationPower, -0.2, 0.2);
+
+        previousXPower = xPower;
+        previousYPower = yPower;
+        previousRotatePower = rotationPower;
+
+        teleopSwerve(xPower, yPower, rotationPower, true);
+
+        return Robot.CONT;
+    }
+
+    public void resetKinematics() {
+        frontLeftWheel.setXPosition(0);
+        frontLeftWheel.setYPosition(0);
+        frontRightWheel.setXPosition(0);
+        frontRightWheel.setYPosition(0);
+        rearLeftWheel.setXPosition(0);
+        rearLeftWheel.setYPosition(0);
+        rearRightWheel.setXPosition(0);
+        rearRightWheel.setYPosition(0);
+    }
     public void testWheel(){
         rearRightWheel.setDriveMotorPower(-0.5);
     }

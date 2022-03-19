@@ -381,6 +381,38 @@ public class Auto {
         //If we are done with a step, we go on to the next one and continue the routine
         if (status == Robot.DONE) {
             shootStep++;
+            shootFirstTime = true;
+        }
+
+        return Robot.CONT;
+    }
+
+    public int testPoints() {
+        int status = Robot.CONT;
+
+        if (firstTime == true) {
+            step = 1;
+            firstTime = false;
+        }
+
+        switch(step) {
+            case 1:
+                status = drive.goToPoint(0, -4, 0);
+                break;    
+            case 2:
+                //come home
+                status = drive.goToPoint(2, -2, 45);   
+                break;      
+            default:
+                //Finished routine
+                firstTime = true;
+                step = 1;
+                drive.stopWheels();
+                return Robot.DONE;
+        }
+        //If we are done with a step, we go on to the next one and continue the routine
+        if (status == Robot.DONE) {
+            step++;
         }
 
         return Robot.CONT;

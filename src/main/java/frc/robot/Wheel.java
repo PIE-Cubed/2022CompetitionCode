@@ -55,6 +55,7 @@ public class Wheel {
         // Motor Controllers Instantiation
         this.driveMotor   = new CANSparkMax(driveMotorID, MotorType.kBrushless);
         this.driveEncoder = driveMotor.getEncoder();
+        this.driveEncoder.setPosition(0);
         this.rotateMotor  = new CANSparkMax(rotateMotorID, MotorType.kBrushed);
         this.name         = motorName;
 
@@ -113,8 +114,6 @@ public class Wheel {
                     //x or y proportion of the absolute angle of the wheel * the distance traveled
         kinematicsX += Math.sin(Math.toRadians(currWheelAngle + Drive.ahrs.getYaw())) * (encoderValue - previousEncoder) / ticksPerFoot;
         kinematicsY += Math.cos(Math.toRadians(currWheelAngle + Drive.ahrs.getYaw())) * (encoderValue - previousEncoder) / ticksPerFoot;
-        System.out.println("encoder: " + encoderValue + " previousEncoder: " + previousEncoder);
-        System.out.println("sin: " + Math.sin(Math.toRadians(currWheelAngle + Drive.ahrs.getYaw())));
 
         SmartDashboard.putNumber(this.name + " X", kinematicsX);
         SmartDashboard.putNumber(this.name + " Y", kinematicsY);
@@ -223,6 +222,12 @@ public class Wheel {
     }
     public double getYPosition() {
         return kinematicsY;
+    }
+    public void setXPosition(double initX) {
+        kinematicsX = initX;
+    }
+    public void setYPosition(double initY) {
+        kinematicsY = initY;
     }
 
     /****************************************************************************************** 

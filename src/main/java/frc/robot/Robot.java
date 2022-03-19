@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
   // Variables
   private int status = Robot.CONT;
   private int cargoStatus = Robot.CONT;
+  private int testStatus = Robot.CONT;
 
   //Enumeration for manual or limelight control
   public static enum DriveMode {
@@ -222,6 +223,8 @@ public class Robot extends TimedRobot {
     drive.changeledMode(Drive.LEDState.ON);
 
     cargoStatus = Robot.CONT;
+
+    testStatus = Robot.CONT;
   }
 
   @Override
@@ -236,7 +239,9 @@ public class Robot extends TimedRobot {
     //drive.testLimelightTargeting();
     //drive.testRotate();
     //shooter.testShooter(.60);
-    drive.testWheelAngle();
+    if (testStatus == Robot.CONT) {
+      testStatus = auto.testPoints();
+    }
   }
 
   /**
@@ -254,6 +259,8 @@ public class Robot extends TimedRobot {
 
     //Kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
+
+    drive.testAverageLocation();
 
     //General state changes
     if (autokill == true) {
