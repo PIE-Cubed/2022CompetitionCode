@@ -6,7 +6,6 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 
@@ -37,7 +36,7 @@ public class Controls {
         xboxController = new XboxController(XBOX_ID);
 
         // Rate limiter
-        xLimiter = new SlewRateLimiter(0.85);
+        xLimiter = new SlewRateLimiter(0.80);
     }
 
     /**
@@ -258,26 +257,6 @@ public class Controls {
         }
         else {
             return GrabberDirection.OFF;
-        }
-    }
-
-    /**
-     * Uses the Xbox Controller's rumbing to display CargoTracking error
-     * @param rumblePower
-     */
-    public void controllerRumble(double rumblePower) {
-        double scaledRumble = rumblePower / 240;
-        double absPower = Math.abs(scaledRumble);
-
-        if (scaledRumble < 0) {
-            xboxController.setRumble(RumbleType.kLeftRumble , absPower / 3);
-        }
-        else if (scaledRumble > 0) {
-            xboxController.setRumble(RumbleType.kRightRumble, absPower / 3);
-        }
-        else {
-            xboxController.setRumble(RumbleType.kLeftRumble , 0);
-            xboxController.setRumble(RumbleType.kRightRumble, 0);
         }
     }
 

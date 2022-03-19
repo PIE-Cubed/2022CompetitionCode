@@ -122,6 +122,8 @@ public class Robot extends TimedRobot {
    */
   public void robotPeriodic() {
     //Nothing yet...
+    //Passes if we are on the red alliance to the Pi for Object Tracking
+    cargoTracking.setRedAlliance( setRedAlliance() );
   }
 
   @Override
@@ -236,14 +238,13 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    if (status == Robot.CONT) {
+	if (status == Robot.CONT) {
       //status = drive.autoSwerve(3.0, 0, -90, 0.1);
       status = drive.autoAdjustWheels(0);
     }
     else if (status == Robot.DONE) {
       System.out.println("Done");
     }
-
     //climber.climberRotate(.5);
     //cargoTracking.autoCargoTrack();
     //System.out.println("Climber encoder: " + climber.getClimberEncoder());
@@ -270,8 +271,9 @@ public class Robot extends TimedRobot {
     double driveX               = controls.getDriveX();
     double driveY               = controls.getDriveY();
     double rotatePower          = controls.getRotatePower();
-    ShootLocation shootLocation = controls.getShootLocation();
     boolean enableCargoTracking = controls.enableCargoTracking();
+    ShootLocation shootLocation = controls.getShootLocation();
+
 
     //Kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
@@ -331,10 +333,8 @@ public class Robot extends TimedRobot {
     else if (driveMode == DriveMode.CARGO_TARGETING) {
       int cargoStatus = cargoTracking.autoCargoTrack();
 
-      if (cargoStatus == Robot.CONT) {
-        // Doesn't do anything
-      }
-      else if (cargoStatus == Robot.DONE) {
+
+      if (cargoStatus == Robot.DONE) {
         driveMode = DriveMode.CARGO_TARGETED;
       }
       else if (cargoStatus == Robot.FAIL) {
