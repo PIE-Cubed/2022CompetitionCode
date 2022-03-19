@@ -92,6 +92,9 @@ public class Auto {
 
                 // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
+                grabber.deploy();
+                shooter.disableShooter();
+                shooter.retractFeeder();
                 drive.stopWheels();
  
                 return Robot.DONE;
@@ -154,6 +157,9 @@ public class Auto {
 
                 // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
+                grabber.deploy();
+                shooter.disableShooter();
+                shooter.retractFeeder();
                 drive.stopWheels();
 
                 return Robot.DONE;
@@ -168,7 +174,7 @@ public class Auto {
     }
 
     /**
-     * 
+     * Autonomous program for the position closest to the wall
      * @param balls
      * @param delayMs
      * @return
@@ -221,98 +227,18 @@ public class Auto {
                 }
                 status = Robot.DONE;
                 break;
-            default:
-                //Finished routine
-                step = 1;
-                firstTime = true;
-
-                //Stops applicable motors
-                grabber.setGrabberMotor(GrabberDirection.OFF);
-                drive.stopWheels();
-
-                return Robot.DONE;
-            }
-
-            //If we are done with a step, we go on to the next one and continue the routine
-            if (status == Robot.DONE) {
-                step++;
-            }
-
-            return Robot.CONT;
-        }
-
-    /**
-     * Autonomous program for the position closest to the wall
-     * @param balls
-     * @param delayMs
-     * @return status
-     */
-    public int alexWallAuto(int balls, long delayMs) {
-        int status = Robot.CONT;
-
-        // Ensures that the values aren't too high
-        if (balls > 3 || balls < 2) {
-            balls = 2;
-        }
-
-        // Ensures that the values aren't too high
-        delayMs = (long)MathUtil.clamp((double)delayMs, 0, 6000);
-
-		if (firstTime == true) {
-			firstTime = false;
-			step = 1;
-		}
-
-        switch(step) {
-            case 1:
-                Drive.ahrs.zeroYaw();
-                status = autoDelay(delayMs);
-                break;
-            case 2:
-                grabber.deploy();
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
-                status = Robot.DONE;
-                break;
-            case 3:
-                status = drive.autoAdjustWheels(0);
-                break;
-            case 4:
-                shooter.shooterControl(ShootLocation.AUTO_RING);
-                status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
-                break;
-            case 5:
-                grabber.setGrabberMotor(GrabberDirection.OFF);
-                grabber.retract();
-                status = Robot.DONE;
-                break;
-            case 6:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
-                break;
-            case 7:
-                //If we are only doing 2 ball path, the routine is over
-                if (balls < 3) {
-                    step = 100;
-                }
-                status = Robot.DONE;
-                break;
             case 8:
-                status = drive.autoRotate(110);
+                status = drive.autoRotate(50);
                 break;
             case 9:
-                status = drive.autoAdjustWheels(0);
+                grabber.deploy();
+                status = drive.autoCrabDrive(7.0, 90, 0.5);
                 break;
             case 10:
-                grabber.deploy();
                 grabber.setGrabberMotor(GrabberDirection.FORWARD);
-                status = Robot.DONE;
+                status = drive.autoCrabDrive(2.25, 0, 0.2);
                 break;
             case 11:
-                status = drive.autoCrabDrive(5.6, 0, 0.5);
-                break;
-            case 12:
-                status = drive.autoRotate(45);
-                break;
-            case 13:
                 status = autoShoot(ShootLocation.AUTO_RING, 1);
                 break;
             default:
@@ -322,6 +248,9 @@ public class Auto {
 
                 //Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
+                grabber.deploy();
+                shooter.disableShooter();
+                shooter.retractFeeder();
                 drive.stopWheels();
 
                 return Robot.DONE;
@@ -334,7 +263,6 @@ public class Auto {
 
         return Robot.CONT;
     }
-
 
     /**
      * An auto program to shoot balls

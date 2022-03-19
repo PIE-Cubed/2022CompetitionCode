@@ -50,11 +50,11 @@ public class Drive {
 
     //Target Controller
 	private static final double tP = 0.015; //0.033
-	private static final double tI = 0.002;
+	private static final double tI = 0.001; //0.002
     private static final double tD = 0.00;
     
     //Auto crab drive controller
-    private static final double acdP = 0.02; //0.03
+    private static final double acdP = 0.005; //0.02
     private static final double acdI = 0.00;
     private static final double acdD = 0.00;
 
@@ -68,7 +68,7 @@ public class Drive {
     private static final double TARGET_I_MIN = -1 * TARGET_I_MAX;
 
 	//Variables
-    private boolean crabFirstTime            = true;
+    private boolean crabFirstTime        = true;
     private boolean swerveFirstTime      = true;
     private boolean rotateFirstTime      = true;
     private boolean adjustFirstTime      = true;
