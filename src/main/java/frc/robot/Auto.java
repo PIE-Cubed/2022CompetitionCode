@@ -293,7 +293,7 @@ public class Auto {
                 status = Robot.DONE;
                 break;
             case 8:
-                status = drive.autoRotate(105);
+                status = drive.autoRotate(110);
                 break;
             case 9:
                 status = drive.autoAdjustWheels(0);
@@ -328,6 +328,8 @@ public class Auto {
         if (status == Robot.DONE) {
             step++;
         }
+
+        System.out.println("Case: " + step);
 
         return Robot.CONT;
     }

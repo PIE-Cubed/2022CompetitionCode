@@ -223,6 +223,9 @@ public class Robot extends TimedRobot {
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( setRedAlliance() );
 
+    //
+    status = Robot.CONT;
+
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
   }
@@ -233,9 +236,13 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    // if (status == Robot.CONT) {
-    //   status = drive.autoSwerve(3.0, 0, -90, 0.1);
-    // }
+    if (status == Robot.CONT) {
+      //status = drive.autoSwerve(3.0, 0, -90, 0.1);
+      status = drive.autoAdjustWheels(0);
+    }
+    else if (status == Robot.DONE) {
+      System.out.println("Done");
+    }
 
     //climber.climberRotate(.5);
     //cargoTracking.autoCargoTrack();
