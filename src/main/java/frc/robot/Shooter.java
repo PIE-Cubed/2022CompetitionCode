@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
 	//2 holes above marked one
@@ -232,10 +232,10 @@ public class Shooter {
 		}
 
 		//Displays powers and rpms to smartdashboard
-		SmartDashboard.putNumber("Front power", frontPower);
-		SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
-		SmartDashboard.putNumber("Rear power", rearPower);
-		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+		// SmartDashboard.putNumber("Front power", frontPower);
+		// SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
+		// SmartDashboard.putNumber("Rear power", rearPower);
+		// SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
 
 		frontShooter.set(frontPower);
 		rearShooter.set(rearPower);
