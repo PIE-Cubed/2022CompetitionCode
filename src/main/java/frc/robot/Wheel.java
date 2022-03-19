@@ -4,6 +4,7 @@ package frc.robot;
  * Imports
  */
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
@@ -20,6 +21,13 @@ public class Wheel {
     private CANSparkMax      driveMotor;
     private RelativeEncoder  driveEncoder;
     private CANSparkMax      rotateMotor;
+
+    //Kinematics variables
+    private double kinematicsX = 0;
+    private double kinematicsY = 0;
+    private double encoderValue = 0;
+    private double previousEncoder = 0;
+    private static final double ticksPerFoot = 5.65;
 
     private Drive.WheelProperties name;
 
@@ -77,6 +85,10 @@ public class Wheel {
         double currWheelAngle;
         double rotatePower;
 
+        previousEncoder = encoderValue;
+        encoderValue = getEncoderValue();
+
+
         currWheelAngle = getRotateMotorPosition();
         
         if (Math.abs(currWheelAngle-targetWheelAngle) > 90) {
@@ -96,6 +108,17 @@ public class Wheel {
          */
         setRotateMotorPower(rotatePower);
         setDriveMotorPower(drivePower);
+
+        //Calculates position of each wheel in feet     
+                    //x or y proportion of the absolute angle of the wheel * the distance traveled
+        kinematicsX += Math.sin(Math.toRadians(currWheelAngle + Drive.ahrs.getYaw())) * (encoderValue - previousEncoder) / ticksPerFoot;
+        kinematicsY += Math.cos(Math.toRadians(currWheelAngle + Drive.ahrs.getYaw())) * (encoderValue - previousEncoder) / ticksPerFoot;
+        System.out.println("encoder: " + encoderValue + " previousEncoder: " + previousEncoder);
+        System.out.println("sin: " + Math.sin(Math.toRadians(currWheelAngle + Drive.ahrs.getYaw())));
+
+        SmartDashboard.putNumber(this.name + " X", kinematicsX);
+        SmartDashboard.putNumber(this.name + " Y", kinematicsY);
+
 
         //Are we within 2 degrees of target wheel angle? 
         //The return values do not need to be used 
@@ -192,6 +215,14 @@ public class Wheel {
             tempValue *= -1;
         } 
         return tempValue;
+    }
+
+    //Test kinematics
+    public double getXPosition() {
+        return kinematicsX;
+    }
+    public double getYPosition() {
+        return kinematicsY;
     }
 
     /****************************************************************************************** 
