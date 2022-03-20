@@ -36,7 +36,7 @@ public class Controls {
         xboxController = new XboxController(XBOX_ID);
 
         // Rate limiter
-        xLimiter = new SlewRateLimiter(0.80);
+        xLimiter = new SlewRateLimiter(0.75);
     }
 
     /**
@@ -63,7 +63,7 @@ public class Controls {
         }
 
         //Cubes the power and clamps it because the rotate is SUPER sensitive
-        power = Math.pow(power, 3.0); 
+        power = Math.pow(power, 3.0);
         power = MathUtil.clamp(power, -.5, .5);
             
         return power;    
@@ -173,11 +173,11 @@ public class Controls {
     }
 
     /**
-     * Button B
+     * Button Y
      * @return buttonBPressed
      */
-    public boolean testButtonB() {
-        return xboxController.getBButtonPressed();
+    public boolean startShooter() {
+        return xboxController.getYButton();
     }
         
     /** 

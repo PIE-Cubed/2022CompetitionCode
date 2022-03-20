@@ -32,7 +32,7 @@ public class Grabber {
     private DoubleSolenoid grabberPiston;
 
     //CONSTANTS
-    private final double GRABBER_POWER = -0.7;
+    private final double GRABBER_POWER = -0.75;
 
     /**
      * Enumerator for Grabber States

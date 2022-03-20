@@ -48,10 +48,6 @@ public class LedLights {
 			// Sets our colors to blue
 			blueAlliance();
 		}
-		else {
-			// Sets our colors to Team Colors
-			teamColors();
-		}
 	}
 
 	public void redAlliance(){

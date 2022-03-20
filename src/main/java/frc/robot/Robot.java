@@ -37,12 +37,12 @@ public class Robot extends TimedRobot {
   Shooter       shooter;
   CargoTracking cargoTracking;
   Auto          auto;
+  LedLights     led;
 
   // Variables
   private int status              = Robot.CONT;
   private int reloadStatus        = Robot.CONT;
   private int targetStatus        = Robot.CONT;
-  private boolean reloadFirstTime = true;
 
   // Enumeration for manual or limelight control
   public static enum DriveMode {
@@ -53,13 +53,6 @@ public class Robot extends TimedRobot {
     CARGO_TARGETED;
   }
   private DriveMode driveMode = DriveMode.MANUAL;
-
-  // Enumeration to reload the shooter
-  public static enum Reload {
-    RETRACTED,
-    DEPLOYED;
-  } 
-  private Reload reloadState = Reload.RETRACTED;
 
   // Auto path
   private static final String kCenterAuto = "Center";
@@ -118,7 +111,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Number of Balls", m_numBallsChooser);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance( setRedAlliance() );
+    cargoTracking.setRedAlliance( getRedAlliance() );
     
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -130,9 +123,8 @@ public class Robot extends TimedRobot {
    * Always runs on the robot
    */
   public void robotPeriodic() {
-    //Nothing yet...
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance( setRedAlliance() );
+    cargoTracking.setRedAlliance( getRedAlliance() );
   }
 
   @Override
@@ -151,7 +143,7 @@ public class Robot extends TimedRobot {
     delaySec = (int)SmartDashboard.getNumber("Auto delay seconds", 0);
 
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance( setRedAlliance() );
+    cargoTracking.setRedAlliance( getRedAlliance() );
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -197,7 +189,7 @@ public class Robot extends TimedRobot {
    */
   public void teleopInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance( setRedAlliance() );
+    cargoTracking.setRedAlliance( getRedAlliance() );
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
@@ -226,7 +218,7 @@ public class Robot extends TimedRobot {
    * Shouldn't ever do anything
    */
   public void disabledPeriodic() {
-    // Nothing yet...
+    // Sets the Led's to team colors when disabled
   }
 
   @Override
@@ -236,7 +228,7 @@ public class Robot extends TimedRobot {
    */
   public void testInit() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
-    cargoTracking.setRedAlliance( setRedAlliance() );
+    cargoTracking.setRedAlliance( getRedAlliance() );
 
     //
     status = Robot.CONT;
@@ -369,6 +361,7 @@ public class Robot extends TimedRobot {
      */
     // Controls function
     boolean deployRetract               = controls.grabberDeployRetract();
+    boolean startShooter                = controls.startShooter();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
     Shooter.ShootLocation shootLocation = controls.getShootLocation();
 
@@ -384,35 +377,28 @@ public class Robot extends TimedRobot {
      * Shooter control
      */
     if (shootLocation == Shooter.ShootLocation.OFF) {
+      auto.resetFirstTIme();
       shooter.disableShooter();
+
+      if (startShooter == true) {
+        shooter.shooterControl(Shooter.ShootLocation.HIGH_SHOT); 
+      }
     }
     else {
       shooter.shooterControl(shootLocation);
 
-      // if (isReady == true) {
-      //   shooter.deployFeeder();
-      // }
-
-      if (reloadState == Reload.RETRACTED) {
-        if (isShooterReady == true) {
-          shooter.deployFeeder();
-          reloadState = Reload.DEPLOYED;
-        }
-        reloadFirstTime = true;
-      }
-      else if (reloadState == Reload.DEPLOYED) {
-        if (isShooterReady == false) {
-          shooter.retractFeeder();
-        }
-
-        if (reloadFirstTime == true) {
-          reloadStatus    = auto.autoDelay(500);
-          reloadFirstTime = false;
-        }
+      /*if (isShooterReady == true) {
+        reloadStatus = auto.autoDelay(500);
 
         if (reloadStatus == Robot.DONE) {
-          reloadState = Reload.RETRACTED;
+          shooter.deployFeeder();
         }
+      }
+      else {
+        shooter.retractFeeder();
+      }*/
+      if (isShooterReady == true) {
+        shooter.deployFeeder();
       }
     }
   }
@@ -464,7 +450,7 @@ public class Robot extends TimedRobot {
    * Determines if we are on the red alliance
    * @return isRed
    */
-  private boolean setRedAlliance() {
+  private boolean getRedAlliance() {
     //Gets and returns if we are red from the FMS
     boolean isRed = isRedAlliance.getBoolean(false);
     return isRed;

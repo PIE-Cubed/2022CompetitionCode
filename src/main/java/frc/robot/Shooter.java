@@ -45,17 +45,17 @@ public class Shooter {
 	// POWER CONSTANTS
 	public final double OFF_POWER  = 0.00;
 
-	public final double LOW_SHOT_REAR_POWER    = 0.31; //0.28
+	public final double LOW_SHOT_REAR_POWER    =  0.31; //0.28
 	public final double LOW_SHOT_FRONT_POWER   = -0.27; //-0.27
 
-	public final double HIGH_SHOT_REAR_POWER   = 0.495; //0.475
-	public final double HIGH_SHOT_FRONT_POWER  = -0.475; //0.445 //Untested
+	public final double HIGH_SHOT_REAR_POWER   =  0.465 ; //0.495
+	public final double HIGH_SHOT_FRONT_POWER  = -0.445; //0.475
 
-	public final double LAUNCH_PAD_REAR_POWER  = 0.5; //0.46
+	public final double LAUNCH_PAD_REAR_POWER  =  0.5; //0.46
 	public final double LAUNCH_PAD_FRONT_POWER = -0.5; //0.46
 
-	public final double AUTO_RING_REAR_POWER   = 0.5; //0.5
-	public final double AUTO_RING_FRONT_POWER  = -0.5; //0.5
+	public final double AUTO_RING_REAR_POWER   =  0.495; //0.5
+	public final double AUTO_RING_FRONT_POWER  = -0.475; //0.5
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
@@ -65,19 +65,19 @@ public class Shooter {
 	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1650; //1650
 
 	// 9 feet and 6 inches, from the center of the hub
-	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2750; //2650
-	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2750; //2580
+	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2550; //2530
+	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2550; //2530
 
 	// 16 feet and 10 inches, from the center of the hub
-	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 2870;
-	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 2970;
+	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 2900; //
+	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 2900; //
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_REAR_TARGET_RPM   = 2780;
-	public final double AUTO_RING_FRONT_TARGET_RPM  = 2880; //Front moves faster, so it needs faster target rpm
+	public final double AUTO_RING_REAR_TARGET_RPM   = 2550; //2780
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 2550; //2780
 
 	// RPM OFFSET
-	private final int RPM_OFFSET = 50;
+	private final int RPM_OFFSET = 40;
 
 	// Current Limit Constants
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
@@ -113,7 +113,7 @@ public class Shooter {
 
 	// P, I, D constants
 	private static final double kP = 0.0000; //0.00010
-	private static final double kI = 0.0001; //0.00005
+	private static final double kI = 0.0004; //0.0001
 	private static final double kD = 0.00;
 
 
@@ -139,7 +139,7 @@ public class Shooter {
 		// Set Shooter related motors to off to Start the Match
 		frontShooter.set(0.0);
 		rearShooter .set(0.0);
-		feeder.set(Value.kReverse);
+		retractFeeder();
 
 		// Encoders
 		frontShooterEncoder = frontShooter.getEncoder();

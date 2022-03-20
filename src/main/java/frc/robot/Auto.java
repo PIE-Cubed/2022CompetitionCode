@@ -464,6 +464,10 @@ public class Auto {
         return Robot.CONT;
     }
 
+    public void resetFirstTIme() {
+        delayFirstTime = true;
+    }
+
     /****************************************************************************************** 
     *
     *    autoInit()
