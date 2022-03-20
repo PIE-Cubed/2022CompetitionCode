@@ -16,7 +16,8 @@ public class CargoTracking {
 	private boolean cargoFirstTime = true;
 
 	// Object creation
-	private Drive drive;
+	private Drive     drive;
+	private LedLights led;
 
 	// Network Table
 	private NetworkTable TrackingValues;
@@ -72,6 +73,7 @@ public class CargoTracking {
 	public CargoTracking(Drive drive) {
 		// Instance creation
 		this.drive = drive;
+		led        = LedLights.getInstance();
 
 		// Creates a PID controller
 		cargoController = new PIDController(cP, cI, cD);
@@ -111,12 +113,15 @@ public class CargoTracking {
 		}
 
 		if (noTarget == true) {
-			//Increments the noTargetCount
+			// Increments the noTargetCount
 			noTargetCount++;
 
 			if (noTargetCount <= FAIL_COUNT) {
 				// Robot continues searching
 				faceCargo();
+
+				// LED lights turn Yellow
+				led.cargoTrackingAdjusting();
 
 				// Returns the error code for continue
 				return Robot.CONT;
@@ -134,6 +139,9 @@ public class CargoTracking {
 				// Prints telemetry
 				System.out.println("Cargo Not Found!");
 
+				// LED lights turn Red
+				led.cargoTrackingNoTarget();
+
 				// Returns error code for failure
 				return Robot.DONE;
 			}
@@ -142,7 +150,7 @@ public class CargoTracking {
 		// Rotates the robot
 		faceCargo();
 
-		// If the robot is aat the setpoint, targetLockedCount increses
+		// If the robot is at the setpoint, targetLockedCount increses
 		if (cargoController.atSetpoint() == true) {
 			targetLockedCount++;
 		}
@@ -160,6 +168,9 @@ public class CargoTracking {
 
 			// Prints telemetry
 			System.out.println("Cargo Found!" + " CenterX: " + centerX);
+
+			// Led lights turn Green
+			led.cargoTrackingFinished();
 
 			// Returns error code for success
 			return Robot.DONE;

@@ -106,6 +106,9 @@ public class Drive {
 	public boolean limeControl   = false;
 	public int     limeStatus    = 0;
         
+    //Limelight-Required Object Creation
+    private LedLights led;
+
     /**
      * Enumerators
      */
@@ -285,6 +288,9 @@ public class Drive {
         System.out.println("navx Ready");
     
         ahrs.zeroYaw();
+
+        // Led lights
+        led = LedLights.getInstance();
 
         //PID Controllers
         rotateController = new PIDController(kP, kI, kD);
@@ -820,7 +826,8 @@ public class Drive {
 			noTargetCount++;
 
 			if (noTargetCount <= FAIL_DELAY) {
-                //Tells the robot to continue searching
+                //Tells the robot to continue searching, Led lights turn Yellow
+                led.limelightAdjusting();
 				return Robot.CONT;
 			}
 			else {
@@ -832,6 +839,9 @@ public class Drive {
 
                 //Stops the robot
                 stopWheels();
+                
+                // Led lights turn Red
+                led.limelightNoValidTarget();
                 
                 //Returns the error code for failure
 				return Robot.DONE;
@@ -864,6 +874,9 @@ public class Drive {
             
             //Stops the robot
 			stopWheels();
+
+            // Led lights turn Green
+            led.limelightFinished();
 
             //Returns the error code for success
 			return Robot.DONE;

@@ -14,6 +14,7 @@ public class Auto {
     Grabber grabber;
     Shooter shooter;
     CargoTracking cargoTracking;
+    private LedLights led;
 
     // Step Variables
     private int step = 1;
@@ -41,6 +42,7 @@ public class Auto {
 		this.grabber       = grabber;
         this.shooter       = shooter;
         this.cargoTracking = cargoTracking;
+        led                = LedLights.getInstance();
     }
 
     /**
@@ -69,6 +71,7 @@ public class Auto {
             case 1:
                 Drive.ahrs.zeroYaw();
                 status = autoDelay(delayMs);
+                led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
                 grabber.deploy();
@@ -89,6 +92,9 @@ public class Auto {
                 //Finished routine
                 step = 1;
                 firstTime = true;
+
+                // Led lights turn Gold
+                led.autoModeFinished(); 
 
                 // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
@@ -134,6 +140,7 @@ public class Auto {
             case 1:
                 Drive.ahrs.zeroYaw();
                 status = autoDelay(delayMs);
+                led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
                 grabber.deploy();
@@ -154,6 +161,9 @@ public class Auto {
                 //Finished routine
                 step = 1;
                 firstTime = true;
+
+                // Led lights turn Gold
+                led.autoModeFinished();
 
                 // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
@@ -199,6 +209,7 @@ public class Auto {
             case 1:
                 Drive.ahrs.zeroYaw();
                 status = autoDelay(delayMs);
+                led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
                 grabber.deploy();
@@ -246,6 +257,9 @@ public class Auto {
                 step = 1;
                 firstTime = true;
 
+                // Led lights turn Gold
+                led.autoModeFinished();
+
                 //Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 grabber.deploy();
@@ -291,6 +305,7 @@ public class Auto {
                 //Starts speeding up shooter and targetting
                 shooter.shooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
+                led.autoMode(); // Led lights turn Aqua
                 status = Robot.DONE;
                 break;
             case 2:
@@ -340,6 +355,11 @@ public class Auto {
                 shooter.disableShooter();
                 shootStep = 1;
                 shootFirstTime = true;
+
+                // Led lights turn Gold
+                led.autoModeFinished();
+
+                // Returns error codes for success
                 return Robot.DONE;
         }
 
@@ -367,6 +387,7 @@ public class Auto {
         switch (cargoStep) {
             case 1:
                 status = cargoTracking.autoCargoTrack();
+                led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
                 grabber.deploy();
@@ -388,6 +409,9 @@ public class Auto {
                 // Finishes the routine
                 cargoStep = 1;
                 cargoFirstTime = true;
+
+                // Led lights turn Gold
+                led.autoModeFinished();
 
                 // Resets applicable motors
                 grabber.retract();

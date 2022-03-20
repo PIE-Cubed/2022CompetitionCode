@@ -39,10 +39,12 @@ public class Robot extends TimedRobot {
   Auto          auto;
 
   // Variables
-  private int status = Robot.CONT;
-  private int targetStatus = 0;
+  private int status              = Robot.CONT;
+  private int reloadStatus        = Robot.CONT;
+  private int targetStatus        = Robot.CONT;
+  private boolean reloadFirstTime = true;
 
-  //Enumeration for manual or limelight control
+  // Enumeration for manual or limelight control
   public static enum DriveMode {
     MANUAL,
     LIMELIGHT_TARGETING,
@@ -52,21 +54,28 @@ public class Robot extends TimedRobot {
   }
   private DriveMode driveMode = DriveMode.MANUAL;
 
-  //Auto path
+  // Enumeration to reload the shooter
+  public static enum Reload {
+    RETRACTED,
+    DEPLOYED;
+  } 
+  private Reload reloadState = Reload.RETRACTED;
+
+  // Auto path
   private static final String kCenterAuto = "Center";
   private static final String kWallAuto   = "Wall";
   private static final String kHangarAuto = "Hangar";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  //Number of balls
+  // Number of balls
   private static final int kTwoBall   = 2;
   private static final int kThreeBall = 3;
   //private static final int kFourBall  = 4;
   private int m_numBalls;
   private final SendableChooser<Integer> m_numBallsChooser = new SendableChooser<>();
 
-  //Auto Delay
+  // Auto Delay
   private int delaySec = 0;
 
   /**
@@ -358,9 +367,13 @@ public class Robot extends TimedRobot {
     /**
      * Grabber control
      */
+    // Controls function
     boolean deployRetract               = controls.grabberDeployRetract();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
     Shooter.ShootLocation shootLocation = controls.getShootLocation();
+
+    // Shooter Ready
+    boolean isShooterReady              = shooter.shooterReady();
 
     if (deployRetract == true) {
       grabber.deployRetract();
@@ -376,8 +389,30 @@ public class Robot extends TimedRobot {
     else {
       shooter.shooterControl(shootLocation);
 
-      if (shooter.shooterReady() == true) {
-        shooter.deployFeeder();
+      // if (isReady == true) {
+      //   shooter.deployFeeder();
+      // }
+
+      if (reloadState == Reload.RETRACTED) {
+        if (isShooterReady == true) {
+          shooter.deployFeeder();
+          reloadState = Reload.DEPLOYED;
+        }
+        reloadFirstTime = true;
+      }
+      else if (reloadState == Reload.DEPLOYED) {
+        if (isShooterReady == false) {
+          shooter.retractFeeder();
+        }
+
+        if (reloadFirstTime == true) {
+          reloadStatus    = auto.autoDelay(500);
+          reloadFirstTime = false;
+        }
+
+        if (reloadStatus == Robot.DONE) {
+          reloadState = Reload.RETRACTED;
+        }
       }
     }
   }
