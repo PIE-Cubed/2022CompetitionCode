@@ -38,9 +38,6 @@ public class Shooter {
 	private int FEEDER_RETRACT_ID = 7;
 	private int PCM_CAN_ID        = 2;
 
-	// Instance Creation
-	private LedLights led;
-
 	// Encoders
 	private RelativeEncoder frontShooterEncoder;
 	private RelativeEncoder rearShooterEncoder;
@@ -63,7 +60,7 @@ public class Shooter {
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 0;
 
-	// Against the target
+	// Against the board
 	public final double LOW_SHOT_REAR_TARGET_RPM    = 1650; //1650
 	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1650; //1650
 
@@ -130,7 +127,6 @@ public class Shooter {
 		frontShooter  = new CANSparkMax(FRONT_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
 		rearShooter   = new CANSparkMax(REAR_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
 		feeder        = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, FEEDER_DEPLOY_ID, FEEDER_RETRACT_ID);
-		led 		  = LedLights.getInstance();
 
 		// Sets the current limtis for the motors
 		frontShooter.setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
