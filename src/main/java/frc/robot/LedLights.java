@@ -157,29 +157,34 @@ public class LedLights {
 		errorCodeDisplayed = true;
 	}
 	
+	//Green- shooter up to speed and limelight targeted
+	//Yellow- shooter up to speed, but limelight not targeted
+	//Red - shooter not up to speed
+		//Red flashing- limelight and shooter are both off	
 	public void updateShooter() {
 		if (shooterOnTarget && limelightOnTarget) {
 			//Pure green
 			ledController.set(0.77);
 		}
 		else if (shooterOnTarget && limelightNoTarget) {
-			//Green and red
-			ledController.set(-0.85);
+			//Solid yellow
+			ledController.set(0.69);//-0.85
 		}
 		else if (shooterOnTarget) {
-			//Green and yellow
-			ledController.set(-0.91);
+			//Solid yellow
+			ledController.set(0.69);//0.73
 		}
 		else if (!shooterOnTarget && limelightNoTarget) {
-			//Red
-			ledController.set(-0.11);//-0.85
+			//Red flashing
+			ledController.set(-0.11);
 		}
 		else if (!shooterOnTarget && limelightOnTarget) {
-			//Red and green, more red though
+			//Solid red
+			ledController.set(0.61);
 		}
 		else if (!shooterOnTarget) {
-			//Red and yellow
-			ledController.set(0.65);//-0.93?
+			//Red flashing
+			ledController.set(-0.11);
 		}
 	}
 
