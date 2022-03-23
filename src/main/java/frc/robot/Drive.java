@@ -340,25 +340,6 @@ public class Drive {
 		pipeline.setNumber(0);
     }
 
-    /****************************************************************************************** 
-    *
-    *    driveInit()
-    *    Resets drive variables
-    * 
-    ******************************************************************************************/
-    public void driveInit() {
-        //Variables
-        crabFirstTime        = true;
-        swerveFirstTime      = true;
-        rotateFirstTime      = true;
-        adjustFirstTime      = true;
-        count                = 0;
-        encoderTarget        = 0;
-        swerveEncoderTarget  = 0;
-        targetOrientation    = 0;
-        autoSwerveStartAngle = 0;
-    }
-
 
     /****************************************************************************************** 
     *

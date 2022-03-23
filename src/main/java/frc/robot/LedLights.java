@@ -23,9 +23,12 @@ public class LedLights {
 	private boolean shooterOnTarget;
 	private boolean limelightOnTarget;
 	private boolean limelightNoTarget;
+	private boolean errorCodeDisplayed;
+	private int     delayCount;
 
 	// CONSTANTS
 	private final int LED_PWM_CHANNEL = 0;
+	private final int LED_DELAY       = 20; 
 
 	// Object creation
 	private Spark ledController;
@@ -36,9 +39,10 @@ public class LedLights {
 		ledController = new Spark(LED_PWM_CHANNEL);
 
 		// Sets variables
-		shooterOnTarget   = false;
-		limelightOnTarget = false;
-		limelightNoTarget = true;
+		shooterOnTarget    = false;
+		limelightOnTarget  = false;
+		limelightNoTarget  = true;
+		errorCodeDisplayed = false;
 
 		// Sets the default color to team colors
 		teamColors();
@@ -51,30 +55,50 @@ public class LedLights {
 		// Sparkle blue on gold
 		//ledController.set(.53).
 		ledController.set(0.41);
+		errorCodeDisplayed = false;
 	}
 
 	/**
 	 * DEFAULT
 	 */
 	public void defaultMode( boolean isRedAlliance) {
-		if (isRedAlliance == true) {
-			// Sets our colors to red
-			//redAlliance();
+		// Checkes if an error code has recently been displayed
+		if (errorCodeDisplayed == true) {
+			// Resets the delay counter
+			delayCount = 0;
 		}
-		else if (isRedAlliance == false) {
-			// Sets our colors to blue
-			//blueAlliance();
+		else {
+			// Increments the counter and determines that an error code has not been displayed
+			errorCodeDisplayed = false;
+			delayCount ++;
+		}
+
+		// If passed the delay amount (20 cycles of the code), reverts to alliance colors
+		if (delayCount >= LED_DELAY) {
+			if (isRedAlliance == true) {
+				// Sets our colors to red
+				redAlliance();
+			}
+			else if (isRedAlliance == false) {
+				// Sets our colors to blue
+				blueAlliance();
+			}
+
+			// Resets the counter
+			delayCount = 0;
 		}
 	}
 
 	public void redAlliance(){
 		// Heartbeat Red
 		ledController.set(-0.25);
+		errorCodeDisplayed = false;
 	}
 
 	public void blueAlliance(){
 		// Heartbeat Blue
 		ledController.set(-0.23);
+		errorCodeDisplayed = false;
 	}
 
 	/**
@@ -83,11 +107,13 @@ public class LedLights {
 	public void autoMode() {
 		// Solid color set to Aqua
 		ledController.set(0.81);
+		errorCodeDisplayed = true;
 	}
 
 	public void autoModeFinished() {
 		// Solid color set to Gold
 		ledController.set(0.67);
+		errorCodeDisplayed = true;
 	}
 
 	/**
@@ -97,10 +123,12 @@ public class LedLights {
 		// Heart Beat Red
 		//ledController.set(-0.25);
 		shooterOnTarget = true;
+		errorCodeDisplayed = true;
 	}
 
 	public void shooterNotReady() {
 		shooterOnTarget = false;
+		errorCodeDisplayed = true;
 	}
 
 
@@ -111,12 +139,14 @@ public class LedLights {
 		// Solid Green
 		//ledController.set(0.77);
 		limelightOnTarget = true;
+		errorCodeDisplayed = true;
 	}
 
 	public void limelightAdjusting() {
 		// Solid Yellow
 		ledController.set(0.69);
 		limelightOnTarget = false;
+		errorCodeDisplayed = true;
 	}
 
 	public void limelightNoValidTarget() {
@@ -124,8 +154,8 @@ public class LedLights {
 		//ledController.set(0.61);
 		limelightNoTarget = true;
 		limelightOnTarget = false;
+		errorCodeDisplayed = true;
 	}
-		// No Valid Target may be in the wrong spot
 	
 	public void updateShooter() {
 		if (shooterOnTarget && limelightOnTarget) {
@@ -159,16 +189,19 @@ public class LedLights {
 	public void cargoTrackingFinished() {
 		// Solid Green
 		ledController.set(0.77);
+		errorCodeDisplayed = true;
 	}
 
 	public void cargoTrackingAdjusting() {
 		// Solid Yellow
 		ledController.set(0.69);
+		errorCodeDisplayed = true;
 	}
 
 	public void cargoTrackingNoTarget() {
 		// Solid Red
 		ledController.set(0.61);
+		errorCodeDisplayed = true;
 	}
 
 }

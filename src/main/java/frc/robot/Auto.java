@@ -467,25 +467,6 @@ public class Auto {
     public void resetFirstTIme() {
         delayFirstTime = true;
     }
-
-    /****************************************************************************************** 
-    *
-    *    autoInit()
-    *    Resets auto variables
-    * 
-    ******************************************************************************************/
-    public void autoInit() {
-        // Step Variables
-        step = 1;
-        shootStep = 1;
-        cargoStep = 1;
-
-        // First Time variables 
-        firstTime      = true;
-        shootFirstTime = true;
-        cargoFirstTime = true;
-        delayFirstTime = true;
-    }
 }
 
 // End of Auto Class

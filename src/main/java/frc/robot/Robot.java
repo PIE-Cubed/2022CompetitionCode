@@ -41,7 +41,6 @@ public class Robot extends TimedRobot {
 
   // Variables
   private int status              = Robot.CONT;
-  private int reloadStatus        = Robot.CONT;
   private int targetStatus        = Robot.CONT;
 
   // Enumeration for manual or limelight control
@@ -152,11 +151,7 @@ public class Robot extends TimedRobot {
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
 
-    Drive.ahrs.zeroYaw();  
-    
-    //Resets variables
-    drive.driveInit();
-    auto.autoInit();
+    Drive.ahrs.zeroYaw();
   }
 
   @Override
@@ -214,15 +209,18 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // Sets the climber motors to coast
     climber.setClimberIdleMode(IdleMode.kCoast);
+
+    // Sets the Led's to team colors when disabled
+    led.teamColors();
   }
 
   @Override
   /**
    * disabledPeriodic()
+   * Shouldn't do anything
    */
   public void disabledPeriodic() {
-    // Sets the Led's to team colors when disabled
-    led.teamColors();
+    // Nothing yet...
   }
 
   @Override
@@ -391,16 +389,6 @@ public class Robot extends TimedRobot {
     else {
       shooter.shooterControl(shootLocation);
 
-      /*if (isShooterReady == true) {
-        reloadStatus = auto.autoDelay(500);
-
-        if (reloadStatus == Robot.DONE) {
-          shooter.deployFeeder();
-        }
-      }
-      else {
-        shooter.retractFeeder();
-      }*/
       if (isShooterReady == true) {
         shooter.deployFeeder();
         led.shooterReady();
