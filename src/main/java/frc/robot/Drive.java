@@ -573,11 +573,22 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    teleopRotate()
+    *    teleopRotate but defaults to no optimized turning
+    * 
+    ******************************************************************************************/
+    public void teleopRotate(double rotatePower) {
+        teleopRotate(rotatePower, false);
+    }
+
+
+    /****************************************************************************************** 
+    *
+    *    teleopRotate()
     *    <p> Only uses Z to rotate robot
     *    <p> This function negates rotatePower in order to make positive inputs turn the robot clockwise
     * 
     ******************************************************************************************/
-    public void teleopRotate(double rotatePower) {
+    public void teleopRotate(double rotatePower, boolean optimize) {
         frontRightWheel.rotateAndDrive(rotateRightFrontMotorAngle, rotatePower * -1, false);
         frontLeftWheel.rotateAndDrive(rotateLeftFrontMotorAngle, rotatePower * -1, false);
         rearRightWheel.rotateAndDrive(rotateRightRearMotorAngle, rotatePower * -1, false);
@@ -855,7 +866,7 @@ public class Drive {
         // Rotate
 		m_LimelightCalculatedPower = targetController.calculate(tx, 0.0);
         m_LimelightCalculatedPower = MathUtil.clamp(m_LimelightCalculatedPower, -0.50, 0.50);
-		teleopRotate(-1 * m_LimelightCalculatedPower);
+		teleopRotate(-1 * m_LimelightCalculatedPower, true);
 		//System.out.println("Pid out: " + m_LimelightCalculatedPower);
 
 		// CHECK: Routine Complete

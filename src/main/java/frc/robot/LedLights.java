@@ -20,6 +20,9 @@ public class LedLights {
 	}
 
 	// Variables
+	private boolean shooterOnTarget;
+	private boolean limelightOnTarget;
+	private boolean limelightNoTarget;
 
 	// CONSTANTS
 	private final int LED_PWM_CHANNEL = 0;
@@ -32,8 +35,22 @@ public class LedLights {
 		// Creates an instance for the Spark Controler
 		ledController = new Spark(LED_PWM_CHANNEL);
 
+		// Sets variables
+		shooterOnTarget   = false;
+		limelightOnTarget = false;
+		limelightNoTarget = true;
+
 		// Sets the default color to team colors
 		teamColors();
+	}
+
+	/**
+	 * Team Colors
+	 */
+	public void teamColors() {
+		// Sparkle blue on gold
+		//ledController.set(.53).
+		ledController.set(0.41);
 	}
 
 	/**
@@ -42,11 +59,11 @@ public class LedLights {
 	public void defaultMode( boolean isRedAlliance) {
 		if (isRedAlliance == true) {
 			// Sets our colors to red
-			redAlliance();
+			//redAlliance();
 		}
 		else if (isRedAlliance == false) {
 			// Sets our colors to blue
-			blueAlliance();
+			//blueAlliance();
 		}
 	}
 
@@ -58,11 +75,6 @@ public class LedLights {
 	public void blueAlliance(){
 		// Heartbeat Blue
 		ledController.set(-0.23);
-	}
-
-	public void teamColors() {
-		// Sparkle blue on gold
-		ledController.set(0.53);
 	}
 
 	/**
@@ -83,33 +95,63 @@ public class LedLights {
 	 */
 	public void shooterReady() {
 		// Heart Beat Red
-		ledController.set(-0.25);
+		//ledController.set(-0.25);
+		shooterOnTarget = true;
 	}
 
-	public void onTarget() {
-		// Solid color set to Green
-		ledController.set(0.77);
+	public void shooterNotReady() {
+		shooterOnTarget = false;
 	}
-		// INCOMPLETE - Input location unknown
+
 
 	/**
 	 * LIMELIGHT ERROR CODES
 	 */
 	public void limelightFinished() {
 		// Solid Green
-		ledController.set(0.77);
+		//ledController.set(0.77);
+		limelightOnTarget = true;
 	}
 
 	public void limelightAdjusting() {
 		// Solid Yellow
 		ledController.set(0.69);
+		limelightOnTarget = false;
 	}
 
 	public void limelightNoValidTarget() {
 		// Solid Red
-		ledController.set(0.61);
+		//ledController.set(0.61);
+		limelightNoTarget = true;
+		limelightOnTarget = false;
 	}
 		// No Valid Target may be in the wrong spot
+	
+	public void updateShooter() {
+		if (shooterOnTarget && limelightOnTarget) {
+			//Pure green
+			ledController.set(0.77);
+		}
+		else if (shooterOnTarget && limelightNoTarget) {
+			//Green and red
+			ledController.set(-0.85);
+		}
+		else if (shooterOnTarget) {
+			//Green and yellow
+			ledController.set(-0.91);
+		}
+		else if (!shooterOnTarget && limelightNoTarget) {
+			//Red
+			ledController.set(-0.11);//-0.85
+		}
+		else if (!shooterOnTarget && limelightOnTarget) {
+			//Red and green, more red though
+		}
+		else if (!shooterOnTarget) {
+			//Red and yellow
+			ledController.set(0.65);//-0.93?
+		}
+	}
 
 	/**
 	 * OBJECT TRACKING ERROR CODES

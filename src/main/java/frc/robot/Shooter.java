@@ -51,8 +51,8 @@ public class Shooter {
 	public final double HIGH_SHOT_REAR_POWER   =  0.465 ; //0.495
 	public final double HIGH_SHOT_FRONT_POWER  = -0.445; //0.475
 
-	public final double LAUNCH_PAD_REAR_POWER  =  0.5; //0.46
-	public final double LAUNCH_PAD_FRONT_POWER = -0.5; //0.46
+	public final double LAUNCH_PAD_REAR_POWER  =  0.525; //0.5
+	public final double LAUNCH_PAD_FRONT_POWER = -0.525; //0.5
 
 	public final double AUTO_RING_REAR_POWER   =  0.495; //0.5
 	public final double AUTO_RING_FRONT_POWER  = -0.475; //0.5
@@ -69,8 +69,8 @@ public class Shooter {
 	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2550; //2530
 
 	// 16 feet and 10 inches, from the center of the hub
-	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 2900; //
-	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 2900; //
+	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3000; //2900
+	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3000; //2900
 
 	// 12 feet and 8 inches, from the center of the hub
 	public final double AUTO_RING_REAR_TARGET_RPM   = 2550; //2780

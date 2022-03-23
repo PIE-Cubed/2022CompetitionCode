@@ -83,6 +83,7 @@ public class Robot extends TimedRobot {
     shooter       = new Shooter();
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber, shooter, cargoTracking);
+    led           = LedLights.getInstance();
 
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -125,6 +126,9 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( getRedAlliance() );
+
+    // Passes our color to the lights
+    led.defaultMode( getRedAlliance() );
   }
 
   @Override
@@ -215,10 +219,10 @@ public class Robot extends TimedRobot {
   @Override
   /**
    * disabledPeriodic()
-   * Shouldn't ever do anything
    */
   public void disabledPeriodic() {
     // Sets the Led's to team colors when disabled
+    led.teamColors();
   }
 
   @Override
@@ -399,7 +403,13 @@ public class Robot extends TimedRobot {
       }*/
       if (isShooterReady == true) {
         shooter.deployFeeder();
+        led.shooterReady();
       }
+      else {
+        led.shooterNotReady();
+      }
+
+      led.updateShooter();
     }
   }
 
