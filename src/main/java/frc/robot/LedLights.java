@@ -28,7 +28,7 @@ public class LedLights {
 
 	// CONSTANTS
 	private final int LED_PWM_CHANNEL = 0;
-	private final int LED_DELAY       = 20; 
+	private final int LED_DELAY       = 50; 
 
 	// Object creation
 	private Spark ledController;
@@ -64,12 +64,12 @@ public class LedLights {
 	public void defaultMode( boolean isRedAlliance) {
 		// Checkes if an error code has recently been displayed
 		if (errorCodeDisplayed == true) {
-			// Resets the delay counter
+			// Resets the delay counter and determines if an error code has been displayed
+			errorCodeDisplayed = false;
 			delayCount = 0;
 		}
 		else {
-			// Increments the counter and determines that an error code has not been displayed
-			errorCodeDisplayed = false;
+			// Increments the counter
 			delayCount ++;
 		}
 
@@ -90,13 +90,13 @@ public class LedLights {
 	}
 
 	public void redAlliance(){
-		// Heartbeat Red
+		// Heartbeat Red (-0.25)
 		ledController.set(-0.25);
 		errorCodeDisplayed = false;
 	}
 
 	public void blueAlliance(){
-		// Heartbeat Blue
+		// Heartbeat Blue (-0.23)
 		ledController.set(-0.23);
 		errorCodeDisplayed = false;
 	}
@@ -157,10 +157,10 @@ public class LedLights {
 		errorCodeDisplayed = true;
 	}
 	
-	//Green- shooter up to speed and limelight targeted
-	//Yellow- shooter up to speed, but limelight not targeted
-	//Red - shooter not up to speed
-		//Red flashing- limelight and shooter are both off	
+	//Green        - shooter up to speed and limelight targeted
+	//Yellow       - shooter up to speed, but limelight not targeted
+	//Red          - shooter not up to speed
+	//Red flashing - limelight and shooter are both off	
 	public void updateShooter() {
 		if (shooterOnTarget && limelightOnTarget) {
 			//Pure green
@@ -206,6 +206,27 @@ public class LedLights {
 	public void cargoTrackingNoTarget() {
 		// Solid Red
 		ledController.set(0.61);
+		errorCodeDisplayed = true;
+	}
+
+	/**
+	 * CLIMBER ERROR CODES
+	 */
+	public void climberAtPosition() {
+		// Forest twinkle
+		ledController.set(-0.47);
+		errorCodeDisplayed = true;
+	}
+
+	public void climberMoving() {
+		// Strobe gold
+		ledController.set(-0.07);
+		errorCodeDisplayed = true;
+	}
+
+	public void climberDone() {
+		// Rainbow party palette
+		ledController.set(-0.97);
 		errorCodeDisplayed = true;
 	}
 

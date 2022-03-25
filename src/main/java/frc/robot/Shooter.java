@@ -51,8 +51,8 @@ public class Shooter {
 	public final double HIGH_SHOT_REAR_POWER   =  0.465 ; //0.495
 	public final double HIGH_SHOT_FRONT_POWER  = -0.445; //0.475
 
-	public final double LAUNCH_PAD_REAR_POWER  =  0.525; //0.5
-	public final double LAUNCH_PAD_FRONT_POWER = -0.525; //0.5
+	public final double LAUNCH_PAD_REAR_POWER  =  0.56; //0.525
+	public final double LAUNCH_PAD_FRONT_POWER = -0.55; //0.525
 
 	public final double AUTO_RING_REAR_POWER   =  0.495; //0.5
 	public final double AUTO_RING_FRONT_POWER  = -0.475; //0.5
@@ -69,12 +69,12 @@ public class Shooter {
 	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2550; //2530
 
 	// 16 feet and 10 inches, from the center of the hub
-	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3000; //2900
-	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3000; //2900
+	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3150; //2900
+	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3150; //2900
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_REAR_TARGET_RPM   = 2550; //2780
-	public final double AUTO_RING_FRONT_TARGET_RPM  = 2550; //2780
+	public final double AUTO_RING_REAR_TARGET_RPM   = 2550; //2550
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 2550; //2550
 
 	// RPM OFFSET
 	private final int RPM_OFFSET = 40;
@@ -267,11 +267,14 @@ public class Shooter {
 		double frontLowerLimit = frontTargetVelocity - RPM_OFFSET;
 		double frontUpperLimit = frontTargetVelocity + RPM_OFFSET;
 
-		if ((rearRpm  > rearLowerLimit  && rearRpm < rearUpperLimit) && 
+		if ((rearTargetVelocity > 1)    && (frontTargetVelocity > 1) && 
+			(rearRpm  > rearLowerLimit  && rearRpm  < rearUpperLimit) && 
 			(frontRpm > frontLowerLimit && frontRpm < frontUpperLimit))  {
+			//System.out.println("Shooter at rpm");
 			targetCount ++;
 			
-			if(targetCount >= ON_TRAGET_DELAY) { 
+			if (targetCount >= ON_TRAGET_DELAY) { 
+				//System.out.println("Shooter ready");
 				return true;
 			}
 			else {

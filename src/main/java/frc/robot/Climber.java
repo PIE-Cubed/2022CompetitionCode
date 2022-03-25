@@ -54,6 +54,9 @@ public class Climber {
     }
     private ClawState blueClawState;
     private ClawState yellowClawState;
+
+    // Object creation
+    private LedLights led;
     
     /**
      * CONSTRUCTOR
@@ -76,8 +79,11 @@ public class Climber {
         climberEncoder.setPosition(0.0); 
 
         //The Claws
-        blueClaw    = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, BLUE_CLAW_OPEN, BLUE_CLAW_CLOSE); 
-        yellowClaw  = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, YELLOW_CLAW_OPEN, YELLOW_CLAW_CLOSE); 
+        blueClaw    = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, BLUE_CLAW_OPEN, BLUE_CLAW_CLOSE);
+        yellowClaw  = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, YELLOW_CLAW_OPEN, YELLOW_CLAW_CLOSE);
+
+        // Instance creation
+        led = LedLights.getInstance();
 
         // Closes the claws
         blueClawClose();
@@ -134,6 +140,8 @@ public class Climber {
     public int moveToBar2() {
         if (getClimberEncoder() >= BAR_TWO_POSITION) {
             climberMotor.set(0);
+            led.climberAtPosition();
+
             return Robot.DONE;
         }
         else {
@@ -146,6 +154,8 @@ public class Climber {
             else {
                 climberMotor.set(0.4);
             }
+            led.climberMoving();
+
             return Robot.CONT;
         }
     }
@@ -158,10 +168,14 @@ public class Climber {
         if (getClimberEncoder() <= BAR_THREE_POSITION) {
             climberMotor.set(0);
             blueClawClose();
+            led.climberAtPosition();
+
             return Robot.DONE;
         }
         else {
             climberMotor.set(-0.5);
+            led.climberMoving();
+
             return Robot.CONT;
         }
     }
@@ -174,6 +188,8 @@ public class Climber {
         if (getClimberEncoder() <= BAR_FOUR_POSITION) {
             climberMotor.set(0);
             //yellowClawClose();
+            led.climberDone();
+
             return Robot.DONE;
         }
         else {
@@ -190,6 +206,8 @@ public class Climber {
                 yellowClawClose();
                 climberMotor.set(-0.5);
             }
+            led.climberMoving();
+
             return Robot.CONT;
         }
     }
