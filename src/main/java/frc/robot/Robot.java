@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
 
-    //Creates the Networktable Entries
+    //Creates the Networktable Entry
     isRedAlliance = FMSInfo.getEntry("IsRedAlliance"); // Boolean
   }
 
@@ -151,6 +151,10 @@ public class Robot extends TimedRobot {
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
 
+    // Inits the ledlights for auto
+    led.autoInit();
+
+    // Resets the gyro
     Drive.ahrs.zeroYaw();
   }
 
@@ -187,15 +191,22 @@ public class Robot extends TimedRobot {
    * Runs once at the start of TeleOp
    */
   public void teleopInit() {
-    //Passes if we are on the red alliance to the Pi for Object Tracking
+    // Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( getRedAlliance() );
 
-    //Sets the limelight LED mode
+    // Inits the led lights
+    led.teleopInit();
+
+    // Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
     climber.setClimberIdleMode(IdleMode.kBrake);
   }
 
   @Override
+  /**
+   * teleopPeriodic()
+   * Runs constantly during TeleOp
+   */
   public void teleopPeriodic() {
     wheelControl();
     ballControl();
@@ -358,9 +369,6 @@ public class Robot extends TimedRobot {
    * Controls the ball in TeleOp
    */
   private void ballControl() {
-    /**
-     * Grabber control
-     */
     // Controls function
     boolean deployRetract               = controls.grabberDeployRetract();
     boolean startShooter                = controls.startShooter();
@@ -370,6 +378,9 @@ public class Robot extends TimedRobot {
     // Shooter Ready
     boolean isShooterReady              = shooter.shooterReady();
 
+    /**
+     * Grabber control
+     */
     if (deployRetract == true) {
       grabber.deployRetract();
     }

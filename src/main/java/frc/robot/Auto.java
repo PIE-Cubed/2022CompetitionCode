@@ -14,7 +14,7 @@ public class Auto {
     Grabber grabber;
     Shooter shooter;
     CargoTracking cargoTracking;
-    private LedLights led;
+    LedLights led;
 
     // Step Variables
     private int step = 1;
@@ -37,7 +37,8 @@ public class Auto {
      * @param drive
      * @param grabber
      */
-    public Auto(Drive drive, Grabber grabber, Shooter shooter, CargoTracking cargoTracking){
+    public Auto(Drive drive, Grabber grabber, Shooter shooter, CargoTracking cargoTracking) {
+        // Instance creation
         this.drive         = drive;
 		this.grabber       = grabber;
         this.shooter       = shooter;
@@ -94,7 +95,7 @@ public class Auto {
                 firstTime = true;
 
                 // Led lights turn Gold
-                led.autoModeFinished(); 
+                led.autoModeFinished();
 
                 // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);

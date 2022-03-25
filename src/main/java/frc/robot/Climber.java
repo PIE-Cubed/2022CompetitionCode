@@ -140,7 +140,6 @@ public class Climber {
     public int moveToBar2() {
         if (getClimberEncoder() >= BAR_TWO_POSITION) {
             climberMotor.set(0);
-            led.climberAtPosition();
 
             return Robot.DONE;
         }
@@ -168,7 +167,6 @@ public class Climber {
         if (getClimberEncoder() <= BAR_THREE_POSITION) {
             climberMotor.set(0);
             blueClawClose();
-            led.climberAtPosition();
 
             return Robot.DONE;
         }

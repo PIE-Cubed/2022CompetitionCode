@@ -39,6 +39,7 @@ public class LedLights {
 		ledController = new Spark(LED_PWM_CHANNEL);
 
 		// Sets variables
+		delayCount = 0;
 		shooterOnTarget    = false;
 		limelightOnTarget  = false;
 		limelightNoTarget  = true;
@@ -163,27 +164,27 @@ public class LedLights {
 	//Red flashing - limelight and shooter are both off	
 	public void updateShooter() {
 		if (shooterOnTarget && limelightOnTarget) {
-			//Pure green
+			// Solid Green
 			ledController.set(0.77);
 		}
 		else if (shooterOnTarget && limelightNoTarget) {
-			//Solid yellow
+			// Solid Yellow
 			ledController.set(0.69);//-0.85
 		}
 		else if (shooterOnTarget) {
-			//Solid yellow
+			// Solid Yellow
 			ledController.set(0.69);//0.73
 		}
 		else if (!shooterOnTarget && limelightNoTarget) {
-			//Red flashing
+			// Strobe Red
 			ledController.set(-0.11);
 		}
 		else if (!shooterOnTarget && limelightOnTarget) {
-			//Solid red
+			// Solid Red
 			ledController.set(0.61);
 		}
 		else if (!shooterOnTarget) {
-			//Red flashing
+			// Strobe Red
 			ledController.set(-0.11);
 		}
 	}
@@ -213,8 +214,8 @@ public class LedLights {
 	 * CLIMBER ERROR CODES
 	 */
 	public void climberAtPosition() {
-		// Forest twinkle
-		ledController.set(-0.47);
+		// Solid Green
+		ledController.set(0.77);
 		errorCodeDisplayed = true;
 	}
 
@@ -228,6 +229,20 @@ public class LedLights {
 		// Rainbow party palette
 		ledController.set(-0.97);
 		errorCodeDisplayed = true;
+
+		// Sets delayCount to something absurd
+		delayCount = (int)-1.0e100;
+	}
+
+	/**
+	 * INIT FUNCTIONS
+	 */
+	public void autoInit() {
+		delayCount = (int)-1.0e100;
+	}
+
+	public void teleopInit() {
+		delayCount = 0;
 	}
 
 }
