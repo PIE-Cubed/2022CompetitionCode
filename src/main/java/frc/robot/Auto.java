@@ -89,6 +89,9 @@ public class Auto {
             case 5:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
+            case 6:
+                status = drive.autoCrabDrive(2.0, 0);
+                break;
             default:
                 //Finished routine
                 step = 1;
@@ -157,6 +160,9 @@ public class Auto {
                 break;
             case 5:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
+                break;
+            case 6:
+                status = drive.autoCrabDrive(2.0, 0);
                 break;
             default:
                 //Finished routine
@@ -251,7 +257,10 @@ public class Auto {
                 status = drive.autoCrabDrive(2.25, 0, 0.2);
                 break;
             case 11:
-                status = autoShoot(ShootLocation.AUTO_RING, 1);
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                break;
+            case 12:
+                status = drive.autoCrabDrive(2.0, 0);
                 break;
             default:
                 //Finished routine
@@ -289,6 +298,8 @@ public class Auto {
         int status = Robot.CONT;
         TargetPipeline targettingLocation;
 
+        boolean isShooterReady = shooter.shooterReady();
+
         if ( (location == ShootLocation.HIGH_SHOT) || (location == ShootLocation.AUTO_RING) ) {
             targettingLocation = TargetPipeline.ON_TARMAC;
         }
@@ -311,7 +322,7 @@ public class Auto {
                 break;
             case 2:
                 //Continues speeding up shooter and targetting until shooter is at correct RPM
-                if (shooter.shooterReady()) {
+                if (isShooterReady == true) {
                     status = Robot.DONE;
                 }
                 else {
@@ -321,17 +332,17 @@ public class Auto {
                 drive.limelightPIDTargeting(targettingLocation);
                 break;
             case 3:
-                //Deploys feeder for 0.5 seconds
+                //Deploys feeder for 0.75 seconds
                 shooter.deployFeeder();
                 shooter.shooterControl(location);
-                status = autoDelay(500);
+                status = autoDelay(2000); //.75 secs (too long for 3 ball)
                 break;
             case 4:
                 //If we are shooting 2 balls, retract feeder and wait 0.5 seconds
                 if (numBalls == 2) {
                     shooter.retractFeeder();
                     shooter.shooterControl(location);
-                    status = autoDelay(500);
+                    status = autoDelay(2000); // .5 sec (too long for 3 ball)
                 }
                 else {
                     step = 100;
@@ -341,7 +352,7 @@ public class Auto {
             case 5:
                 //Once the shooter is ready, move on
                 shooter.shooterControl(location);
-                if (shooter.shooterReady()) {
+                if (isShooterReady == true) {
                     status = Robot.DONE;
                 }
                 break;
