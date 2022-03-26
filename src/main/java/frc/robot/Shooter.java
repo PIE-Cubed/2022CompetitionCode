@@ -48,33 +48,33 @@ public class Shooter {
 	public final double LOW_SHOT_REAR_POWER    =  0.31; //0.28
 	public final double LOW_SHOT_FRONT_POWER   = -0.27; //-0.27
 
-	public final double HIGH_SHOT_REAR_POWER   =  0.52; //0.465
-	public final double HIGH_SHOT_FRONT_POWER  = -0.50; //0.445
+	public final double HIGH_SHOT_REAR_POWER   =  0.53; //0.465
+	public final double HIGH_SHOT_FRONT_POWER  = -0.51; //0.445
 
 	public final double LAUNCH_PAD_REAR_POWER  =  0.56; //0.525
 	public final double LAUNCH_PAD_FRONT_POWER = -0.55; //0.525
 
-	public final double AUTO_RING_REAR_POWER   =  0.52; //0.495
-	public final double AUTO_RING_FRONT_POWER  = -0.50; //0.475
+	public final double AUTO_RING_REAR_POWER   =  0.53; //0.495
+	public final double AUTO_RING_FRONT_POWER  = -0.51; //0.475
 
 	// RPM CONSTANTS
-	public final double OFF_TARGET_RPM              = 0;
+	public final double OFF_TARGET_RPM              = 0; //And will always be 0
 
 	// Against the board
 	public final double LOW_SHOT_REAR_TARGET_RPM    = 1650; //1650
 	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1650; //1650
 
 	// 9 feet and 6 inches, from the center of the hub
-	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2700; //2550
-	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2700; //2550
+	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2800; //2700
+	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2800; //2700
 
 	// 16 feet and 10 inches, from the center of the hub
 	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3150; //2900
 	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3150; //2900
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_REAR_TARGET_RPM   = 2700; //2550
-	public final double AUTO_RING_FRONT_TARGET_RPM  = 2700; //2550
+	public final double AUTO_RING_REAR_TARGET_RPM   = 2800; //2700
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 2800; //2700
 
 	// RPM OFFSET
 	private final int RPM_OFFSET = 40;
