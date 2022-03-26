@@ -108,7 +108,7 @@ public class LedLights {
 	public void autoMode() {
 		// Solid color set to Aqua
 		ledController.set(0.81);
-		errorCodeDisplayed = true;
+		errorCodeDisplayed = false;
 	}
 
 	public void autoModeFinished() {
@@ -228,7 +228,7 @@ public class LedLights {
 	public void climberDone() {
 		// Rainbow party palette
 		ledController.set(-0.97);
-		errorCodeDisplayed = true;
+		errorCodeDisplayed = false;
 
 		// Sets delayCount to something absurd
 		delayCount = (int)-1.0e100;
