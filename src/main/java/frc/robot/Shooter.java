@@ -58,7 +58,7 @@ public class Shooter {
 	public final double AUTO_RING_FRONT_POWER  = -0.51; //0.475
 
 	// RPM CONSTANTS
-	public final double OFF_TARGET_RPM              = 0; //And will always be 0
+	public final double OFF_TARGET_RPM              = 0; //Will always be 0
 
 	// Against the board
 	public final double LOW_SHOT_REAR_TARGET_RPM    = 1650; //1650
