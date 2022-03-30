@@ -30,20 +30,21 @@ public class Robot extends TimedRobot {
   private NetworkTableEntry isRedAlliance;	
 
   // Object creation
-  Drive         drive;
-  Controls      controls;
-  Grabber       grabber;
-  Climber       climber;
-  Shooter       shooter;
-  CargoTracking cargoTracking;
-  Auto          auto;
-  LedLights     led;
+  Drive                   drive;
+  Auto                    auto;
+  Grabber                 grabber;
+  Shooter                 shooter;
+  Climber                 climber;
+  Controls                controls;
+  CargoTracking           cargoTracking;
+  LedLights               led;
+  PowerDistributionPanel  pdp;
 
   // Variables
   private int status              = Robot.CONT;
   private int targetStatus        = Robot.CONT;
 
-  // Enumeration for manual or limelight control
+  // Enumeration for manual or automatic  control
   public static enum DriveMode {
     MANUAL,
     LIMELIGHT_TARGETING,
@@ -83,6 +84,7 @@ public class Robot extends TimedRobot {
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber, shooter, cargoTracking);
     led           = LedLights.getInstance();
+    pdp           = new PowerDistributionPanel();
 
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -176,7 +178,8 @@ public class Robot extends TimedRobot {
           status = auto.hangerAuto(balls, autoDelayMSec);
           break;
         case kWallAuto:
-          status = auto.wallAuto(balls, autoDelayMSec);
+          status = auto.autoShoot(Shooter.ShootLocation.HIGH_SHOT, 2);
+          // status = auto.wallAuto(balls, autoDelayMSec);
           break;
         default:
           status = DONE;
@@ -211,6 +214,8 @@ public class Robot extends TimedRobot {
     wheelControl();
     ballControl();
     climberControl();
+
+    pdp.testSmartDashboard();
   }
 
   @Override
@@ -263,7 +268,6 @@ public class Robot extends TimedRobot {
     else if (status == Robot.DONE) {
       System.out.println("Done");
     }
-    //climber.climberRotate(.5);
     //cargoTracking.autoCargoTrack();
     //System.out.println("Climber encoder: " + climber.getClimberEncoder());
     //shooter.shooterControl(ShootLocation.AUTO_RING);
@@ -276,8 +280,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
     SmartDashboard.putNumber("Target RPM", 1450);
     SmartDashboard.putNumber("80% RPM", 1450 * 0.8);*/
-    //drive.testLimelightTargeting();
-    //drive.testRotate();
     //drive.testWheelAngle();
   }
 

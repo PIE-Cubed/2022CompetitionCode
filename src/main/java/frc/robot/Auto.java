@@ -294,7 +294,7 @@ public class Auto {
      * @param numBalls
      * @return status
      */
-    private int autoShoot(ShootLocation location, int numBalls) {
+    public int autoShoot(ShootLocation location, int numBalls) {
         int status = Robot.CONT;
         TargetPipeline targettingLocation;
 
@@ -308,6 +308,7 @@ public class Auto {
         }
 
 		if (shootFirstTime == true) {
+            isShooterReady = false;
 			shootFirstTime = false;
 			shootStep = 1;
 		}

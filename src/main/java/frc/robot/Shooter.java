@@ -58,7 +58,7 @@ public class Shooter {
 	public final double AUTO_RING_FRONT_POWER  = -0.51; //0.475
 
 	// RPM CONSTANTS
-	public final double OFF_TARGET_RPM              = 0; //Will always be 0
+	public final double OFF_TARGET_RPM              = 6000; //Will always be 0
 
 	// Against the board
 	public final double LOW_SHOT_REAR_TARGET_RPM    = 1650; //1650
@@ -83,11 +83,11 @@ public class Shooter {
 	private static final int SHOOTER_CURRENT_LIMIT = 80;
 
 	// Variables
-	public  double                frontTargetVelocity;
-	public  double                rearTargetVelocity;
-	private int                   targetCount        = 0;
-	private double                frontPower         = 0;
-	private double                rearPower          = 0;
+	public  double                frontTargetVelocity = 0;
+	public  double                rearTargetVelocity  = 0;
+	private int                   targetCount         = 0;
+	private double                frontPower          = 0;
+	private double                rearPower           = 0;
 
 	public static enum ShootLocation {
 		HIGH_SHOT,
@@ -148,8 +148,7 @@ public class Shooter {
 		// PID Controller
 		frontShooterController = new PIDController(kP, kI, kD);
 		rearShooterController  = new PIDController(kP, kI, kD);
-		frontShooterController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
-
+		frontShooterController.setIntegratorRange (MIN_INTEGRATOR, MAX_INTEGRATOR);
 	}
 
 

@@ -142,7 +142,7 @@ public class Drive {
      * An enum containing each wheel's properties including: drive and rotate motor IDs, drive motor types, and rotate sensor IDs
      */ 
     public enum WheelProperties {
-        FRONT_RIGHT_WHEEL(16, // DRIVE MOTOR ID
+        FRONT_RIGHT_WHEEL(14, // DRIVE MOTOR ID - SHOULD BE 16
                         17, // ROTATE MOTOR ID
                         3, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
@@ -152,7 +152,7 @@ public class Drive {
                         0, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         FL_OFFSET), //Offset
-        REAR_RIGHT_WHEEL(14, // DRIVE MOTOR ID
+        REAR_RIGHT_WHEEL(16, // DRIVE MOTOR ID - SHOULD BE 14
                         15, // ROTATE MOTOR ID
                         2, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
