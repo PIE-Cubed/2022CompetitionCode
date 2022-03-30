@@ -96,7 +96,7 @@ public class Wheel {
         setDriveMotorPower(drivePower);
 
         //Are we within 2 degrees of target wheel angle? 
-        //The return values does not need to be used 
+        //The return value does not need to be used 
         if (rotatePower < 0.06) {
             return Robot.DONE;
         }
