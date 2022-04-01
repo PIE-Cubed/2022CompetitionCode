@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class PowerDistributionPanel {
-    PowerDistribution powerDistributionPanel;
-
+    // Object Creation
+    PowerDistribution pdp;
 
     //Power channels, not the same as CAN ids
     private int FR_DRIVE = 6;
@@ -20,41 +20,41 @@ public class PowerDistributionPanel {
     private int BL_ROTATE = 16;
 
     public PowerDistributionPanel() {
-        powerDistributionPanel = new PowerDistribution(2, ModuleType.kRev);
+        pdp = new PowerDistribution(2, ModuleType.kRev);
     }
 
     public double getVoltage() {
-        return powerDistributionPanel.getVoltage();
+        return pdp.getVoltage();
     }
 
     public double getCurrent() {
-        return powerDistributionPanel.getTotalCurrent();
+        return pdp.getTotalCurrent();
     }
 
     //Returns power (being drawn I assume), which is the product of voltage and current, in watts
     public double getPower() {
-        return powerDistributionPanel.getTotalPower();
+        return pdp.getTotalPower();
     }
 
     //Power * time, in joules
     public double getEnergy() {
-        return powerDistributionPanel.getTotalEnergy();
+        return pdp.getTotalEnergy();
     }
 
     public double getSwerveCurrent() {
-        double driveCurrent  = powerDistributionPanel.getCurrent(FR_DRIVE)  + powerDistributionPanel.getCurrent(FL_DRIVE)  + powerDistributionPanel.getCurrent(BR_DRIVE)  + powerDistributionPanel.getCurrent(BL_DRIVE); 
-        double rotateCurrent = powerDistributionPanel.getCurrent(FR_ROTATE) + powerDistributionPanel.getCurrent(FL_ROTATE) + powerDistributionPanel.getCurrent(BR_ROTATE) + powerDistributionPanel.getCurrent(BL_ROTATE);
+        double driveCurrent  = pdp.getCurrent(FR_DRIVE)  + pdp.getCurrent(FL_DRIVE)  + pdp.getCurrent(BR_DRIVE)  + pdp.getCurrent(BL_DRIVE); 
+        double rotateCurrent = pdp.getCurrent(FR_ROTATE) + pdp.getCurrent(FL_ROTATE) + pdp.getCurrent(BR_ROTATE) + pdp.getCurrent(BL_ROTATE);
         return driveCurrent + rotateCurrent;
     }
 
     public double getMotorCurrent(int channel) {
-        return powerDistributionPanel.getCurrent(channel);
+        return pdp.getCurrent(channel);
     }
 
     public void testSmartDashboard() {
-        SmartDashboard.putNumber("FR Drive Current", powerDistributionPanel.getCurrent(FR_DRIVE));
-        SmartDashboard.putNumber("FL Drive Current", powerDistributionPanel.getCurrent(FL_DRIVE));
-        SmartDashboard.putNumber("BR Drive Current", powerDistributionPanel.getCurrent(BR_DRIVE));
-        SmartDashboard.putNumber("BL Drive Current", powerDistributionPanel.getCurrent(BL_DRIVE));
+        SmartDashboard.putNumber("FR Drive Current", pdp.getCurrent(FR_DRIVE));
+        SmartDashboard.putNumber("FL Drive Current", pdp.getCurrent(FL_DRIVE));
+        SmartDashboard.putNumber("BR Drive Current", pdp.getCurrent(BR_DRIVE));
+        SmartDashboard.putNumber("BL Drive Current", pdp.getCurrent(BL_DRIVE));
     }
 }
