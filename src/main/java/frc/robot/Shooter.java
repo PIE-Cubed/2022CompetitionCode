@@ -10,7 +10,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
@@ -112,10 +112,13 @@ public class Shooter {
 	private static final double MAX_INTEGRATOR =  0.1; //0.05
 
 	// P, I, D constants
-	private static final double kP = 0.0000; //0.00010
-	private static final double kI = 0.0004; //0.0001
-	private static final double kD = 0.00;
+	//private static final double kP = 0.0000; //0.0000- competition values
+	//private static final double kI = 0.0004; //0.0004- competition values
+	//private static final double kD = 0.00;
 
+	private static final double kP = 0.0010; //0.0000- competition values
+	private static final double kI = 0.0000; //0.0004- competition values
+ 	private static final double kD = 0.00;
 
 	/****************************************************************************************** 
     *
@@ -149,6 +152,7 @@ public class Shooter {
 		frontShooterController = new PIDController(kP, kI, kD);
 		rearShooterController  = new PIDController(kP, kI, kD);
 		frontShooterController.setIntegratorRange (MIN_INTEGRATOR, MAX_INTEGRATOR);
+		rearShooterController.setIntegratorRange(MIN_INTEGRATOR, MAX_INTEGRATOR);
 	}
 
 
@@ -158,7 +162,7 @@ public class Shooter {
 	*    Uses PID to get shooter to appropriate speed for given shot
     *   
 	******************************************************************************************/
-	public void shooterControl(ShootLocation location) {
+	public void shooterControlOld(ShootLocation location) {
 		double frontPowerError;
 		double rearPowerError;
 		
@@ -239,6 +243,65 @@ public class Shooter {
 		// SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
 		// SmartDashboard.putNumber("Rear power", rearPower);
 		// SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+
+		frontShooter.set(frontPower);
+		rearShooter.set(rearPower);
+	}
+
+
+	public void shooterControl(ShootLocation location) {
+		double frontPowerError;
+		double rearPowerError;
+		
+		if (location == ShootLocation.HIGH_SHOT) {
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), HIGH_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , HIGH_SHOT_REAR_TARGET_RPM);
+			frontTargetVelocity = HIGH_SHOT_FRONT_TARGET_RPM;
+			rearTargetVelocity  = HIGH_SHOT_REAR_TARGET_RPM;
+			frontPower          = HIGH_SHOT_FRONT_POWER;
+			rearPower           = HIGH_SHOT_REAR_POWER;
+		}
+		else if (location == ShootLocation.LOW_SHOT) {
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LOW_SHOT_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LOW_SHOT_REAR_TARGET_RPM);
+			frontTargetVelocity = LOW_SHOT_FRONT_TARGET_RPM;
+			rearTargetVelocity  = LOW_SHOT_REAR_TARGET_RPM;
+			frontPower          = LOW_SHOT_FRONT_POWER;
+			rearPower           = LOW_SHOT_REAR_POWER;
+		}
+		else if (location == ShootLocation.LAUNCH_PAD) {
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), LAUNCH_PAD_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , LAUNCH_PAD_REAR_TARGET_RPM);
+			frontTargetVelocity = LAUNCH_PAD_FRONT_TARGET_RPM;
+			rearTargetVelocity  = LAUNCH_PAD_REAR_TARGET_RPM;
+			frontPower          = LAUNCH_PAD_FRONT_POWER;
+			rearPower           = LAUNCH_PAD_REAR_POWER;
+		}
+		else if (location == ShootLocation.AUTO_RING) {
+			frontPowerError     = frontShooterController.calculate( getabsRPM(FRONT_SHOOTER_ID), AUTO_RING_FRONT_TARGET_RPM);
+			rearPowerError      = rearShooterController.calculate( getabsRPM(REAR_SHOOTER_ID) , AUTO_RING_REAR_TARGET_RPM);
+			frontTargetVelocity = AUTO_RING_FRONT_TARGET_RPM;
+			rearTargetVelocity  = AUTO_RING_REAR_TARGET_RPM;
+			frontPower          = AUTO_RING_FRONT_POWER;
+			rearPower           = AUTO_RING_REAR_POWER;
+		}
+		else {
+			frontPowerError     = OFF_POWER;
+			rearPowerError      = OFF_POWER;
+			frontTargetVelocity = OFF_TARGET_RPM;
+			rearTargetVelocity  = OFF_TARGET_RPM;
+			frontPower          = OFF_POWER;
+			rearPower           = OFF_POWER;
+		}
+
+		frontPower = frontPower + frontPowerError;
+		rearPower  = rearPower  + rearPowerError;
+
+		//Displays powers and rpms to smartdashboard
+		SmartDashboard.putNumber("Front power", frontPower);
+		SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
+		SmartDashboard.putNumber("Rear power", rearPower);
+		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
 
 		frontShooter.set(frontPower);
 		rearShooter.set(rearPower);

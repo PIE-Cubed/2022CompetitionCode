@@ -214,8 +214,7 @@ public class Robot extends TimedRobot {
     wheelControl();
     ballControl();
     climberControl();
-
-    pdp.testSmartDashboard();
+    SmartDashboard.putNumber("Total current: ", pdp.getCurrent());
   }
 
   @Override
@@ -261,13 +260,15 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-	  if (status == Robot.CONT) {
+    climber.climberRotate(-1);
+	  /*if (status == Robot.CONT) {
       //status = drive.autoSwerve(3.0, 0, -90, 0.1);
-      status = drive.autoAdjustWheels(0);
+
+      //status = drive.autoAdjustWheels(0);
     }
     else if (status == Robot.DONE) {
-      System.out.println("Done");
-    }
+      //System.out.println("Done");
+    }*/
     //cargoTracking.autoCargoTrack();
     //System.out.println("Climber encoder: " + climber.getClimberEncoder());
     //shooter.shooterControl(ShootLocation.AUTO_RING);
