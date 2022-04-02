@@ -43,13 +43,16 @@ public class Shooter {
 	private RelativeEncoder rearShooterEncoder;
 
 	// POWER CONSTANTS
+	// Find power required to get to target rpm w/o PID
+	// Subtract by 0.03
+	// Use PID woth mostly I, the P will just give a boost at the start
 	public final double OFF_POWER  = 0.00;
 
 	public final double LOW_SHOT_REAR_POWER    =  0.31; //0.28
 	public final double LOW_SHOT_FRONT_POWER   = -0.27; //-0.27
 
-	public final double HIGH_SHOT_REAR_POWER   =  0.53; //0.465
-	public final double HIGH_SHOT_FRONT_POWER  = -0.51; //0.445
+	public final double HIGH_SHOT_REAR_POWER   =  0.53; //0.53-comp
+	public final double HIGH_SHOT_FRONT_POWER  = -0.49; //0.51-comp
 
 	public final double LAUNCH_PAD_REAR_POWER  =  0.56; //0.525
 	public final double LAUNCH_PAD_FRONT_POWER = -0.55; //0.525
@@ -116,8 +119,8 @@ public class Shooter {
 	//private static final double kI = 0.0004; //0.0004- competition values
 	//private static final double kD = 0.00;
 
-	private static final double kP = 0.0010; //0.0000- competition values
-	private static final double kI = 0.0000; //0.0004- competition values
+	private static final double kP = 0.00008; //0.0000- competition values
+	private static final double kI = 0.0006; //0.0004- competition values
  	private static final double kD = 0.00;
 
 	/****************************************************************************************** 
@@ -294,7 +297,7 @@ public class Shooter {
 			rearPower           = OFF_POWER;
 		}
 
-		frontPower = frontPower + frontPowerError;
+		frontPower = frontPower - frontPowerError;
 		rearPower  = rearPower  + rearPowerError;
 
 		//Displays powers and rpms to smartdashboard
@@ -317,7 +320,7 @@ public class Shooter {
 		//Variables
 		double rearRpm;
 		double frontRpm;
-		final int ON_TRAGET_DELAY = 10;
+		int ON_TARGET_DELAY = 5; //10- comp
 
 		//Gets rpm values
 		rearRpm  = getabsRPM(REAR_SHOOTER_ID);
@@ -335,7 +338,7 @@ public class Shooter {
 			//System.out.println("Shooter at rpm");
 			targetCount ++;
 			
-			if (targetCount >= ON_TRAGET_DELAY) { 
+			if (targetCount >= ON_TARGET_DELAY) { 
 				//System.out.println("Shooter ready");
 				return true;
 			}
