@@ -44,7 +44,6 @@ public class Robot extends TimedRobot {
   private int status              = Robot.CONT;
   private int targetStatus        = Robot.CONT;
   private int reloadStatus        = Robot.CONT;
-  private boolean reloadFirstTime = true;
 
   // Enumeration for manual or automatic  control
   public static enum DriveMode {
@@ -55,13 +54,6 @@ public class Robot extends TimedRobot {
     CARGO_TARGETED;
   }
   private DriveMode driveMode = DriveMode.MANUAL;
-
-  // Enumeration to reload the shooter
-  public static enum Reload {
-    RETRACTED,
-    DEPLOYED;
-  } 
-  private Reload reloadState = Reload.RETRACTED;
 
   // Auto path
   private static final String kCenterAuto = "Center";
@@ -412,35 +404,25 @@ public class Robot extends TimedRobot {
     else {
       shooter.shooterControl(shootLocation);
 
-      /*if (reloadState == Reload.RETRACTED) {
-        if (isShooterReady == true) {
-          shooter.deployFeeder();
-          reloadState = Reload.DEPLOYED;
-        }
-        reloadFirstTime = true;
-      }
-      else if (reloadState == Reload.DEPLOYED) {
-        if (isShooterReady == false) {
-          shooter.retractFeeder();
-        }
-
-        if (reloadFirstTime == true) {
-          reloadStatus    = auto.autoDelay(250);
-          reloadFirstTime = false;
-        }
-
-        if (reloadStatus == Robot.DONE) {
-          reloadState = Reload.RETRACTED;
-        }
-      }*/
-
       if (isShooterReady == true) {
+        reloadStatus = auto.autoDelay(750);
+        if (reloadStatus == Robot.DONE) {
+          shooter.deployFeeder();
+        }
+        led.shooterReady();
+      }
+      else {
+        shooter.retractFeeder();
+        led.shooterNotReady();
+      }
+
+      /*if (isShooterReady == true) {
         shooter.deployFeeder();
         led.shooterReady();
       }
       else {
         led.shooterNotReady();
-      }
+      }*/
 
       led.updateShooter();
     }
