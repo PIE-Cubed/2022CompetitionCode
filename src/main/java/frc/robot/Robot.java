@@ -43,6 +43,8 @@ public class Robot extends TimedRobot {
   // Variables
   private int status              = Robot.CONT;
   private int targetStatus        = Robot.CONT;
+  private int reloadStatus        = Robot.CONT;
+  private boolean reloadFirstTime = false;
 
   // Enumeration for manual or automatic  control
   public static enum DriveMode {
@@ -53,6 +55,13 @@ public class Robot extends TimedRobot {
     CARGO_TARGETED;
   }
   private DriveMode driveMode = DriveMode.MANUAL;
+
+  // Enumeration to reload the shooter
+  public static enum Reload {
+    RETRACTED,
+    DEPLOYED;
+  } 
+  private Reload reloadState = Reload.RETRACTED;
 
   // Auto path
   private static final String kCenterAuto = "Center";
@@ -100,8 +109,8 @@ public class Robot extends TimedRobot {
    */
   public void robotInit() {
     //Auto selection
-    m_chooser.setDefaultOption("Center Auto", kCenterAuto);
-    m_chooser.addOption("Wall Auto", kWallAuto);
+    m_chooser.setDefaultOption("Wall Auto", kWallAuto);
+    m_chooser.addOption("Center Auto", kCenterAuto);
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     SmartDashboard.putNumber("Auto delay seconds", 0);
@@ -214,7 +223,7 @@ public class Robot extends TimedRobot {
     wheelControl();
     ballControl();
     climberControl();
-    SmartDashboard.putNumber("Total current: ", pdp.getCurrent());
+    //SmartDashboard.putNumber("Total current: ", pdp.getCurrent());
   }
 
   @Override
@@ -307,9 +316,9 @@ public class Robot extends TimedRobot {
     //Manual driving
     if (driveMode == DriveMode.MANUAL) {
       //Drives if we are out of dead zone
-      if ((Math.abs(driveX) > 0) ||
-          (Math.abs(driveY) > 0) || 
-          (Math.abs(rotatePower) > 0)) {
+      if ((Math.abs(driveX) > 0.05) ||
+          (Math.abs(driveY) > 0.05) || 
+          (Math.abs(rotatePower) > 0.01)) {
         drive.teleopSwerve(driveX, driveY, rotatePower, false, true);
       }
       else {
@@ -410,6 +419,34 @@ public class Robot extends TimedRobot {
       else {
         led.shooterNotReady();
       }
+
+      /*if (isShooterReady == true) {
+        reloadStatus = auto.autoDelay(500);
+        if (reloadState == Reload.RETRACTED) {
+          if (reloadStatus == Robot.DONE) {
+            shooter.deployFeeder();
+            reloadState = Reload.DEPLOYED;
+          }
+          reloadFirstTime = true;
+        }
+      }
+      else if (reloadState == Reload.DEPLOYED) {
+        if (isShooterReady == false) {
+          shooter.retractFeeder();
+        }
+
+        if (reloadFirstTime == true) {
+          reloadStatus    = auto.autoDelay(500);
+          reloadFirstTime = false;
+        }
+
+        if (reloadStatus == Robot.DONE) {
+          reloadState = Reload.RETRACTED;
+        }
+      }
+      else {
+        shooter.retractFeeder();
+      }*/
 
       led.updateShooter();
     }

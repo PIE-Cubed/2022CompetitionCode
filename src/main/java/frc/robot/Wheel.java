@@ -20,7 +20,6 @@ public class Wheel {
     private CANSparkMax      driveMotor;
     private RelativeEncoder  driveEncoder;
     private CANSparkMax      rotateMotor;
-
     private Drive.WheelProperties name;
 
     // The sensor is just a 0V to 5V voltage signal that plugs into the analog inputs in the RoboRio, hence the AnalogPotentiometer objects.

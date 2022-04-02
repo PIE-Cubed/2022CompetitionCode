@@ -64,7 +64,7 @@ public class Drive {
     private static final double sD = 0.00;
 
     //Integrator Range
-    private static final double TARGET_I_MAX = 0.06;
+    private static final double TARGET_I_MAX = 0.05;
     private static final double TARGET_I_MIN = -1 * TARGET_I_MAX;
 
 	//Variables
@@ -84,7 +84,7 @@ public class Drive {
 
     //BLUE ROBOT
     private static final double FL_OFFSET = 309.8;
-    private static final double FR_OFFSET = 248;
+    private static final double FR_OFFSET = 248.0;
     private static final double BL_OFFSET = 165.7;
     private static final double BR_OFFSET = -33.2;
 
@@ -986,42 +986,40 @@ public class Drive {
     *    TEST FUNCTIONS
     * 
     ******************************************************************************************/
-    public void testWheel(){
+    public void testWheel() {
         rearRightWheel.setDriveMotorPower(-0.5);
     }
     
-    public void testRotate(){
+    public void testRotate() {
         double power = -.2;
         frontLeftWheel.setRotateMotorPower(power);
         frontRightWheel.setRotateMotorPower(power);
         rearLeftWheel.setRotateMotorPower(power);
         rearRightWheel.setRotateMotorPower(power);
         System.out.println("Degrees: " + rearLeftWheel.getRotateMotorPosition());
-    }
+    } //Line 1000!
 
     public void testPID() {
         frontLeftWheel.rotateAndDrive(0, 0, false);
     }
 
-    public void testEncoder(){
+    public void testEncoder() {
         System.out.println("FR encoder: " + frontRightWheel.getEncoderValue());
     }
 
-    public void testWheelAngle(){
+    public void testWheelAngle() {
         //Use this to calibrate wheel angle sensors
         //Offset in wheel constructor should be the returned value * -1
-        System.out.println("FL Angle: " + frontLeftWheel.testWheelAngle());
-        System.out.println("FR Angle: " + frontRightWheel.testWheelAngle());
-        System.out.println("RL Angle: " + rearLeftWheel.testWheelAngle());
-        System.out.println("RR Angle: " + rearRightWheel.testWheelAngle());
+        System.out.println("FL Offset: " + -frontLeftWheel.testWheelAngle());
+        System.out.println("FR Offset: " + -frontRightWheel.testWheelAngle());
+        System.out.println("RL Offset: " + -rearLeftWheel.testWheelAngle());
+        System.out.println("RR Offset: " + -rearRightWheel.testWheelAngle());
     }
 
     public void testLimelightTargeting() {
-        System.out.print("tv: " + get_tv() + "      |     ");
+        System.out.print("tv: " + get_tv());
         System.out.println("tx: " + get_tx());
     }
-    //yay line 1000
-    
 }
 
 // End of the Drive Class

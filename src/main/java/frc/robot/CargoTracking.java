@@ -47,7 +47,7 @@ public class CargoTracking {
 	private final int  TIME_OUT_SEC  = 5;
 	private final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
 	private final int  FAIL_COUNT      = 20;
-	private final int  ON_TARGET_COUNT = 5;
+	private final int  ON_TARGET_DELAY = 5;
 
 	// PID controller
 	private static PIDController cargoController;
@@ -156,7 +156,7 @@ public class CargoTracking {
 		}
 
 		// Checks if the targetLockedCount is greater than our threshold for success
-		if (targetLockedCount >= ON_TARGET_COUNT) {
+		if (targetLockedCount >= ON_TARGET_DELAY) {
 			// Resets variables
 			noTargetCount = 0;
 			targetLockedCount = 0;

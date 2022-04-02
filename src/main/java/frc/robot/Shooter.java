@@ -10,11 +10,10 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
 	//2 holes above marked one
@@ -54,11 +53,11 @@ public class Shooter {
 	public final double HIGH_SHOT_REAR_POWER   =  0.53; //0.53-comp
 	public final double HIGH_SHOT_FRONT_POWER  = -0.49; //0.51-comp
 
-	public final double LAUNCH_PAD_REAR_POWER  =  0.56; //0.525
-	public final double LAUNCH_PAD_FRONT_POWER = -0.55; //0.525
+	public final double LAUNCH_PAD_REAR_POWER  =  0.65; //0.525
+	public final double LAUNCH_PAD_FRONT_POWER = -0.52; //0.525
 
-	public final double AUTO_RING_REAR_POWER   =  0.53; //0.495
-	public final double AUTO_RING_FRONT_POWER  = -0.51; //0.475
+	public final double AUTO_RING_REAR_POWER   =  0.57; //0.495
+	public final double AUTO_RING_FRONT_POWER  = -0.55; //0.475
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM              = 6000; //Will always be 0
@@ -68,16 +67,16 @@ public class Shooter {
 	public final double LOW_SHOT_FRONT_TARGET_RPM   = 1650; //1650
 
 	// 9 feet and 6 inches, from the center of the hub
-	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2700; //2800
-	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2700; //2800
+	public final double HIGH_SHOT_REAR_TARGET_RPM   = 2700; //2550
+	public final double HIGH_SHOT_FRONT_TARGET_RPM  = 2700; //2550
 
 	// 16 feet and 10 inches, from the center of the hub
-	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3150; //2900
-	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3150; //2900
+	public final double LAUNCH_PAD_REAR_TARGET_RPM  = 3700; //3750
+	public final double LAUNCH_PAD_FRONT_TARGET_RPM = 3200; //3250
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_REAR_TARGET_RPM   = 2700; //2800
-	public final double AUTO_RING_FRONT_TARGET_RPM  = 2700; //2800
+	public final double AUTO_RING_REAR_TARGET_RPM   = 2875; //2800
+	public final double AUTO_RING_FRONT_TARGET_RPM  = 2875; //2800
 
 	// RPM OFFSET
 	private final int RPM_OFFSET = 40;
@@ -301,10 +300,10 @@ public class Shooter {
 		rearPower  = rearPower  + rearPowerError;
 
 		//Displays powers and rpms to smartdashboard
-		SmartDashboard.putNumber("Front power", frontPower);
-		SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
-		SmartDashboard.putNumber("Rear power", rearPower);
-		SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+		// SmartDashboard.putNumber("Front power", frontPower);
+		// SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
+		// SmartDashboard.putNumber("Rear power", rearPower);
+		// SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
 
 		frontShooter.set(frontPower);
 		rearShooter.set(rearPower);

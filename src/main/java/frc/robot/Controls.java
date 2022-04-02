@@ -138,6 +138,7 @@ public class Controls {
         }
         else if (joystick.getTrigger()) {
             return ShootLocation.HIGH_SHOT;
+            //return ShootLocation.AUTO_RING;
         }
         else {
             return ShootLocation.OFF;
