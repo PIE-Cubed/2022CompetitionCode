@@ -477,7 +477,7 @@ public class Auto {
         return Robot.CONT;
     }
 
-    public void resetFirstTIme() {
+    public void resetFirstTime() {
         delayFirstTime = true;
     }
 }

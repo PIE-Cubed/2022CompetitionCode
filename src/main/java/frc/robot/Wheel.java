@@ -76,10 +76,10 @@ public class Wheel {
 
         currWheelAngle = getRotateMotorPosition();
 
-        if ((Math.abs(currWheelAngle - targetWheelAngle) > 90) && teleop == true) {
+        /*if ((Math.abs(currWheelAngle - targetWheelAngle) > 90) && teleop == true) {
             targetWheelAngle = targetWheelAngle + 180;
             drivePower = -1 * drivePower;
-        }
+        }*/
 
         rotatePower = rotationPID.calculate(currWheelAngle, targetWheelAngle);
 
@@ -181,7 +181,7 @@ public class Wheel {
     *    Returns the encoder value of the drive motor
     * 
     ******************************************************************************************/
-    public double getEncoderValue(){
+    public double getEncoderValue() {
         double tempValue = driveEncoder.getPosition();
 
         if ((name.equals(Drive.WheelProperties.FRONT_LEFT_WHEEL)) || 
