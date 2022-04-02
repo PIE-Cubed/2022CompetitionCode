@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   private int status              = Robot.CONT;
   private int targetStatus        = Robot.CONT;
   private int reloadStatus        = Robot.CONT;
-  private boolean reloadFirstTime = false;
+  private boolean reloadFirstTime = true;
 
   // Enumeration for manual or automatic  control
   public static enum DriveMode {
@@ -402,7 +402,7 @@ public class Robot extends TimedRobot {
      * Shooter control
      */
     if (shootLocation == Shooter.ShootLocation.OFF) {
-      auto.resetFirstTIme();
+      auto.resetFirstTime();
       shooter.disableShooter();
 
       if (startShooter == true) {
@@ -412,23 +412,12 @@ public class Robot extends TimedRobot {
     else {
       shooter.shooterControl(shootLocation);
 
-      if (isShooterReady == true) {
-        shooter.deployFeeder();
-        led.shooterReady();
-      }
-      else {
-        led.shooterNotReady();
-      }
-
-      /*if (isShooterReady == true) {
-        reloadStatus = auto.autoDelay(500);
-        if (reloadState == Reload.RETRACTED) {
-          if (reloadStatus == Robot.DONE) {
-            shooter.deployFeeder();
-            reloadState = Reload.DEPLOYED;
-          }
-          reloadFirstTime = true;
+      /*if (reloadState == Reload.RETRACTED) {
+        if (isShooterReady == true) {
+          shooter.deployFeeder();
+          reloadState = Reload.DEPLOYED;
         }
+        reloadFirstTime = true;
       }
       else if (reloadState == Reload.DEPLOYED) {
         if (isShooterReady == false) {
@@ -436,17 +425,22 @@ public class Robot extends TimedRobot {
         }
 
         if (reloadFirstTime == true) {
-          reloadStatus    = auto.autoDelay(500);
+          reloadStatus    = auto.autoDelay(250);
           reloadFirstTime = false;
         }
 
         if (reloadStatus == Robot.DONE) {
           reloadState = Reload.RETRACTED;
         }
+      }*/
+
+      if (isShooterReady == true) {
+        shooter.deployFeeder();
+        led.shooterReady();
       }
       else {
-        shooter.retractFeeder();
-      }*/
+        led.shooterNotReady();
+      }
 
       led.updateShooter();
     }
