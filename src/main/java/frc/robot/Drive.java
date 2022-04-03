@@ -83,16 +83,16 @@ public class Drive {
     private final double ticksPerFoot = 5.65;
 
     //BLUE ROBOT
-    private static final double FL_OFFSET = 309.8;
-    private static final double FR_OFFSET = 248.0;
-    private static final double BL_OFFSET = 165.7;
-    private static final double BR_OFFSET = -33.2;
+    // private static final double FL_OFFSET = 309.8;
+    // private static final double FR_OFFSET = 248.0;
+    // private static final double BL_OFFSET = 165.7;
+    // private static final double BR_OFFSET = -33.2;
 
     //Yellow ROBOT
-    // private static final double FL_OFFSET = -151.21;
-    // private static final double FR_OFFSET = -150.36;
-    // private static final double BL_OFFSET = -103.64;
-    // private static final double BR_OFFSET =  146.41; //93.10
+    private static final double FL_OFFSET = -151.21;
+    private static final double FR_OFFSET = -150.36;
+    private static final double BL_OFFSET =  143.73;
+    private static final double BR_OFFSET =  22.073;
 
 	//Limelight Variables
     private int     noTargetCount      = 0;
@@ -142,7 +142,7 @@ public class Drive {
      * An enum containing each wheel's properties including: drive and rotate motor IDs, drive motor types, and rotate sensor IDs
      */ 
     public enum WheelProperties {
-        FRONT_RIGHT_WHEEL(14, // DRIVE MOTOR ID - SHOULD BE 16
+        FRONT_RIGHT_WHEEL(14, // DRIVE MOTOR ID
                         17, // ROTATE MOTOR ID
                         3, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
@@ -152,7 +152,7 @@ public class Drive {
                         0, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
                         FL_OFFSET), //Offset
-        REAR_RIGHT_WHEEL(16, // DRIVE MOTOR ID - SHOULD BE 14
+        REAR_RIGHT_WHEEL(16, // DRIVE MOTOR ID
                         15, // ROTATE MOTOR ID
                         2, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
@@ -382,10 +382,10 @@ public class Drive {
 
         //If we are rotating CCW, and we are not crab driving, then the robot will flip the wheel angles and powers
         //This keeps the wheels in the same position when turning both ways, making small rotations easier
-        /*if ((rotatePower < 0) && (crabX == 0 && crabY == 0)) {
+        if ((rotatePower < 0) && (crabX == 0 && crabY == 0)) {
             swervePower *= -1;
             swerveAngle += 180;
-        }*/
+        }
 
         PowerAndAngle swerveNums = new PowerAndAngle(swervePower, swerveAngle);
 

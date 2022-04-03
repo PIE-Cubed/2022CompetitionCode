@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Drive.TargetPipeline;
+import frc.robot.Grabber.GrabberState;
 import frc.robot.Shooter.ShootLocation;
 
 /**
@@ -43,7 +44,6 @@ public class Robot extends TimedRobot {
   // Variables
   private int status              = Robot.CONT;
   private int targetStatus        = Robot.CONT;
-  private int reloadStatus        = Robot.CONT;
 
   // Enumeration for manual or automatic  control
   public static enum DriveMode {
@@ -261,28 +261,7 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    climber.climberRotate(-1);
-	  /*if (status == Robot.CONT) {
-      //status = drive.autoSwerve(3.0, 0, -90, 0.1);
-
-      //status = drive.autoAdjustWheels(0);
-    }
-    else if (status == Robot.DONE) {
-      //System.out.println("Done");
-    }*/
-    //cargoTracking.autoCargoTrack();
-    //System.out.println("Climber encoder: " + climber.getClimberEncoder());
-    //shooter.shooterControl(ShootLocation.AUTO_RING);
-    //shooter.testShootMotors(SmartDashboard.getNumber("Shooter power", 0));
-    //drive.testWheelAngle();
-    /*
-    shooter.shooterControl(ShootLocation.LOW_SHOT);
-    SmartDashboard.putBoolean("Shooter ready", shooter.shooterReady());
-    SmartDashboard.putNumber("Test front rpm", shooter.getabsRPM(19));
-    SmartDashboard.putNumber("Test rear rpm" , shooter.getabsRPM(20));
-    SmartDashboard.putNumber("Target RPM", 1450);
-    SmartDashboard.putNumber("80% RPM", 1450 * 0.8);*/
-    //drive.testWheelAngle();
+    drive.testWheelAngle();
   }
 
   /**
@@ -394,35 +373,28 @@ public class Robot extends TimedRobot {
      * Shooter control
      */
     if (shootLocation == Shooter.ShootLocation.OFF) {
-      auto.resetFirstTime();
       shooter.disableShooter();
 
+      if (Grabber.grabberState == GrabberState.RETRACT) {
+        shooter.blockBalls();
+      }
+
       if (startShooter == true) {
-        shooter.shooterControl(Shooter.ShootLocation.HIGH_SHOT); 
+        shooter.shooterControl(Shooter.ShootLocation.HIGH_SHOT);
+        shooter.blockAll();
       }
     }
     else {
       shooter.shooterControl(shootLocation);
 
       if (isShooterReady == true) {
-        reloadStatus = auto.autoDelay(750);
-        if (reloadStatus == Robot.DONE) {
-          shooter.deployFeeder();
-        }
+        shooter.openAll();
         led.shooterReady();
       }
       else {
-        shooter.retractFeeder();
+        shooter.blockShooter();
         led.shooterNotReady();
       }
-
-      /*if (isShooterReady == true) {
-        shooter.deployFeeder();
-        led.shooterReady();
-      }
-      else {
-        led.shooterNotReady();
-      }*/
 
       led.updateShooter();
     }

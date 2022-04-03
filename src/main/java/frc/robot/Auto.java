@@ -104,7 +104,7 @@ public class Auto {
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 grabber.deploy();
                 shooter.disableShooter();
-                shooter.retractFeeder();
+                shooter.releaseBalls();
                 drive.stopWheels();
  
                 return Robot.DONE;
@@ -176,7 +176,7 @@ public class Auto {
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 grabber.deploy();
                 shooter.disableShooter();
-                shooter.retractFeeder();
+                shooter.releaseBalls();
                 drive.stopWheels();
 
                 return Robot.DONE;
@@ -274,7 +274,7 @@ public class Auto {
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 grabber.deploy();
                 shooter.disableShooter();
-                shooter.retractFeeder();
+                shooter.releaseBalls();
                 drive.stopWheels();
 
                 return Robot.DONE;
@@ -333,36 +333,11 @@ public class Auto {
                 drive.limelightPIDTargeting(targettingLocation);
                 break;
             case 3:
-                //Deploys feeder for 0.75 seconds
-                shooter.deployFeeder();
+                //Retracts the shooter pistons to fire balls
+                shooter.openAll();
                 shooter.shooterControl(location);
-                status = autoDelay(2000); //.75 secs (too long for 3 ball)
+                status = autoDelay(numBalls * 1000);
                 break;
-            case 4:
-                //If we are shooting 2 balls, retract feeder and wait 0.5 seconds
-                if (numBalls == 2) {
-                    shooter.retractFeeder();
-                    shooter.shooterControl(location);
-                    status = autoDelay(2000); // .5 sec (too long for 3 ball)
-                }
-                else {
-                    step = 100;
-                    status = Robot.DONE;
-                }
-                break;
-            case 5:
-                //Once the shooter is ready, move on
-                shooter.shooterControl(location);
-                if (isShooterReady == true) {
-                    status = Robot.DONE;
-                }
-                break;
-            case 6:
-                //Deploys final ball
-                shooter.deployFeeder();
-                shooter.shooterControl(location);
-                status = autoDelay(500);
-                break;                 
             default:
                 //Finished routine
                 shooter.disableShooter();

@@ -41,7 +41,7 @@ public class Grabber {
         DEPLOY,
         RETRACT;
     }
-    private GrabberState grabberState;
+    public static GrabberState grabberState;
 
     /**
      * Enumerater for Grabber Direction
