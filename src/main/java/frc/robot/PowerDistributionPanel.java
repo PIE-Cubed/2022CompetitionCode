@@ -21,6 +21,7 @@ public class PowerDistributionPanel {
 
     public PowerDistributionPanel() {
         pdp = new PowerDistribution(2, ModuleType.kRev);
+        pdp.setSwitchableChannel(true);
     }
 
     public double getVoltage() {

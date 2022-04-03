@@ -18,9 +18,11 @@ public class Grabber {
     private static final int SPARK_ID  = 18;
 
     //PNEUMATICS IDS
-    private final int PCM_CAN_ID    = 1;
-    private final int DEPLOY_ID     = 4;
-    private final int RETRACT_ID    = 0;
+    private final int PCM_CAN_ID              = 1;
+    private final int GRABBER_DEPLOY_ID       = 4;
+    private final int GRABBER_RETRACT_ID      = 0;
+    private final int BALL_BLOCKER_DEPLOY_ID  = 1;
+	private final int BALL_BLOCKER_RETRACT_ID = 5;
 
     //SPARK MAX CURRENT LIMIT
     private int GRABBER_CURRENT_LIMIT = 60;
@@ -29,6 +31,7 @@ public class Grabber {
     private CANSparkMax grabberMotor;
 
     //Pistons
+    private DoubleSolenoid ballBlocker;
     private DoubleSolenoid grabberPiston;
 
     //CONSTANTS
@@ -47,8 +50,8 @@ public class Grabber {
      * Enumerater for Grabber Direction
      */
     public static enum GrabberDirection {
-        FORWARD,
-        REVERSE,
+        INTAKE,
+        EXPEL,
         OFF;
     }
 
@@ -62,9 +65,13 @@ public class Grabber {
         grabberMotor.set(0.0);
 
         //Grabber Piston Init
-        grabberPiston = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, DEPLOY_ID, RETRACT_ID);
+        grabberPiston = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, GRABBER_DEPLOY_ID, GRABBER_RETRACT_ID);
         grabberPiston.set(Value.kReverse);
         grabberState = GrabberState.RETRACT;
+
+        //Ball blocker Piston Init
+        ballBlocker = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, BALL_BLOCKER_DEPLOY_ID, BALL_BLOCKER_RETRACT_ID);
+        ballBlocker.set(Value.kReverse);
     }
 
     /*
@@ -73,20 +80,20 @@ public class Grabber {
     public void deployRetract() {
         // Toggle the State of the Piston
         if (grabberState == GrabberState.DEPLOY) {
-            retract();
+            grabberRetract();
         }
         else if (grabberState == GrabberState.RETRACT) {
-            deploy();
+            grabberDeploy();
         }
     }
 
     public void setGrabberMotor(GrabberDirection dir) {
         // Grabber Intake
-        if (dir == GrabberDirection.FORWARD) {
+        if (dir == GrabberDirection.INTAKE) {
             grabberMotor.set(GRABBER_POWER);
         }
         // Grabber Reverse
-        else if (dir == GrabberDirection.REVERSE) {
+        else if (dir == GrabberDirection.EXPEL) {
             grabberMotor.set(GRABBER_POWER * -1);
         }
         // No direction
@@ -98,15 +105,34 @@ public class Grabber {
     /**
      * Individual functions
      */
-    public void deploy() {
+    /**
+     * Deploys the grabber
+     * <p> Automatically brings the ball blocker up
+     */
+    public void grabberDeploy() {
         grabberPiston.set(Value.kForward);
         grabberState = GrabberState.DEPLOY;
+        releaseBalls();
     }
 
-    public void retract() {
+    public void grabberRetract() {
         grabberPiston.set(Value.kReverse);
         grabberState = GrabberState.RETRACT;
     }
+
+    /**
+	 * Deploys the ball blocker to stop balls from leaving the robot
+	 */
+	public void blockBalls() {
+		ballBlocker.set(Value.kForward);
+	}
+
+	/**
+	 * Retracts the ball blocker to allow balls to enter the robot
+	 */
+	public void releaseBalls() {
+		ballBlocker.set(Value.kReverse);
+	}
 
 }
 

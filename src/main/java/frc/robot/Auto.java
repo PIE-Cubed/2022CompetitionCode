@@ -75,8 +75,8 @@ public class Auto {
                 led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
-                grabber.deploy();
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                grabber.grabberDeploy();
+                grabber.setGrabberMotor(GrabberDirection.INTAKE);
                 status = Robot.DONE;
                 break;
             case 3:
@@ -102,9 +102,9 @@ public class Auto {
 
                 // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
-                grabber.deploy();
+                grabber.grabberDeploy();
+                grabber.releaseBalls();
                 shooter.disableShooter();
-                shooter.releaseBalls();
                 drive.stopWheels();
  
                 return Robot.DONE;
@@ -147,8 +147,8 @@ public class Auto {
                 led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
-                grabber.deploy();
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                grabber.grabberDeploy();
+                grabber.setGrabberMotor(GrabberDirection.INTAKE);
                 status = Robot.DONE;
                 break;
             case 3:
@@ -174,9 +174,9 @@ public class Auto {
 
                 // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
-                grabber.deploy();
+                grabber.grabberDeploy();
+                grabber.releaseBalls();
                 shooter.disableShooter();
-                shooter.releaseBalls();
                 drive.stopWheels();
 
                 return Robot.DONE;
@@ -219,8 +219,8 @@ public class Auto {
                 led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
-                grabber.deploy();
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                grabber.grabberDeploy();
+                grabber.setGrabberMotor(GrabberDirection.INTAKE);
                 status = Robot.DONE;
                 break;
             case 3:
@@ -231,7 +231,7 @@ public class Auto {
                 status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                grabber.retract();
+                grabber.grabberRetract();
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 status = Robot.DONE;
                 break;
@@ -249,12 +249,12 @@ public class Auto {
                 status = drive.autoRotate(50);
                 break;
             case 9:
-                grabber.deploy();
+                grabber.grabberDeploy();
                 status = drive.autoCrabDrive(7.0, 90, 0.5);
                 break;
             case 10:
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
-                status = drive.autoCrabDrive(2.25, 0, 0.2);
+                grabber.setGrabberMotor(GrabberDirection.INTAKE);
+                status = drive.autoCrabDrive(2.15, 0, 0.2);
                 break;
             case 11:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
@@ -272,9 +272,8 @@ public class Auto {
 
                 //Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
-                grabber.deploy();
+                grabber.grabberDeploy();
                 shooter.disableShooter();
-                shooter.releaseBalls();
                 drive.stopWheels();
 
                 return Robot.DONE;
@@ -334,7 +333,8 @@ public class Auto {
                 break;
             case 3:
                 //Retracts the shooter pistons to fire balls
-                shooter.openAll();
+                shooter.openShooter();
+                grabber.releaseBalls();
                 shooter.shooterControl(location);
                 status = autoDelay(numBalls * 1000);
                 break;
@@ -378,12 +378,12 @@ public class Auto {
                 led.autoMode(); // Led lights turn Aqua
                 break;
             case 2:
-                grabber.deploy();
+                grabber.grabberDeploy();
                 status = Robot.DONE;
                 break;
             case 3:
                 System.out.println("Yaw: " + Drive.ahrs.getYaw());
-                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                grabber.setGrabberMotor(GrabberDirection.INTAKE);
                 cargoHeading = Drive.ahrs.getYaw();
                 status = Robot.DONE;
                 break;
@@ -402,7 +402,7 @@ public class Auto {
                 led.autoModeFinished();
 
                 // Resets applicable motors
-                grabber.retract();
+                grabber.grabberRetract();
                 grabber.setGrabberMotor(GrabberDirection.OFF);
 
                 // Returns the error code for success
@@ -421,7 +421,7 @@ public class Auto {
             cargoFirstTime = true;
 
             // Stops applicable motors
-            grabber.retract();
+            grabber.grabberRetract();
             grabber.setGrabberMotor(GrabberDirection.OFF);
 
             // Returns the error code for failure 

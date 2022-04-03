@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
 public class Shooter {
@@ -24,48 +25,44 @@ public class Shooter {
 	//High from edge of tarmac- 0.525 speed, 2980-3100 rpm
 	
 	// SPARK MAX
-	private CANSparkMax    leadShooter;
-	private CANSparkMax    followShooter;
+	private CANSparkMax    leadShooter;   // Needs negative power to shoot
+	private CANSparkMax    followShooter; // Needs positive power to shoot
 	private DoubleSolenoid shooterBlocker;
-	private DoubleSolenoid ballBlocker;
 
 	// SPARK MAX ID's
-	private int FOLLOW_SHOOTER_ID  = 19; //follow is left
-	private int LEAD_SHOOTER_ID   = 20; //lead is right
+	private int LEAD_SHOOTER_ID   = 20; //Lead is right
+	private int FOLLOW_SHOOTER_ID = 19; //Follow is left
 
-	private final int BALL_BLOCKER_DEPLOY_ID     = 1;
-	private final int BALL_BLOCKER_RETRACT_ID    = 5;
-	private final int SHOOTER_BLOCKER_DEPLOY_ID  = 0;
-	private final int SHOOTER_BLOCKER_RETRACT_ID = 7;
-	private final int BALL_BLOCKER_PCM_ID        = 1;
-	private final int SHOOTER_BLOCKER_PCM_ID     = 2;
+	private final int SHOOTER_BLOCKER_DEPLOY_ID  = 7;
+	private final int SHOOTER_BLOCKER_RETRACT_ID = 0;
+	private final int PCM_CAN_ID                 = 2;
 
 	// Encoders
 	private RelativeEncoder shooterEncoder;
 
 	// POWER CONSTANTS
 	// Find power required to get to target rpm w/o PID Subtract by 0.03
-	// Use PID woth mostly I, the P will just give a boost at the start
+	// Use PID with mostly I, the P will just give a boost at the start
 	public final double OFF_POWER        =  -0.00;
-	public final double LOW_SHOT_POWER   =  -0.30; //0.28
-	public final double HIGH_SHOT_POWER  =  -0.60; //0.53-comp
-	public final double LAUNCH_PAD_POWER =  -0.70; //0.525
-	public final double AUTO_RING_POWER  =  -0.60; //0.495
+	public final double LOW_SHOT_POWER   =  -0.35; //-0.40
+	public final double HIGH_SHOT_POWER  =  -0.60; //-0.53
+	public final double LAUNCH_PAD_POWER =  -0.75; //-0.70
+	public final double AUTO_RING_POWER  =  -0.63; //-0.49
 
 	// RPM CONSTANTS
-	public final double OFF_TARGET_RPM              = 6000; //Will always be 0, don't want shooter ready to be true while off
+	public final double OFF_TARGET_RPM         = 6000; //Don't want shooter ready to be true while off
 
 	//Against hub
-	public final double LOW_SHOT_TARGET_RPM    = 1800; //Literally no idea
+	public final double LOW_SHOT_TARGET_RPM    = 2100; //2200
 
 	// 9 feet and 6 inches, from the center of the hub
-	public final double HIGH_SHOT_TARGET_RPM   = 3600; //Literally no idea
+	public final double HIGH_SHOT_TARGET_RPM   = 3650; //3600
 
 	// 16 feet and 10 inches, from the center of the hub
-	public final double LAUNCH_PAD_TARGET_RPM  = 4200; //Literally no idea
+	public final double LAUNCH_PAD_TARGET_RPM  = 4250; //4200
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_TARGET_RPM   = 3600; //Literally no idea
+	public final double AUTO_RING_TARGET_RPM   = 3750; //3600
 
 	// RPM OFFSET
 	private final int RPM_OFFSET = 50;
@@ -112,8 +109,7 @@ public class Shooter {
 		// SPARK Max
 		leadShooter    = new CANSparkMax(LEAD_SHOOTER_ID, MotorType.kBrushless); //Shooter 2 requires positive power to shoot
 		followShooter  = new CANSparkMax(FOLLOW_SHOOTER_ID, MotorType.kBrushless); //Shooter 1 requires negative power to shoot
-		ballBlocker    = new DoubleSolenoid(BALL_BLOCKER_PCM_ID   , PneumaticsModuleType.CTREPCM, BALL_BLOCKER_DEPLOY_ID   , BALL_BLOCKER_RETRACT_ID);
-		shooterBlocker = new DoubleSolenoid(SHOOTER_BLOCKER_PCM_ID, PneumaticsModuleType.CTREPCM, SHOOTER_BLOCKER_DEPLOY_ID, SHOOTER_BLOCKER_RETRACT_ID);
+		shooterBlocker = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, SHOOTER_BLOCKER_DEPLOY_ID, SHOOTER_BLOCKER_RETRACT_ID);
 
 		// Sets the current limtis for the motors
 		leadShooter  .setSmartCurrentLimit(SHOOTER_CURRENT_LIMIT);
@@ -125,11 +121,11 @@ public class Shooter {
 		followShooter.follow(leadShooter, true);
 
 		// Set Shooter related motors to off to Start the Match
-		leadShooter.set(0.00);
+		leadShooter  .set(0.00);
+		followShooter.set(0.00);
 
-		// Resets all the pistons
+		// Resets the piston
 		blockShooter();
-		releaseBalls();
 
 		// Encoders
 		shooterEncoder = leadShooter.getEncoder();
@@ -172,13 +168,12 @@ public class Shooter {
 			power           = OFF_POWER;
 		}
 
-		power = power + powerError;
+		power = power - powerError;
+		power = MathUtil.clamp(power, -1.00, 1.00);
 
 		//Displays powers and rpms to smartdashboard
-		// SmartDashboard.putNumber("Front power", frontPower);
-		// SmartDashboard.putNumber("Front rpm", getabsRPM(FRONT_SHOOTER_ID));
-		// SmartDashboard.putNumber("Rear power", rearPower);
-		// SmartDashboard.putNumber("Rear rpm", getabsRPM(REAR_SHOOTER_ID));
+		// SmartDashboard.putNumber("Power", power);
+		// SmartDashboard.putNumber("RPM", getabsRPM());
 
 		leadShooter.set(power);
 	}
@@ -235,44 +230,14 @@ public class Shooter {
 	}
 
 	/**
-	 * Deploys the ball blocker to stop balls from leaving the robot
-	 */
-	public void blockBalls() {
-		ballBlocker.set(Value.kForward);
-	}
-
-	/**
-	 * Retracts the ball blocker to allow balls to enter the robot
-	 */
-	public void releaseBalls() {
-		ballBlocker.set(Value.kReverse);
-	}
-
-	/**
 	 * DEBUG / TEST FUNCTIONS
 	 */
 	/**
 	 * Debug function to disable all motors that are controlled by this class
 	 */
 	public void disableShooter(){
-		leadShooter.set(0);
+		leadShooter.set(0.00);
 		blockShooter();
-	}
-
-	/**
-	 * Deploys all pistons (no ball movement)
-	 */
-	public void blockAll() {
-		blockShooter();
-		blockBalls();
-	}
-
-	/**
-	 * Retracts all pistons (allows ball movement)
-	 */
-	public void openAll() {
-		openShooter();
-		releaseBalls();
 	}
 
 	/**
@@ -288,10 +253,11 @@ public class Shooter {
 	 * 
 	 * @param power
 	 */
-	public void testShootMotors(double power) {
-		//Lead shooter motor 1 needs to be negative to shoot a ball
-		//Shooter motor 2 (rear motor) needs to be positive to shoot a ball
-		leadShooter.set(-power);
+	public void testShootMotor(double power) {
+		//Lead shooter motor needs to be negative to shoot a ball
+		//Follow shooter motor (rear motor) needs to be positive to shoot a ball
+		leadShooter.set(power);
+		//SmartDashboard.putNumber("RPM", getabsRPM());
 	}
 
 }

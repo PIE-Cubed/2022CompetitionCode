@@ -165,7 +165,7 @@ public class Controls {
     }
     
     /**
-     * Button A
+     * Button A Pressed
      * @return buttonAPressed
      */
     public boolean grabberDeployRetract() {
@@ -173,7 +173,23 @@ public class Controls {
     }
 
     /**
-     * Button Y
+     * Button B Pressed
+     * @return
+     */
+    public boolean secureBalls() {
+        return xboxController.getBButtonPressed();
+    }
+
+    /**
+     * Button X Pressed
+     * @return
+     */
+    public boolean releaseBalls() {
+        return xboxController.getXButtonPressed();
+    }
+
+    /**
+     * Button Y Pressed
      * @return buttonBPressed
      */
     public boolean startShooter() {
@@ -250,10 +266,10 @@ public class Controls {
     //Grabber Direction based off of D-Pad
     public GrabberDirection getGrabberDirection() {
         if (xboxController.getPOV() == 0) {
-            return GrabberDirection.FORWARD;
+            return GrabberDirection.INTAKE;
         }
         else if (xboxController.getPOV() == 180) {
-            return GrabberDirection.REVERSE;
+            return GrabberDirection.EXPEL;
         }
         else {
             return GrabberDirection.OFF;

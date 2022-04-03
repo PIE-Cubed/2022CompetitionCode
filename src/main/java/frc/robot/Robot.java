@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Drive.TargetPipeline;
-import frc.robot.Grabber.GrabberState;
 import frc.robot.Shooter.ShootLocation;
 
 /**
@@ -39,7 +38,7 @@ public class Robot extends TimedRobot {
   Controls                controls;
   CargoTracking           cargoTracking;
   LedLights               led;
-  PowerDistributionPanel  pdp;
+  //PowerDistributionPanel  pdp;
 
   // Variables
   private int status              = Robot.CONT;
@@ -85,7 +84,7 @@ public class Robot extends TimedRobot {
     cargoTracking = new CargoTracking(drive);
     auto          = new Auto(drive, grabber, shooter, cargoTracking);
     led           = LedLights.getInstance();
-    pdp           = new PowerDistributionPanel();
+    //pdp           = new PowerDistributionPanel();
 
     //Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
@@ -179,8 +178,7 @@ public class Robot extends TimedRobot {
           status = auto.hangerAuto(balls, autoDelayMSec);
           break;
         case kWallAuto:
-          status = auto.autoShoot(Shooter.ShootLocation.HIGH_SHOT, 2);
-          // status = auto.wallAuto(balls, autoDelayMSec);
+          status = auto.wallAuto(balls, autoDelayMSec);
           break;
         default:
           status = DONE;
@@ -248,11 +246,13 @@ public class Robot extends TimedRobot {
     //Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( getRedAlliance() );
 
-    //
+    //Resets status
     status = Robot.CONT;
 
     //Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
+
+    //SmartDashboard.putNumber("Shoot Power", 0.00);
   }
 
   @Override
@@ -261,14 +261,15 @@ public class Robot extends TimedRobot {
    * Runs constantly during test
    */
   public void testPeriodic() {
-    drive.testWheelAngle();
+    //shooter.testShootMotor(SmartDashboard.getNumber("Shoot Power", 0.00));
+    //drive.testWheelAngle();
   }
 
   /**
    * Controls the wheels in TeleOp
    */
   private void wheelControl() {
-    //Gets Joystick Values
+    // Gets Joystick Values
     double driveX               = controls.getDriveX();
     double driveY               = controls.getDriveY();
     double rotatePower          = controls.getRotatePower();
@@ -276,38 +277,38 @@ public class Robot extends TimedRobot {
     ShootLocation shootLocation = controls.getShootLocation();
 
 
-    //Kills all automatic funcitons (Start on the Xbox controller)
+    // Kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
 
-    //General state changes
+    // General state changes
     if (autokill == true) {
       driveMode = DriveMode.MANUAL;
     } 
 
-    //Manual driving
+    // Manual driving
     if (driveMode == DriveMode.MANUAL) {
-      //Drives if we are out of dead zone
+      // Drives if we are out of dead zone
       if ((Math.abs(driveX) > 0.05) ||
           (Math.abs(driveY) > 0.05) || 
           (Math.abs(rotatePower) > 0.01)) {
         drive.teleopSwerve(driveX, driveY, rotatePower, false, true);
       }
       else {
-        //Robot is in dead zone, doesn't drive
+        // Robot is in dead zone, doesn't drive
         drive.stopWheels();
       }
 
-      //Exit conditions
+      // Exit conditions
       if ((shootLocation == ShootLocation.HIGH_SHOT) || (shootLocation == ShootLocation.LAUNCH_PAD)) {
         driveMode = DriveMode.LIMELIGHT_TARGETING;
       }
 
-      //Exit coditions
+      // Exit coditions
       if (enableCargoTracking == true) {
         driveMode = DriveMode.CARGO_TARGETING;
       }
     } 
-    //Limelight targeting
+    // Limelight targeting
     else if (driveMode == DriveMode.LIMELIGHT_TARGETING) {
       if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
         driveMode = DriveMode.MANUAL;
@@ -323,14 +324,14 @@ public class Robot extends TimedRobot {
         driveMode = DriveMode.MANUAL;
       }
     }
-    //Limelight targeted
+    // Limelight targeted
     else if (driveMode == DriveMode.LIMELIGHT_TARGETED) {
       //Does nothing until trigger is released
       if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
         driveMode = DriveMode.MANUAL;
       }
     }
-    //Raspberry Pi Targeting
+    // Raspberry Pi Targeting
     else if (driveMode == DriveMode.CARGO_TARGETING) {
       int cargoStatus = cargoTracking.autoCargoTrack();
 
@@ -342,7 +343,7 @@ public class Robot extends TimedRobot {
         driveMode = DriveMode.MANUAL;
       }
     }
-    //Raspberry Pi Targeted
+    // Raspberry Pi Targeted
     else if (driveMode == DriveMode.CARGO_TARGETED) {
       driveMode = DriveMode.MANUAL;
     }
@@ -355,6 +356,8 @@ public class Robot extends TimedRobot {
     // Controls function
     boolean deployRetract               = controls.grabberDeployRetract();
     boolean startShooter                = controls.startShooter();
+    boolean secureBalls                 = controls.secureBalls();
+    boolean releaseBalls                = controls.releaseBalls();
     Grabber.GrabberDirection grabberDir = controls.getGrabberDirection();
     Shooter.ShootLocation shootLocation = controls.getShootLocation();
 
@@ -368,31 +371,47 @@ public class Robot extends TimedRobot {
       grabber.deployRetract();
     }
     grabber.setGrabberMotor(grabberDir);
-    
+
+    /**
+     * Ball blocker
+     * <p> Manual controls takes precedent over automatic control
+     * <p> Automatically brings the ball blocker up when grabberDeploy() is called
+     */
+    // Manual
+    if ((secureBalls == true) && (releaseBalls == true)) {
+      System.out.println("ERROR! BOTH BALL BLOCKER BUTTONS PRESSED!");
+    }
+    else if (secureBalls == true) {
+      grabber.blockBalls();
+    }
+    else if (releaseBalls == true) {
+      grabber.releaseBalls();
+    }
+    // Automatic
+    else if (grabberDir == Grabber.GrabberDirection.INTAKE) {
+      grabber.releaseBalls();
+    }
+
     /**
      * Shooter control
      */
     if (shootLocation == Shooter.ShootLocation.OFF) {
       shooter.disableShooter();
-
-      if (Grabber.grabberState == GrabberState.RETRACT) {
-        shooter.blockBalls();
-      }
+      shooter.blockShooter();
 
       if (startShooter == true) {
         shooter.shooterControl(Shooter.ShootLocation.HIGH_SHOT);
-        shooter.blockAll();
       }
     }
     else {
       shooter.shooterControl(shootLocation);
 
       if (isShooterReady == true) {
-        shooter.openAll();
+        shooter.openShooter();
+        grabber.releaseBalls();
         led.shooterReady();
       }
       else {
-        shooter.blockShooter();
         led.shooterNotReady();
       }
 
