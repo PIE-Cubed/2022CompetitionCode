@@ -397,12 +397,16 @@ public class Auto {
 
         switch(step) {
             case 1:
-                status = drive.goToPoint(0, -4, 0);
-                break;    
+                Drive.ahrs.zeroYaw();
+                grabber.deploy();
+                grabber.setGrabberMotor(GrabberDirection.FORWARD);
+                status = Robot.DONE;
             case 2:
-                //come home
-                status = drive.goToPoint(2, -2, 45);   
-                break;      
+                status = drive.goToPoint(-4, 0, -90);
+                break;
+            case 3:
+                status = autoDelay(2000);
+                break;
             default:
                 //Finished routine
                 firstTime = true;
