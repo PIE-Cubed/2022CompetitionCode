@@ -231,36 +231,30 @@ public class Auto {
                 status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                grabber.grabberRetract();
-                grabber.setGrabberMotor(GrabberDirection.OFF);
-                status = Robot.DONE;
-                break;
-            case 6:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
-            case 7:
+            case 6:
                 //If we are only doing 2 ball path, the routine is over
                 if (balls < 3) {
-                    // Goes to step 11 to ensure we leave tarmac
-                    step = 11;
+                    // Goes to step 10 to ensure we leave tarmac
+                    step = 10;
                 }
                 status = Robot.DONE;
                 break;
-            case 8:
+            case 7:
                 status = drive.autoRotate(50);
                 break;
-            case 9:
-                grabber.grabberDeploy();
+            case 8:
                 status = drive.autoCrabDrive(7.0, 90, 0.5);
                 break;
-            case 10:
+            case 9:
                 grabber.setGrabberMotor(GrabberDirection.INTAKE);
                 status = drive.autoCrabDrive(2.15, 0, 0.2);
                 break;
-            case 11:
+            case 10:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
-            case 12:
+            case 11:
                 status = drive.autoCrabDrive(2.0, 0);
                 break;
             default:

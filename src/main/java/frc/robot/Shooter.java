@@ -47,7 +47,7 @@ public class Shooter {
 	public final double LOW_SHOT_POWER   =  -0.35; //-0.40
 	public final double HIGH_SHOT_POWER  =  -0.63; //-0.63- LOCKED IN
 	public final double LAUNCH_PAD_POWER =  -0.75; //-0.70
-	public final double AUTO_RING_POWER  =  -0.63; //-0.63- LOCKED IN
+	public final double AUTO_RING_POWER  =  -0.64; //-0.63- LOCKED IN
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM         = 6000; //Don't want shooter ready to be true while off
@@ -62,7 +62,7 @@ public class Shooter {
 	public final double LAUNCH_PAD_TARGET_RPM  = 4250; //4200
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_TARGET_RPM   = 3800; //3800- LOCKED IN
+	public final double AUTO_RING_TARGET_RPM   = 3850; //3800- LOCKED IN
 
 	// RPM OFFSET
 	private final int RPM_OFFSET = 50;
