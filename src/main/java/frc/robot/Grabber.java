@@ -35,7 +35,7 @@ public class Grabber {
     private DoubleSolenoid grabberPiston;
 
     //CONSTANTS
-    private final double GRABBER_POWER = -0.75;
+    private final double GRABBER_POWER = -0.65;//-0.75
 
     /**
      * Enumerator for Grabber States
