@@ -241,7 +241,8 @@ public class Auto {
             case 7:
                 //If we are only doing 2 ball path, the routine is over
                 if (balls < 3) {
-                    step = 100;
+                    // Goes to step 11 to ensure we leave tarmac
+                    step = 11;
                 }
                 status = Robot.DONE;
                 break;
