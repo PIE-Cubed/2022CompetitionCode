@@ -62,7 +62,7 @@ public class Shooter {
 	public final double LAUNCH_PAD_TARGET_RPM  = 4250; //4200
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_TARGET_RPM   = 3900; //3850 - ALMOST LOCKED IN
+	public final double AUTO_RING_TARGET_RPM   = 3850; //3850 - ALMOST LOCKED IN
 
 	// RPM OFFSET
 	private final int RPM_OFFSET = 50;
