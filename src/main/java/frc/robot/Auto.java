@@ -83,17 +83,20 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 4:
-                shooter.shooterControl(ShootLocation.AUTO_RING);
                 status = drive.autoCrabDrive(3.5, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                status = autoDelay(1500);
+                status = drive.autoAdjustWheels(180);
                 break;
             case 6:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                shooter.shooterControl(ShootLocation.HIGH_SHOT);
+                status = drive.autoCrabDrive(2.0, 180, 0.2);
                 break;
             case 7:
-                status = drive.autoCrabDrive(2.0, 0);
+                status = autoShoot(ShootLocation.HIGH_SHOT, 4);
+                break;
+            case 8:
+                status = drive.autoCrabDrive(4.0, 0);
                 break;
             default:
                 //Finished routine
@@ -158,17 +161,20 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 4:
-                shooter.shooterControl(ShootLocation.AUTO_RING);
                 status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                status = autoDelay(1500);
+                status = drive.autoAdjustWheels(180);
                 break;
             case 6:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                shooter.shooterControl(ShootLocation.HIGH_SHOT);
+                status = drive.autoCrabDrive(2.0, 180);
                 break;
             case 7:
-                status = drive.autoCrabDrive(2.0, 0);
+                status = autoShoot(ShootLocation.HIGH_SHOT, 4);
+                break;
+            case 8:
+                status = drive.autoCrabDrive(4.0, 0);
                 break;
             default:
                 //Finished routine
@@ -233,35 +239,55 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 4:
-                shooter.shooterControl(ShootLocation.AUTO_RING);
                 status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                status = drive.autoAdjustWheels(180);
                 break;
             case 6:
+                shooter.shooterControl(ShootLocation.HIGH_SHOT);
+                status = drive.autoCrabDrive(2, 180, 0.2);
+                break;
+            case 7:
+                if (balls == 2) {
+                    status = autoShoot(ShootLocation.HIGH_SHOT, 4);
+                }
+                else {
+                    status = autoShoot(ShootLocation.HIGH_SHOT, 2);
+                }
+                break;
+            case 8:
                 //If we are only doing 2 ball path, the routine is over
                 if (balls < 3) {
-                    // Goes to step 10 to ensure we leave tarmac
-                    step = 10;
+                    // Goes to step 13 to ensure we leave tarmac
+                    step = 12;
                 }
                 status = Robot.DONE;
                 break;
-            case 7:
+            case 9:
                 status = drive.autoRotate(50);
                 break;
-            case 8:
+            case 10:
                 status = drive.autoCrabDrive(7.0, 90, 0.5);
                 break;
-            case 9:
+            case 11:
                 grabber.setGrabberMotor(GrabberDirection.INTAKE);
                 status = drive.autoCrabDrive(2.15, 0, 0.2);
                 break;
-            case 10:
+            case 12:
                 status = autoShoot(ShootLocation.AUTO_RING, 2);
                 break;
-            case 11:
-                status = drive.autoCrabDrive(2.0, 0);
+            case 13:
+                grabber.grabberRetract();
+                status = Robot.DONE;
+                break;
+            case 14:
+                if (balls == 2) {
+                    status = drive.autoCrabDrive(4.0, 0);
+                } 
+                else if (balls == 3) {
+                    status = drive.autoCrabDrive(2.0, 0);
+                }
                 break;
             default:
                 //Finished routine
@@ -315,32 +341,36 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
-                //Starts speeding up shooter and targetting
+                // Starts speeding up shooter and targetting
                 shooter.shooterControl(location);
                 drive.limelightPIDTargeting(targettingLocation);
                 led.autoMode(); // Led lights turn Aqua
                 status = Robot.DONE;
                 break;
             case 2:
-                //Continues speeding up shooter and targetting until shooter is at correct RPM
+                // Starts speeding up shooter and targetting
+                shooter.shooterControl(location);
+                status = drive.limelightPIDTargeting(targettingLocation);
+                break;
+            case 3:
+                // Continues speeding up shooter and targetting until shooter is at correct RPM
+                shooter.shooterControl(location);
                 if (isShooterReady == true) {
                     status = Robot.DONE;
                 }
                 else {
                     status = Robot.CONT;
                 }
-                shooter.shooterControl(location);
-                drive.limelightPIDTargeting(targettingLocation);
                 break;
-            case 3:
-                //Retracts the shooter pistons to fire balls
+            case 4:
+                // Retracts the shooter pistons to fire balls
                 shooter.openShooter();
                 grabber.releaseBalls();
                 shooter.shooterControl(location);
                 status = autoDelay(numBalls * 1000);
                 break;
             default:
-                //Finished routine
+                // Finished routine
                 shooter.disableShooter();
                 shootStep = 1;
                 shootFirstTime = true;
@@ -352,7 +382,7 @@ public class Auto {
                 return Robot.DONE;
         }
 
-        //If we are done with a step, we go on to the next one and continue the routine
+        // If we are done with a step, we go on to the next one and continue the routine
         if (status == Robot.DONE) {
             shootStep++;
         }
