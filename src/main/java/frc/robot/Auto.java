@@ -322,15 +322,15 @@ public class Auto {
      */
     public int autoShoot(ShootLocation location, int numBalls) {
         int status = Robot.CONT;
-        TargetPipeline targettingLocation;
+        TargetPipeline targetingLocation;
 
         boolean isShooterReady = shooter.shooterReady();
 
         if ( (location == ShootLocation.HIGH_SHOT) || (location == ShootLocation.AUTO_RING) ) {
-            targettingLocation = TargetPipeline.ON_TARMAC;
+            targetingLocation = TargetPipeline.ON_TARMAC;
         }
         else {
-            targettingLocation = TargetPipeline.OFF_TARMAC;
+            targetingLocation = TargetPipeline.OFF_TARMAC;
         }
 
 		if (shootFirstTime == true) {
@@ -341,19 +341,19 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
-                // Starts speeding up shooter and targetting
+                // Starts speeding up shooter and targeting
                 shooter.shooterControl(location);
-                drive.limelightPIDTargeting(targettingLocation);
+                drive.limelightPIDTargeting(targetingLocation);
                 led.autoMode(); // Led lights turn Aqua
                 status = Robot.DONE;
                 break;
             case 2:
-                // Starts speeding up shooter and targetting
+                // Starts speeding up shooter and targeting
                 shooter.shooterControl(location);
-                status = drive.limelightPIDTargeting(targettingLocation);
+                status = drive.limelightPIDTargeting(targetingLocation);
                 break;
             case 3:
-                // Continues speeding up shooter and targetting until shooter is at correct RPM
+                // Continues speeding up shooter and targeting until shooter is at correct RPM
                 shooter.shooterControl(location);
                 if (isShooterReady == true) {
                     status = Robot.DONE;
