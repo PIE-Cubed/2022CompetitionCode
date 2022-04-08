@@ -31,9 +31,6 @@ public class Wheel {
     private static final double kI = 0.00;
     private static final double kD = 0.00;
 
-    // Variables
-    //private int counter = 0;
-
     // CONSTANTS
     private static final int WHEEL_CURRENT_LIMIT = 120;
 
@@ -97,19 +94,6 @@ public class Wheel {
          */
         setRotateMotorPower(rotatePower);
         setDriveMotorPower(drivePower);
-
-        /*
-        if (counter % 5 == 0) {
-            if (this.name == Drive.WheelProperties.FRONT_RIGHT_WHEEL) {
-                System.out.println("FR CWA: " + currWheelAngle + " TWA: " + targetWheelAngle + " DP: " + drivePower + " RP: " + rotatePower);
-            }
-            if (this.name == Drive.WheelProperties.REAR_RIGHT_WHEEL) {
-                System.out.println("BR CWA: " + currWheelAngle + " TWA: " + targetWheelAngle + " DP: " + drivePower + " RP: " + rotatePower + "\n");
-            }
-        }
-        counter++;
-        */
-
 
         //Are we within 2 degrees of target wheel angle? 
         //The return value does not need to be used 
