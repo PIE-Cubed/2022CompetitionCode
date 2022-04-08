@@ -87,9 +87,12 @@ public class Auto {
                 status = drive.autoCrabDrive(3.5, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                status = autoDelay(1500);
                 break;
             case 6:
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                break;
+            case 7:
                 status = drive.autoCrabDrive(2.0, 0);
                 break;
             default:
@@ -159,9 +162,12 @@ public class Auto {
                 status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
                 break;
             case 5:
-                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                status = autoDelay(1500);
                 break;
             case 6:
+                status = autoShoot(ShootLocation.AUTO_RING, 2);
+                break;
+            case 7:
                 status = drive.autoCrabDrive(2.0, 0);
                 break;
             default:
