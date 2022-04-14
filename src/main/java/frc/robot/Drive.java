@@ -81,7 +81,6 @@ public class Drive {
     //CONSTANTS
     private final int    FAIL_DELAY             = 5;
     private final double ticksPerFoot           = 5.65;
-    private final double limelightMountingAngle = 24; 
 
     //BLUE ROBOT
     private static final double FL_OFFSET = 309.8;
