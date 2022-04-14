@@ -43,7 +43,7 @@ public class Climber {
     private final int YELLOW_CLAW_CLOSE = 6;
 
     //Constants
-    private static final double BAR_TWO_POSITION   =  46.30;
+    private static final double BAR_TWO_POSITION   =  52.07; //46.3
     private static final double BAR_THREE_POSITION = -57.50;
     private static final double BAR_FOUR_POSITION  = -210.39;
 

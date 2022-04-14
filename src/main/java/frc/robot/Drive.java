@@ -41,7 +41,7 @@ public class Drive {
     private PIDController autoSwerveController;
 
     private static final double rotateToleranceDegrees = 2.0f;
-    private static final double kLimeLightToleranceDegrees = 3.0f;
+    private static final double kLimeLightToleranceDegrees = 2.0f;
     
     // Turn Controller
 	private static final double kP = 0.01; //0.02
@@ -79,8 +79,9 @@ public class Drive {
     private double  autoSwerveStartAngle = 0;
     
     //CONSTANTS
-    private final int    FAIL_DELAY   = 5;
-    private final double ticksPerFoot = 5.65;
+    private final int    FAIL_DELAY             = 5;
+    private final double ticksPerFoot           = 5.65;
+    private final double limelightMountingAngle = 24; 
 
     //BLUE ROBOT
     private static final double FL_OFFSET = 309.8;
@@ -801,7 +802,7 @@ public class Drive {
         double tv = get_tv();
         //System.out.println("tv: " + tv);
 		// Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees) [54 degree tolerance]
-		double tx = get_tx();
+		double tx = get_tx() - 2; //Makes ball hit side instead of agitator in center
         //System.out.println("tx: " + tx);
 
 		// Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]

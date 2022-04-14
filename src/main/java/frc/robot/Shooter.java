@@ -23,7 +23,13 @@ public class Shooter {
 	//3 holes above marked one
 	//Low against hub- 0.3 speed, 1650-1750 rpm
 	//High from edge of tarmac- 0.525 speed, 2980-3100 rpm
-	
+
+	//5.4	ty
+	//
+	//
+	//
+
+
 	// SPARK MAX
 	private CANSparkMax    leadShooter;   // Needs negative power to shoot
 	private CANSparkMax    followShooter; // Needs positive power to shoot
