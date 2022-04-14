@@ -332,14 +332,14 @@ public class Auto {
             case 1:
                 // Starts speeding up shooter and targeting
                 shooter.shooterControl(location);
-                drive.limelightPIDTargeting(targetingLocation);
+                drive.limelightPIDTargeting(location, targetingLocation);
                 led.autoMode(); // Led lights turn Aqua
                 status = Robot.DONE;
                 break;
             case 2:
                 // Starts speeding up shooter and targeting
                 shooter.shooterControl(location);
-                status = drive.limelightPIDTargeting(targetingLocation);
+                status = drive.limelightPIDTargeting(location, targetingLocation);
                 break;
             case 3:
                 // Continues speeding up shooter and targeting until shooter is at correct RPM

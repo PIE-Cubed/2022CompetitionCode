@@ -314,7 +314,7 @@ public class Robot extends TimedRobot {
         driveMode = DriveMode.MANUAL;
       }
       else {
-        targetStatus = drive.limelightPIDTargeting(Drive.TargetPipeline.ON_TARMAC);
+        targetStatus = drive.limelightPIDTargeting(shootLocation, Drive.TargetPipeline.ON_TARMAC);
       }
 
       if (targetStatus == Robot.DONE) {

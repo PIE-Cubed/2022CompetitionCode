@@ -7,12 +7,14 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
 
+import edu.wpi.first.networktables.*;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 
-import edu.wpi.first.networktables.*;
-
 import java.util.stream.DoubleStream;
+
+import frc.robot.Shooter.ShootLocation;
 
 /**
  * Start of class
@@ -37,11 +39,13 @@ public class Drive {
     //PID controllers
     private PIDController rotateController;
     private PIDController targetController;
+    private PIDController driveController;
     private PIDController autoCrabDriveController;
     private PIDController autoSwerveController;
 
-    private static final double rotateToleranceDegrees = 2.0f;
+    private static final double rotateToleranceDegrees     = 2.0f;
     private static final double kLimeLightToleranceDegrees = 2.0f;
+    private static final double kLimeLightDriveTolerance   = 0.5f;
     
     // Turn Controller
 	private static final double kP = 0.01; //0.02
@@ -52,6 +56,11 @@ public class Drive {
 	private static final double tP = 0.015; //0.033
 	private static final double tI = 0.001; //0.002
     private static final double tD = 0.00;
+
+    //Drive Controller
+    private static final double dP = 0.015; //0.033
+	private static final double dI = 0.001; //0.002
+    private static final double dD = 0.00;
     
     //Auto crab drive controller
     private static final double acdP = 0.005; //0.02
@@ -307,6 +316,9 @@ public class Drive {
 
         targetController = new PIDController(tP, tI, tD);
         targetController.setTolerance(kLimeLightToleranceDegrees);
+
+        driveController = new PIDController(dP, dI, dD);
+        driveController.setTolerance(kLimeLightDriveTolerance);
 
         //Inegrator Ranges
         targetController.setIntegratorRange(TARGET_I_MIN, TARGET_I_MAX);
@@ -769,31 +781,35 @@ public class Drive {
      * Limelight targeting using PID
      * @return program status
      */
-	public int limelightPIDTargeting(TargetPipeline pipeline) {
-        //Variables
-		double m_LimelightCalculatedPower = 0;
+	public int limelightPIDTargeting(ShootLocation location, TargetPipeline pipeline) {
+        // Variables
+		double limelightRotatePower = 0;
+        double limelightDrivePower  = 0;
         long   currentMs = System.currentTimeMillis(); //Gets the current time
 
-        //Constants
+        // Constants
         final int  TIME_OUT_SEC   = 5;
         final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
+        final double TY_HIGH = 5.9;
+        final double TY_SAFE = 10.0;
+        final double TY_AUTO = 6.0;
 
-        //Sets the required pipeline
+        // Sets the required pipeline
         changePipeline(pipeline);
 
 		if (limeLightFirstTime == true) {
-            //Sets limeLightFirstTime to false
+            // Sets limeLightFirstTime to false
             limeLightFirstTime = false;
 
-            //Resets the variables for tracking targets
+            // Resets the variables for tracking targets
 			noTargetCount    = 0;
             targetLockedCount = 0;
             
-            //Sets and displays the forced time out
+            // Sets and displays the forced time out
 			timeOut = currentMs + TIME_OUT_MSEC;
             //System.out.println("Limelight timeOut " + TIME_OUT_SEC + " seconds");
             
-            //Turns the limelight on
+            // Turns the limelight on
             changeledMode(LEDState.ON);
 		}
 
@@ -805,7 +821,7 @@ public class Drive {
         //System.out.println("tx: " + tx);
 
 		// Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
-        //double ty = get_ty();
+        double ty = get_ty();
         //System.out.println("ty: " + ty);
 		// Target Area (0% of image to 100% of image) [Basic way to determine distance]
         //double ta = get_ta();
@@ -814,41 +830,66 @@ public class Drive {
 		if (tv < 1.0) {
             stopWheels();
 
-            //Adds one to the noTargetCount (will exit this program if that count exceedes 5) 
+            // Adds one to the noTargetCount (will exit this program if that count exceedes 5) 
 			noTargetCount++;
 
 			if (noTargetCount <= FAIL_DELAY) {
-                //Tells the robot to continue searching, Led lights turn Yellow
+                // Tells the robot to continue searching, Led lights turn Yellow
                 led.limelightAdjusting();
 				return Robot.CONT;
 			}
 			else {
-                //Reset variables
+                // Reset variables
 				noTargetCount      = 0;
                 targetLockedCount  = 0;
                 limeLightFirstTime = true;
                 targetController.reset();
 
-                //Stops the robot
+                // Stops the robot
                 stopWheels();
                 
                 // Led lights turn Red
                 led.limelightNoValidTarget();
                 
-                //Returns the error code for failure
+                // Returns the error code for failure
 				return Robot.DONE;
 			}
 		}
         else {
-            //Keeps noTargetCount at 0
+            // Keeps noTargetCount at 0
             noTargetCount = 0;
 		}
 
-        // Rotate
-		m_LimelightCalculatedPower = targetController.calculate(tx, 0.0);
-        m_LimelightCalculatedPower = MathUtil.clamp(m_LimelightCalculatedPower, -0.50, 0.50);
-		teleopRotate(-1 * m_LimelightCalculatedPower, true);
-		//System.out.println("Pid out: " + m_LimelightCalculatedPower);
+        // Calculate Rotate power
+		limelightRotatePower = targetController.calculate(tx, 0.0);
+        limelightRotatePower = MathUtil.clamp(limelightRotatePower, -0.50, 0.50);
+		//teleopRotate(-1 * limelightRotatePower, true);
+		//System.out.println("Pid out: " + limelightCalculatedPower);
+
+        // Calculate Drive power
+        if (location == ShootLocation.LOW_SHOT) {
+            // Doesn't do anything because the limelight shouldn't run
+            limelightDrivePower = 0.00;
+        } 
+        else if (location == ShootLocation.HIGH_SHOT) {
+            // Calculates the power needed to get to the set ty
+            limelightDrivePower = driveController.calculate(ty, TY_HIGH);
+        }
+        else if (location == ShootLocation.LAUNCH_PAD) {
+            // Calculates the power needed to get to the set ty
+            limelightDrivePower = driveController.calculate(ty, TY_SAFE);
+        }
+        else if (location == ShootLocation.AUTO_RING) {
+            // Calculates the power needed to get to the set ty
+            limelightDrivePower = driveController.calculate(ty, TY_AUTO);
+        }
+        else {
+            limelightDrivePower = 0.00;
+        }
+        limelightDrivePower = MathUtil.clamp(limelightDrivePower, -0.25, 0.25);
+
+        // Rotate and drive
+        teleopSwerve(0.00, limelightDrivePower, limelightRotatePower, false, false);
 
 		// CHECK: Routine Complete
 		if (targetController.atSetpoint() == true) {
@@ -858,40 +899,40 @@ public class Drive {
 		}
 
 		if (targetLockedCount >= ON_TARGET_COUNT) {
-            //Reset variables
+            // Reset variables
             targetLockedCount = 0;
             noTargetCount     = 0;
             limeLightFirstTime = true;
             targetController.reset();
             
-            //Stops the robot
+            // Stops the robot
 			stopWheels();
 
             // Led lights turn Green
             led.limelightFinished();
 
-            //Returns the error code for success
+            // Returns the error code for success
 			return Robot.DONE;
         }
         
-		// limelight time out readjust
+		// Limelight time out readjust
 		if (currentMs > timeOut) {
-            //Resets the variables
+            // Resets the variables
             targetLockedCount = 0;
             noTargetCount     = 0;
             limeLightFirstTime = true;
             targetController.reset();
             
-            //Stops the robot
+            // Stops the robot
             stopWheels();
             
-            //Prints the timeout
+            // Prints the timeout
             System.out.println("timeout " + tx + " Target Acquired " + tv);
 
-            //Turns LED's off
+            // Turns LED's off
             //changeledMode(LEDState.OFF);
 
-            //Returns the error code for failure
+            // Returns the error code for failure
 			return Robot.FAIL;
         }
         
