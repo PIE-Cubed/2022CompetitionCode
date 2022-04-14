@@ -55,26 +55,28 @@ public class Drive {
     //Target Controller
 	private static final double tP = 0.015; //0.033
 	private static final double tI = 0.001; //0.002
-    private static final double tD = 0.00;
+    private static final double tD = 0.000;
 
     //Drive Controller
-    private static final double dP = 0.015; //0.033
-	private static final double dI = 0.001; //0.002
-    private static final double dD = 0.00;
+    private static final double dP = 0.045;
+	private static final double dI = 0.001;
+    private static final double dD = 0.000;
     
     //Auto crab drive controller
     private static final double acdP = 0.005; //0.02
-    private static final double acdI = 0.00;
-    private static final double acdD = 0.00;
+    private static final double acdI = 0.000;
+    private static final double acdD = 0.000;
 
     //Swerve Controller
     private static final double sP = 0.003; //0.002
-    private static final double sI = 0.00;
-    private static final double sD = 0.00;
+    private static final double sI = 0.000;
+    private static final double sD = 0.000;
 
     //Integrator Range
     private static final double TARGET_I_MAX = 0.05;
     private static final double TARGET_I_MIN = -1 * TARGET_I_MAX;
+    private static final double DRIVE_I_MAX  = 0.1;
+    private static final double DRIVE_I_MIN  = -1 * DRIVE_I_MAX;
 
 	//Variables
     private boolean crabFirstTime        = true;
@@ -104,8 +106,9 @@ public class Drive {
     // private static final double BR_OFFSET =  22.073;
 
 	//Limelight Variables
-    private int     noTargetCount      = 0;
-    private int     targetLockedCount  = 0;
+    private int     noTargetCount       = 0;
+    private int     targetLockedCount   = 0;
+    private int     distanceLockedCount = 0;
     private long    timeOut;
     private boolean limeLightFirstTime = true;
 	private static final int ON_TARGET_COUNT = 5;
@@ -322,6 +325,7 @@ public class Drive {
 
         //Inegrator Ranges
         targetController.setIntegratorRange(TARGET_I_MIN, TARGET_I_MAX);
+        driveController.setIntegratorRange(DRIVE_I_MIN, DRIVE_I_MAX);
 
         /**
          * LIMELIGHT
@@ -792,7 +796,7 @@ public class Drive {
         final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
         final double TY_HIGH = 5.9;
         final double TY_SAFE = 10.0;
-        final double TY_AUTO = 6.0;
+        final double TY_AUTO = 6.1;
 
         // Sets the required pipeline
         changePipeline(pipeline);
@@ -802,8 +806,9 @@ public class Drive {
             limeLightFirstTime = false;
 
             // Resets the variables for tracking targets
-			noTargetCount    = 0;
-            targetLockedCount = 0;
+			noTargetCount       = 0;
+            targetLockedCount   = 0;
+            distanceLockedCount = 0;
             
             // Sets and displays the forced time out
 			timeOut = currentMs + TIME_OUT_MSEC;
@@ -817,7 +822,7 @@ public class Drive {
         double tv = get_tv();
         //System.out.println("tv: " + tv);
 		// Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees) [54 degree tolerance]
-		double tx = get_tx() - 2; //Makes ball hit side instead of agitator in center
+		double tx = get_tx(); //Makes ball hit side instead of agitator in center
         //System.out.println("tx: " + tx);
 
 		// Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]
@@ -840,10 +845,12 @@ public class Drive {
 			}
 			else {
                 // Reset variables
-				noTargetCount      = 0;
-                targetLockedCount  = 0;
+				noTargetCount       = 0;
+                targetLockedCount   = 0;
+                distanceLockedCount = 0;
                 limeLightFirstTime = true;
                 targetController.reset();
+                driveController.reset();
 
                 // Stops the robot
                 stopWheels();
@@ -886,24 +893,35 @@ public class Drive {
         else {
             limelightDrivePower = 0.00;
         }
-        limelightDrivePower = MathUtil.clamp(limelightDrivePower, -0.25, 0.25);
+
+        // Clamps the drive powers
+        limelightDrivePower = MathUtil.clamp(limelightDrivePower, -0.5, 0.5);
+        limelightDrivePower = -1 * limelightDrivePower;
 
         // Rotate and drive
-        teleopSwerve(0.00, limelightDrivePower, limelightRotatePower, false, false);
+        teleopSwerve(0.00, limelightDrivePower, -1 * limelightRotatePower, false, false);
 
 		// CHECK: Routine Complete
 		if (targetController.atSetpoint() == true) {
             targetLockedCount++;
             
-			//System.out.println("On target");
+			//System.out.println("On X target");
 		}
 
-		if (targetLockedCount >= ON_TARGET_COUNT) {
+        if (driveController.atSetpoint() == true) {
+            distanceLockedCount++;
+
+            //System.out.println("On Distance target");
+        }
+
+		if ((targetLockedCount >= ON_TARGET_COUNT) && (distanceLockedCount >= ON_TARGET_COUNT)) {
             // Reset variables
-            targetLockedCount = 0;
-            noTargetCount     = 0;
+            targetLockedCount   = 0;
+            distanceLockedCount = 0;
+            noTargetCount       = 0;
             limeLightFirstTime = true;
             targetController.reset();
+            driveController.reset();
             
             // Stops the robot
 			stopWheels();
@@ -918,10 +936,12 @@ public class Drive {
 		// Limelight time out readjust
 		if (currentMs > timeOut) {
             // Resets the variables
-            targetLockedCount = 0;
-            noTargetCount     = 0;
-            limeLightFirstTime = true;
+            targetLockedCount   = 0;
+            distanceLockedCount = 0;
+            noTargetCount       = 0;
+            limeLightFirstTime  = true;
             targetController.reset();
+            driveController.reset();
             
             // Stops the robot
             stopWheels();

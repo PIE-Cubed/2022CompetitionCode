@@ -45,9 +45,9 @@ public class Shooter {
 	// Use PID with mostly I, the P will just give a boost at the start
 	public final double OFF_POWER        =  -0.00;
 	public final double LOW_SHOT_POWER   =  -0.35; //-0.40
-	public final double HIGH_SHOT_POWER  =  -0.63; //-0.63- LOCKED IN
+	public final double HIGH_SHOT_POWER  =  -0.63; //-0.63 - LOCKED IN
 	public final double LAUNCH_PAD_POWER =  -0.75; //-0.70
-	public final double AUTO_RING_POWER  =  -0.64; //-0.63- LOCKED IN
+	public final double AUTO_RING_POWER  =  -0.64; //-0.63 - LOCKED IN
 
 	// RPM CONSTANTS
 	public final double OFF_TARGET_RPM         = 6000; //Don't want shooter ready to be true while off
@@ -56,13 +56,13 @@ public class Shooter {
 	public final double LOW_SHOT_TARGET_RPM    = 2100; //2200
 
 	// 9 feet and 6 inches, from the center of the hub
-	public final double HIGH_SHOT_TARGET_RPM   = 3750; //3750- may want to increase once we have a higher ceiling
+	public final double HIGH_SHOT_TARGET_RPM   = 3750; //3750
 
 	// 16 feet and 10 inches, from the center of the hub
 	public final double LAUNCH_PAD_TARGET_RPM  = 4250; //4200
 
 	// 12 feet and 8 inches, from the center of the hub
-	public final double AUTO_RING_TARGET_RPM   = 3850; //3850 - ALMOST LOCKED IN
+	public final double AUTO_RING_TARGET_RPM   = 3850; //3850
 
 	// RPM OFFSET
 	private final int RPM_OFFSET = 50;
