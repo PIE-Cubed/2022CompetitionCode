@@ -794,9 +794,9 @@ public class Drive {
         // Constants
         final int  TIME_OUT_SEC   = 5;
         final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
-        final double TY_HIGH = 5.9;
-        final double TY_SAFE = 10.0;
-        final double TY_AUTO = 6.1;
+        final double TY_HIGH =  5.85;
+        final double TY_AUTO =  5.65;
+        //final double TY_SAFE = -7.20;
 
         // Sets the required pipeline
         changePipeline(pipeline);
@@ -882,20 +882,20 @@ public class Drive {
             // Calculates the power needed to get to the set ty
             limelightDrivePower = driveController.calculate(ty, TY_HIGH);
         }
-        else if (location == ShootLocation.LAUNCH_PAD) {
-            // Calculates the power needed to get to the set ty
-            limelightDrivePower = driveController.calculate(ty, TY_SAFE);
-        }
         else if (location == ShootLocation.AUTO_RING) {
             // Calculates the power needed to get to the set ty
             limelightDrivePower = driveController.calculate(ty, TY_AUTO);
+        }
+        else if (location == ShootLocation.LAUNCH_PAD) {
+            // Does nothing to avoid running into the hangar
+            limelightDrivePower = 0.00;
         }
         else {
             limelightDrivePower = 0.00;
         }
 
         // Clamps the drive powers
-        limelightDrivePower = MathUtil.clamp(limelightDrivePower, -0.5, 0.5);
+        limelightDrivePower = MathUtil.clamp(limelightDrivePower, -0.50, 0.50);
         limelightDrivePower = -1 * limelightDrivePower;
 
         // Rotate and drive
