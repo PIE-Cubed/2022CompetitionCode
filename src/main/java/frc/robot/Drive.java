@@ -44,8 +44,8 @@ public class Drive {
     private PIDController autoSwerveController;
 
     private static final double rotateToleranceDegrees     = 2.0f;
-    private static final double kLimeLightToleranceDegrees = 2.0f;
-    private static final double kLimeLightDriveTolerance   = 0.5f;
+    private static final double kLimeLightToleranceDegrees = 1.0f;
+    private static final double kLimeLightDriveTolerance   = 0.25f;
     
     // Turn Controller
 	private static final double kP = 0.01; //0.02
@@ -794,7 +794,7 @@ public class Drive {
         // Constants
         final int  TIME_OUT_SEC   = 5;
         final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
-        final double TY_HIGH =  5.85;
+        final double TY_HIGH =  9.5; //5.85
         final double TY_AUTO =  5.65;
         //final double TY_SAFE = -7.20;
 
@@ -997,7 +997,7 @@ public class Drive {
      */
     public void changePipeline(TargetPipeline pipelineName) {
         //Makes it a bit easier to change pipelines
-        if (pipelineName == TargetPipeline.ON_TARMAC) {
+        if (pipelineName == TargetPipeline.ON_TARMAC) { //Line 1000
             // Configures the limelight for on tarmac targeting
             pipeline.setNumber(0);
         }
@@ -1058,7 +1058,7 @@ public class Drive {
         rearLeftWheel.setRotateMotorPower(power);
         rearRightWheel.setRotateMotorPower(power);
         System.out.println("Degrees: " + rearLeftWheel.getRotateMotorPosition());
-    } //Line 1000!
+    }
 
     public void testPID() {
         frontLeftWheel.rotateAndDrive(0, 0, false);

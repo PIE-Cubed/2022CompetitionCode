@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
   // Variables
   private int status              = Robot.CONT;
   private int targetStatus        = Robot.CONT;
+  private boolean lowShotEnabled  = false;
 
   // Enumeration for manual or automatic  control
   public static enum DriveMode {
@@ -298,6 +299,14 @@ public class Robot extends TimedRobot {
         drive.stopWheels();
       }
 
+      // Sets a variable that is used later in ShooterControl()
+      if (shootLocation == ShootLocation.LOW_SHOT) {
+        lowShotEnabled = true;
+      }
+      else {
+        lowShotEnabled = false;
+      }
+
       // Exit conditions
       if ((shootLocation == ShootLocation.HIGH_SHOT) || (shootLocation == ShootLocation.LAUNCH_PAD)) {
         driveMode = DriveMode.LIMELIGHT_TARGETING;
@@ -406,10 +415,14 @@ public class Robot extends TimedRobot {
     else {
       shooter.shooterControl(shootLocation);
 
-      if (isShooterReady == true) {
+      if (isShooterReady == true && (lowShotEnabled == true || driveMode == DriveMode.LIMELIGHT_TARGETED)) {
         shooter.openShooter();
         grabber.releaseBalls();
         led.shooterReady();
+      }
+      else if (isShooterReady == false) {
+        shooter.blockShooter();
+        led.shooterNotReady();
       }
       else {
         led.shooterNotReady();
