@@ -90,7 +90,7 @@ public class Auto {
                 break;
             case 6:
                 shooter.shooterControl(ShootLocation.HIGH_SHOT);
-                status = drive.autoCrabDrive(1.75, 180, 0.2);
+                status = drive.autoCrabDrive(1.50, 180, 0.2);
                 break;
             case 7:
                 status = autoShoot(ShootLocation.HIGH_SHOT, 4);
@@ -332,14 +332,14 @@ public class Auto {
             case 1:
                 // Starts speeding up shooter and targeting
                 shooter.shooterControl(location);
-                drive.limelightPIDTargeting(location, targetingLocation);
+                drive.limelightPIDTargeting(location, targetingLocation, false);
                 led.autoMode(); // Led lights turn Aqua
                 status = Robot.DONE;
                 break;
             case 2:
                 // Starts speeding up shooter and targeting
                 shooter.shooterControl(location);
-                status = drive.limelightPIDTargeting(location, targetingLocation);
+                status = drive.limelightPIDTargeting(location, targetingLocation, false);
                 break;
             case 3:
                 // Continues speeding up shooter and targeting until shooter is at correct RPM

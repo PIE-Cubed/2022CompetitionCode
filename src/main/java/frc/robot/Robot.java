@@ -323,7 +323,7 @@ public class Robot extends TimedRobot {
         driveMode = DriveMode.MANUAL;
       }
       else {
-        targetStatus = drive.limelightPIDTargeting(shootLocation, Drive.TargetPipeline.ON_TARMAC);
+        targetStatus = drive.limelightPIDTargeting(shootLocation, Drive.TargetPipeline.ON_TARMAC, true);
       }
 
       if (targetStatus == Robot.DONE) {

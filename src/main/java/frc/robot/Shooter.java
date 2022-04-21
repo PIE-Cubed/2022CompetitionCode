@@ -171,9 +171,6 @@ public class Shooter {
 		power = MathUtil.clamp(power, -1.00, 1.00);
 
 		//Displays powers and rpms to smartdashboard
-		// SmartDashboard.putNumber("Power", power);
-		// SmartDashboard.putNumber("RPM", getabsRPM());
-
 		leadShooter.set(power);
 	}
 

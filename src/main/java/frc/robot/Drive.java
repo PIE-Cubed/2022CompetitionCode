@@ -111,7 +111,8 @@ public class Drive {
     private int     distanceLockedCount = 0;
     private long    timeOut;
     private boolean limeLightFirstTime = true;
-	private static final int ON_TARGET_COUNT = 5;
+	private static final int ON_ROTATION_COUNT = 5;
+    private static final int ON_DISTANCE_COUNT = 20;
     private static final int ON_ANGLE_COUNT  = 10;
 
     //Limelight
@@ -785,14 +786,14 @@ public class Drive {
      * Limelight targeting using PID
      * @return program status
      */
-	public int limelightPIDTargeting(ShootLocation location, TargetPipeline pipeline) {
+	public int limelightPIDTargeting(ShootLocation location, TargetPipeline pipeline, boolean isTeleOp) {
         // Variables
 		double limelightRotatePower = 0;
         double limelightDrivePower  = 0;
         long   currentMs = System.currentTimeMillis(); //Gets the current time
 
         // Constants
-        final int  TIME_OUT_SEC   = 5;
+        final int  TIME_OUT_SEC   = 3;
         final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
         final double TY_HIGH =  9.5; //5.85
         final double TY_AUTO =  5.65;
@@ -873,30 +874,35 @@ public class Drive {
 		//teleopRotate(-1 * limelightRotatePower, true);
 		//System.out.println("Pid out: " + limelightCalculatedPower);
 
-        // Calculate Drive power
-        if (location == ShootLocation.LOW_SHOT) {
-            // Doesn't do anything because the limelight shouldn't run
-            limelightDrivePower = 0.00;
-        } 
-        else if (location == ShootLocation.HIGH_SHOT) {
-            // Calculates the power needed to get to the set ty
-            limelightDrivePower = driveController.calculate(ty, TY_HIGH);
-        }
-        else if (location == ShootLocation.AUTO_RING) {
-            // Calculates the power needed to get to the set ty
-            limelightDrivePower = driveController.calculate(ty, TY_AUTO);
-        }
-        else if (location == ShootLocation.LAUNCH_PAD) {
-            // Does nothing to avoid running into the hangar
-            limelightDrivePower = 0.00;
+        if (isTeleOp == true) {
+            // Calculate Drive power
+            if (location == ShootLocation.LOW_SHOT) {
+                // Doesn't do anything because the limelight shouldn't run
+                limelightDrivePower = 0.00;
+            } 
+            else if (location == ShootLocation.HIGH_SHOT) {
+                // Calculates the power needed to get to the set ty
+                limelightDrivePower = driveController.calculate(ty, TY_HIGH);
+            }
+            else if (location == ShootLocation.AUTO_RING) {
+                // Calculates the power needed to get to the set ty
+                limelightDrivePower = driveController.calculate(ty, TY_AUTO);
+            }
+            else if (location == ShootLocation.LAUNCH_PAD) {
+                // Does nothing to avoid running into the hangar
+                limelightDrivePower = 0.00;
+            }
+            else {
+                limelightDrivePower = 0.00;
+            }
+
+            // Clamps the drive powers
+            limelightDrivePower = MathUtil.clamp(limelightDrivePower, -0.50, 0.50);
+            limelightDrivePower = -1 * limelightDrivePower;
         }
         else {
             limelightDrivePower = 0.00;
         }
-
-        // Clamps the drive powers
-        limelightDrivePower = MathUtil.clamp(limelightDrivePower, -0.50, 0.50);
-        limelightDrivePower = -1 * limelightDrivePower;
 
         // Rotate and drive
         teleopSwerve(0.00, limelightDrivePower, -1 * limelightRotatePower, false, false);
@@ -914,7 +920,7 @@ public class Drive {
             //System.out.println("On Distance target");
         }
 
-		if ((targetLockedCount >= ON_TARGET_COUNT) && (distanceLockedCount >= ON_TARGET_COUNT)) {
+		if ((targetLockedCount >= ON_ROTATION_COUNT) && (distanceLockedCount >= ON_DISTANCE_COUNT)) {
             // Reset variables
             targetLockedCount   = 0;
             distanceLockedCount = 0;
@@ -953,7 +959,7 @@ public class Drive {
             //changeledMode(LEDState.OFF);
 
             // Returns the error code for failure
-			return Robot.FAIL;
+			return Robot.DONE;
         }
         
 		return Robot.CONT;   
