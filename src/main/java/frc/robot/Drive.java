@@ -823,7 +823,7 @@ public class Drive {
         double tv = get_tv();
         //System.out.println("tv: " + tv);
 		// Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees) [54 degree tolerance]
-		double tx = get_tx()-2; //Makes ball hit side instead of agitator in center
+		double tx = get_tx(); //Makes ball hit side instead of agitator in center
         //System.out.println("tx: " + tx);
 
 		// Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) [41 degree tolerance]

@@ -56,8 +56,8 @@ public class CargoTracking {
 	private double cargoToleranceDegrees = 6.00f;
 
 	// Cargo Controller
-	private static final double cP = 0.0025; //0.0030
-	private static final double cI = 0.0023; //0.0037
+	private static final double cP = 0.0030; //0.0025
+	private static final double cI = 0.0015; //0.0023
 	private static final double cD = 0.0000;
 
 	// Integrator limits
@@ -225,7 +225,7 @@ public class CargoTracking {
 			// Scales the power down to account for the image being resized
 			m_CargoCalculatedPower = m_CargoCalculatedPower / IMG_SCALE_FACTOR;
 			// Clamps the power so the robot doesn't go spinning
-			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.50, 0.50);
+			m_CargoCalculatedPower = MathUtil.clamp(m_CargoCalculatedPower, -0.75, 0.75);
 			// Negates the power to make it go in the right direction
 			m_CargoCalculatedPower = -1 * m_CargoCalculatedPower;
 

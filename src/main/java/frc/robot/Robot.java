@@ -263,7 +263,7 @@ public class Robot extends TimedRobot {
    */
   public void testPeriodic() {
     //shooter.testShootMotor(SmartDashboard.getNumber("Shoot Power", 0.00));
-    //drive.testWheelAngle();
+    cargoTracking.autoCargoTrack();
   }
 
   /**

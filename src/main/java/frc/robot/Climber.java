@@ -44,7 +44,7 @@ public class Climber {
 
     //Constants
     private static final double BAR_TWO_POSITION   =  52.07; //46.3
-    private static final double BAR_THREE_POSITION = -57.50;
+    private static final double BAR_THREE_POSITION = -59.00;
     private static final double BAR_FOUR_POSITION  = -210.39;
 
     //The enum and claw variables
