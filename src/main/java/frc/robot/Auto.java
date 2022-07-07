@@ -47,6 +47,60 @@ public class Auto {
     }
 
     /**
+     * Practice autonomous code for the class
+     * @return status
+     */
+    public int practiceAuto() {
+        int status = Robot.CONT;
+    
+		if (firstTime == true) {
+            led.autoMode(); // Led lights turn Aqua
+
+			firstTime = false;
+			step = 1;
+		}
+
+        switch(step) {
+            //CODE GOES HERE
+            //CHECK THE DOCUMENT IN THIS FOLDER FOR A LIST OF USEFUL FUNCTIONS
+
+            case 1:
+                //Format for function that runs over multiple iterations and returns a status
+                status = autoDelay(1000); //autoDelay() returns CONT. until it has been ran for a given amount of milliseconds, where it returns DONE
+                break;
+            case 2:
+                //Format for functions that run over one iteration and don't return a status
+                grabber.grabberDeploy(); //grabberDeploy() brings down the grabber. This only runs once and doesn't need to return a status
+                grabber.setGrabberMotor(GrabberDirection.INTAKE);
+                status = Robot.DONE; //In order for the code to go to the next step, we must manually set status to DONE
+                break;
+            default:
+                //Finished routine
+                step = 1;
+                firstTime = true;
+
+                // Led lights turn Gold
+                led.autoModeFinished();
+
+                // Stops applicable motors
+                grabber.setGrabberMotor(GrabberDirection.OFF);
+                grabber.grabberDeploy();
+                grabber.releaseBalls();
+                shooter.disableShooter();
+                drive.stopWheels();
+ 
+                return Robot.DONE;
+        }
+
+        //If we are done with a step, we go on to the next one and continue the routine
+        if (status == Robot.DONE) {
+            step++;
+        }
+        
+        return Robot.CONT;
+    }
+
+    /**
      * Autonomous program for the position closest to the center
      * @param balls
      * @param delayMs

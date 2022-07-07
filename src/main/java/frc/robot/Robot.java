@@ -171,6 +171,8 @@ public class Robot extends TimedRobot {
     long autoDelayMSec = delaySec * 1000;
 
     if (status == Robot.CONT) {
+      status = auto.practiceAuto();
+      /*
       switch (m_autoSelected) {
         case kCenterAuto:
           status = auto.centerAuto(balls, autoDelayMSec);
@@ -184,7 +186,7 @@ public class Robot extends TimedRobot {
         default:
           status = DONE;
           break;
-      }
+      }*/
     }
   }
 
