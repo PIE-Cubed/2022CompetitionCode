@@ -24,6 +24,7 @@ public class PowerDistributionPanel {
         pdp.setSwitchableChannel(true);
     }
 
+    //Gets the total voltage from power distribution panel
     public double getVoltage() {
         return pdp.getVoltage();
     }
