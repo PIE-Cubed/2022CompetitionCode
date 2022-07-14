@@ -29,6 +29,7 @@ public class PowerDistributionPanel {
         return pdp.getVoltage();
     }
 
+    //Gets the total current drawn by power distribution panel
     public double getCurrent() {
         return pdp.getTotalCurrent();
     }
