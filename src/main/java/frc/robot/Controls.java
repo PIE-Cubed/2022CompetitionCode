@@ -16,14 +16,12 @@ import frc.robot.Shooter.ShootLocation;
  * Start of class
  */
 public class Controls {
-    // Variables
-
     // CONSTANTS
     private final int JOYSTICK_ID = 1;
     private final int XBOX_ID     = 0;
 
-    // Controller Object Declaration
-    private Joystick joystick;
+    // Controller object declaration
+    private Joystick       joystick;
     private XboxController xboxController;
 
     // Rate limiters
@@ -273,19 +271,6 @@ public class Controls {
         }
         else {
             return GrabberDirection.OFF;
-        }
-    }
-
-    //Test controls
-    public double getFeedPower() {
-        if (xboxController.getLeftTriggerAxis() > 0) {
-            return -0.2 * xboxController.getLeftTriggerAxis();
-        }
-        else if (xboxController.getRightTriggerAxis() > 0) {
-            return 0.2 * xboxController.getRightTriggerAxis();
-        }
-        else {
-            return 0;
         }
     }
 }

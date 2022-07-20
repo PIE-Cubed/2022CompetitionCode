@@ -16,7 +16,7 @@ import frc.robot.Drive.TargetPipeline;
 import frc.robot.Shooter.ShootLocation;
 
 /**
- * The class that runs with the start of a match
+ * The class that runs eveything else
  */
 public class Robot extends TimedRobot {
   // ERROR CODES
@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
   private int targetStatus        = Robot.CONT;
   private boolean lowShotEnabled  = false;
 
-  // Enumeration for manual or automatic  control
+  // Enumeration for manual or automatic control
   public static enum DriveMode {
     MANUAL,
     LIMELIGHT_TARGETING,
@@ -65,7 +65,6 @@ public class Robot extends TimedRobot {
   // Number of balls
   private static final int kTwoBall   = 2;
   private static final int kThreeBall = 3;
-  //private static final int kFourBall  = 4;
   private int m_numBalls;
   private final SendableChooser<Integer> m_numBallsChooser = new SendableChooser<>();
 
@@ -76,7 +75,7 @@ public class Robot extends TimedRobot {
    * Constructor
    */
   public Robot() {
-    //Instance Creation
+    // Instance creation
     drive         = new Drive();
     grabber       = new Grabber();
     controls      = new Controls();
@@ -87,10 +86,10 @@ public class Robot extends TimedRobot {
     led           = LedLights.getInstance();
     //pdp           = new PowerDistributionPanel();
 
-    //Creates a Network Tables instance
+    // Creates a Network Tables instance
     FMSInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
 
-    //Creates the Networktable Entry
+    // Creates the Networktable Entry
     isRedAlliance = FMSInfo.getEntry("IsRedAlliance"); // Boolean
   }
 
@@ -100,23 +99,24 @@ public class Robot extends TimedRobot {
    * Runs once when the robot is started
    */
   public void robotInit() {
-    //Auto selection
+    // Auto start location
     m_chooser.setDefaultOption("Wall Auto", kWallAuto);
     m_chooser.addOption("Center Auto", kCenterAuto);
     m_chooser.addOption("Hangar Auto", kHangarAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    // Auto delay
     SmartDashboard.putNumber("Auto delay seconds", 0);
 
-    //Number of Balls to grab
+    // Number of Balls to grab
     m_numBallsChooser.setDefaultOption("2 ball", kTwoBall);
     m_numBallsChooser.addOption("3 ball", kThreeBall);
-    //m_numBallsChooser.addOption("4 ball", kFourBall);
     SmartDashboard.putData("Number of Balls", m_numBallsChooser);
 
-    //Passes if we are on the red alliance to the Pi for Object Tracking
+    // Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( getRedAlliance() );
     
-    //Sets the limelight LED mode
+    // Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
   }
 
@@ -126,7 +126,7 @@ public class Robot extends TimedRobot {
    * Always runs on the robot
    */
   public void robotPeriodic() {
-    //Passes if we are on the red alliance to the Pi for Object Tracking
+    // Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( getRedAlliance() );
 
     // Passes our color to the lights
@@ -139,7 +139,7 @@ public class Robot extends TimedRobot {
    * Runs once when Auto starts
    */
   public void autonomousInit() {
-    //Choses start position
+    // Choses start position
     m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
 
@@ -148,10 +148,10 @@ public class Robot extends TimedRobot {
 
     delaySec = (int)SmartDashboard.getNumber("Auto delay seconds", 0);
 
-    //Passes if we are on the red alliance to the Pi for Object Tracking
+    // Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( getRedAlliance() );
 
-    //Sets the limelight LED mode
+    // Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
 
     // Inits the ledlights for auto
@@ -214,7 +214,6 @@ public class Robot extends TimedRobot {
     wheelControl();
     ballControl();
     climberControl();
-    //SmartDashboard.putNumber("Total current: ", pdp.getCurrent());
   }
 
   @Override
@@ -244,16 +243,14 @@ public class Robot extends TimedRobot {
    * Runs once at the start of Test
    */
   public void testInit() {
-    //Passes if we are on the red alliance to the Pi for Object Tracking
+    // Passes if we are on the red alliance to the Pi for Object Tracking
     cargoTracking.setRedAlliance( getRedAlliance() );
 
-    //Resets status
+    // Resets status
     status = Robot.CONT;
 
-    //Sets the limelight LED mode
+    // Sets the limelight LED mode
     drive.changeledMode(Drive.LEDState.ON);
-
-    //SmartDashboard.putNumber("Shoot Power", 0.00);
   }
 
   @Override
@@ -277,11 +274,9 @@ public class Robot extends TimedRobot {
     boolean enableCargoTracking = controls.enableCargoTracking();
     ShootLocation shootLocation = controls.getShootLocation();
 
-
     // Kills all automatic funcitons (Start on the Xbox controller)
     boolean autokill            = controls.autoKill();
 
-    // General state changes
     if (autokill == true) {
       driveMode = DriveMode.MANUAL;
     } 
@@ -312,7 +307,7 @@ public class Robot extends TimedRobot {
         driveMode = DriveMode.LIMELIGHT_TARGETING;
       }
 
-      // Exit coditions
+      // Exit conditions
       if (enableCargoTracking == true) {
         driveMode = DriveMode.CARGO_TARGETING;
       }
@@ -326,6 +321,7 @@ public class Robot extends TimedRobot {
         targetStatus = drive.limelightPIDTargeting(shootLocation, Drive.TargetPipeline.ON_TARMAC, true);
       }
 
+      // Exit conditions
       if (targetStatus == Robot.DONE) {
         driveMode = DriveMode.LIMELIGHT_TARGETED;
       }
@@ -335,7 +331,7 @@ public class Robot extends TimedRobot {
     }
     // Limelight targeted
     else if (driveMode == DriveMode.LIMELIGHT_TARGETED) {
-      //Does nothing until trigger is released
+      // Does nothing until trigger is released (exit condition)
       if (shootLocation == ShootLocation.OFF || shootLocation == ShootLocation.LOW_SHOT) {
         driveMode = DriveMode.MANUAL;
       }
@@ -343,7 +339,6 @@ public class Robot extends TimedRobot {
     // Raspberry Pi Targeting
     else if (driveMode == DriveMode.CARGO_TARGETING) {
       int cargoStatus = cargoTracking.autoCargoTrack();
-
 
       if (cargoStatus == Robot.DONE) {
         driveMode = DriveMode.CARGO_TARGETED;
@@ -362,7 +357,7 @@ public class Robot extends TimedRobot {
    * Controls the ball in TeleOp
    */
   private void ballControl() {
-    // Controls function
+    // Controls 
     boolean deployRetract               = controls.grabberDeployRetract();
     boolean startShooter                = controls.startShooter();
     boolean secureBalls                 = controls.secureBalls();
@@ -480,11 +475,10 @@ public class Robot extends TimedRobot {
    * @return isRed
    */
   private boolean getRedAlliance() {
-    //Gets and returns if we are red from the FMS
+    // Gets and returns if we are red from the FMS
     boolean isRed = isRedAlliance.getBoolean(false);
     return isRed;
   }
 
 }
-
-//End of the Robot class
+// End of the Robot class

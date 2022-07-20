@@ -4,11 +4,12 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+// Not being used yet, but contains useful code
 public class PowerDistributionPanel {
     // Object Creation
     PowerDistribution pdp;
 
-    //Power channels, not the same as CAN ids
+    // Power channels, not the same as CAN ids
     private int FR_DRIVE = 6;
     private int FL_DRIVE = 19;
     private int BR_DRIVE = 15;
@@ -24,22 +25,22 @@ public class PowerDistributionPanel {
         pdp.setSwitchableChannel(true);
     }
 
-    //Gets the total voltage from power distribution panel
+    // Gets the total voltage from power distribution panel
     public double getVoltage() {
         return pdp.getVoltage();
     }
 
-    //Gets the total current drawn by power distribution panel
+    // Gets the total current drawn by power distribution panel
     public double getCurrent() {
         return pdp.getTotalCurrent();
     }
 
-    //Returns power (being drawn I assume), which is the product of voltage and current, in watts
+    // Gets the total power being drawn, which is the product of voltage and current, in watts
     public double getPower() {
         return pdp.getTotalPower();
     }
 
-    //Power * time, in joules
+    // Power * time, in joules
     public double getEnergy() {
         return pdp.getTotalEnergy();
     }
@@ -54,6 +55,9 @@ public class PowerDistributionPanel {
         return pdp.getCurrent(channel);
     }
 
+    /*
+     * Test functions
+     */
     public void testSmartDashboard() {
         SmartDashboard.putNumber("FR Drive Current", pdp.getCurrent(FR_DRIVE));
         SmartDashboard.putNumber("FL Drive Current", pdp.getCurrent(FL_DRIVE));

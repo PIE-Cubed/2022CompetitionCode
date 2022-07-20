@@ -76,7 +76,7 @@ public class Wheel {
 
         currWheelAngle = getRotateMotorPosition();
 
-        /*
+        /*  Not working code - supposed to reverse wheel power instead of flipping around 180 degrees, caused unintended bugs
         if ((normalizeAngle(targetWheelAngle) < 22.5 && normalizeAngle(targetWheelAngle) > -147.5) && teleop == true) {
             targetWheelAngle = targetWheelAngle + 180;
             drivePower = -1 * drivePower;
@@ -126,7 +126,7 @@ public class Wheel {
     public void setDriveMotorPower(double power) {
         power = MathUtil.clamp(power, -1, 1);
 
-        //Wheels always go forward. To go reverse, rotate wheels
+        // Wheels always go forward. To go reverse, rotate wheels
         if ((name == Drive.WheelProperties.FRONT_LEFT_WHEEL) || 
             (name == Drive.WheelProperties.REAR_LEFT_WHEEL))    {
             driveMotor.set(power * -1);
@@ -145,18 +145,15 @@ public class Wheel {
     private double normalizeAngle(double degrees){
         double adjustedValue = degrees;
 
-        if ((adjustedValue >= 0) && (adjustedValue <= 180)) {
-            //Does nothing to adjustedValue
-        }
-        else if ((adjustedValue <= 0) && (adjustedValue >= -180)) {
-            //Does nothing to adjustedValue
+        if ((adjustedValue >= -180) && (adjustedValue <= 180)) {
+            // Does nothing to adjustedValue
         }
         else if(adjustedValue > 180) {
-            //Makes all values greater than 180 less than it
+            // Makes all values greater than 180 less than it
             adjustedValue -= 360;
         }
         else if(adjustedValue < -180) {
-            //Makes all values less than -180 greater than it
+            // Makes all values less than -180 greater than it
             adjustedValue += 360;
         }
         
@@ -214,5 +211,4 @@ public class Wheel {
     }
 
 }
-
 // End of the Wheel Class

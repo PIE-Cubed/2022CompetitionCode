@@ -13,37 +13,36 @@ public class Climber {
     /*
     Positive power brings right arm (22) yellow claw up from starting point (CCW if looking from right)
     Negative power brings left arm (21) yellow claw up from starting point (CCW if looking from left)
-    Encoder for 1st bar: 46.3
     */
 
-    //Variables
+    // Variables
     private boolean barFourFirstTime = true;
 
-    //Spark Max ID for the climber
+    // Spark Max ID for the climber
     private final int CLIMBER_SPARKMAX_ID  = 22;
     private final int CLIMBER_FOLLOW_SPARKMAX_ID = 21;
 
-    //Current limit
+    // Current limit
     private final int CURRENT_LIMIT = 60;
 
-    //Object creation for the climberMotor
-    private CANSparkMax climberMotor; 
-    private CANSparkMax climberFollowMotor;
+    // Object creation for the climber motors
+    private CANSparkMax     climberMotor; 
+    private CANSparkMax     climberFollowMotor;
     private RelativeEncoder climberEncoder;
 
-    //Object creation for climberPistons
+    // Object creation for climber pistons
     private DoubleSolenoid blueClaw;
     private DoubleSolenoid yellowClaw;
 
-    //Double Solenoid for the claws
+    // Double solenoid IDs
     private final int PCM_CAN_ID1       = 1; 
     private final int BLUE_CLAW_OPEN    = 3;
     private final int BLUE_CLAW_CLOSE   = 7;
     private final int YELLOW_CLAW_OPEN  = 2;
     private final int YELLOW_CLAW_CLOSE = 6;
 
-    //Constants
-    private static final double BAR_TWO_POSITION   =  52.07; //46.3
+    // Constants for bar encoder positions
+    private static final double BAR_TWO_POSITION   =  52.07;
     private static final double BAR_THREE_POSITION = -57.50;
     private static final double BAR_FOUR_POSITION  = -210.39;
 
@@ -55,14 +54,14 @@ public class Climber {
     private ClawState blueClawState;
     private ClawState yellowClawState;
 
-    // Object creation
+    // Object creation for LED
     private LedLights led;
     
     /**
      * CONSTRUCTOR
      */
     public Climber() {
-        //The Motor
+        // The motors
         climberMotor = new CANSparkMax(CLIMBER_SPARKMAX_ID, MotorType.kBrushless);
         climberMotor.setIdleMode(IdleMode.kBrake);
         climberMotor.setSmartCurrentLimit(CURRENT_LIMIT);
@@ -74,15 +73,15 @@ public class Climber {
 
         climberMotor.set(0.0);
 
-        //Encoder
+        // Encoders
         climberEncoder = climberMotor.getEncoder();
         climberEncoder.setPosition(0.0); 
 
-        //The Claws
+        // The claws
         blueClaw    = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, BLUE_CLAW_OPEN, BLUE_CLAW_CLOSE);
         yellowClaw  = new DoubleSolenoid(PCM_CAN_ID1, PneumaticsModuleType.CTREPCM, YELLOW_CLAW_OPEN, YELLOW_CLAW_CLOSE);
 
-        // Instance creation
+        // LED instance creation
         led = LedLights.getInstance();
 
         // Closes the claws
@@ -114,7 +113,7 @@ public class Climber {
         }
     }
 
-    //Direct setting of pistons
+    // Direct setting of pistons
     public void blueClawOpen() {
         blueClaw.set(Value.kForward);
         blueClawState = ClawState.OPEN;
@@ -185,7 +184,7 @@ public class Climber {
     public int moveToBar4() {
         if (getClimberEncoder() <= BAR_FOUR_POSITION) {
             climberMotor.set(0);
-            //yellowClawClose();
+            //yellowClawClose(); -- commented, close claw manually
             led.climberDone();
 
             return Robot.DONE;
@@ -208,6 +207,14 @@ public class Climber {
 
             return Robot.CONT;
         }
+    }
+
+    /**
+     * Resets the climber encoder
+     */
+    public void resetEncoder() {
+        System.out.println("Resetting climber encoders");
+        climberEncoder.setPosition(0.00);
     }
 
     /**
@@ -251,15 +258,6 @@ public class Climber {
     public double getClimberEncoder() {
         return climberEncoder.getPosition();
     }
-
-    /**
-     * Resets the climber encoder
-     */
-    public void resetEncoder() {
-        System.out.println("Resetting climber encoders");
-        climberEncoder.setPosition(0.00);
-    }
-
 }
 
 // End of the Climber Class

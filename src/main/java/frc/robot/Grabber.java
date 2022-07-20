@@ -14,27 +14,27 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
  * Start of class
  */
 public class Grabber {
-    //SPARK MAX ID's
-    private static final int SPARK_ID  = 18;
+    // SPARK MAX ID's
+    private static final int SPARK_ID = 18;
 
-    //PNEUMATICS IDS
+    // PNEUMATICS IDS
     private final int PCM_CAN_ID              = 1;
     private final int GRABBER_DEPLOY_ID       = 4;
     private final int GRABBER_RETRACT_ID      = 0;
     private final int BALL_BLOCKER_DEPLOY_ID  = 1;
 	private final int BALL_BLOCKER_RETRACT_ID = 5;
 
-    //SPARK MAX CURRENT LIMIT
+    // SPARK MAX CURRENT LIMIT
     private int GRABBER_CURRENT_LIMIT = 60;
 
-    //Spark Max Motors
+    // Spark Max motor
     private CANSparkMax grabberMotor;
 
-    //Pistons
+    // Pistons
     private DoubleSolenoid ballBlocker;
     private DoubleSolenoid grabberPiston;
 
-    //CONSTANTS
+    // CONSTANTS
     private final double GRABBER_POWER = -0.75;
 
     /**
@@ -59,17 +59,17 @@ public class Grabber {
      * CONSTRUCTOR
      */
     public Grabber()  {
-        //Grabber Motor Init
+        // Grabber Motor Init
         grabberMotor = new CANSparkMax(SPARK_ID, MotorType.kBrushed);
         grabberMotor.setSmartCurrentLimit(GRABBER_CURRENT_LIMIT);
         grabberMotor.set(0.0);
 
-        //Grabber Piston Init
+        // Grabber Piston Init
         grabberPiston = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, GRABBER_DEPLOY_ID, GRABBER_RETRACT_ID);
         grabberPiston.set(Value.kReverse);
         grabberState = GrabberState.RETRACT;
 
-        //Ball blocker Piston Init
+        // Ball blocker Piston Init
         ballBlocker = new DoubleSolenoid(PCM_CAN_ID, PneumaticsModuleType.CTREPCM, BALL_BLOCKER_DEPLOY_ID, BALL_BLOCKER_RETRACT_ID);
         ballBlocker.set(Value.kReverse);
     }
@@ -135,5 +135,4 @@ public class Grabber {
 	}
 
 }
-
 // End of the Grabber Class

@@ -20,10 +20,10 @@ import frc.robot.Shooter.ShootLocation;
  * Start of class
  */
 public class Drive {
-    //Network Table creation
+    // Network table creation
     private NetworkTable limelightEntries;
 
-    //Network Table Entries
+    // Network table entries
     private NetworkTableEntry targetX;
     private NetworkTableEntry targetY;
     private NetworkTableEntry targetArea;
@@ -33,93 +33,94 @@ public class Drive {
     private NetworkTableEntry stream;
     private NetworkTableEntry pipeline;
 
-    //NAVX
+    // NAVX
     public static AHRS ahrs;
 
-    //PID controllers
-    private PIDController rotateController;
-    private PIDController targetController;
-    private PIDController driveController;
-    private PIDController autoCrabDriveController;
-    private PIDController autoSwerveController;
+    // PID controllers
+    private PIDController rotateController; // Used for turning of robot
+    private PIDController targetController; // Used for limelight turning to correct angle
+    private PIDController driveController;  // Used for limelight driving to correct distance
+    private PIDController autoCrabDriveController; // Used during crab drive to keep the robot at same orientation
+    private PIDController autoSwerveController; // Used to control robot orientation in autoSwerveDrive() - rarely used or tested
 
     private static final double rotateToleranceDegrees     = 2.0f;
     private static final double kLimeLightToleranceDegrees = 1.0f;
     private static final double kLimeLightDriveTolerance   = 0.25f;
     
     // Turn Controller
-	private static final double kP = 0.01; //0.02
+	private static final double kP = 0.01; 
 	private static final double kI = 0.00;
     private static final double kD = 0.00;
 
-    //Target Controller
-	private static final double tP = 0.015; //0.033
-	private static final double tI = 0.001; //0.002
+    // Target Controller
+	private static final double tP = 0.015; 
+	private static final double tI = 0.001; 
     private static final double tD = 0.000;
 
-    //Drive Controller
+    // Drive Controller
     private static final double dP = 0.045;
 	private static final double dI = 0.001;
     private static final double dD = 0.000;
     
-    //Auto crab drive controller
-    private static final double acdP = 0.005; //0.02
+    // Auto crab drive controller
+    private static final double acdP = 0.005; 
     private static final double acdI = 0.000;
     private static final double acdD = 0.000;
 
-    //Swerve Controller
-    private static final double sP = 0.003; //0.002
+    // Swerve Controller
+    private static final double sP = 0.003;
     private static final double sI = 0.000;
     private static final double sD = 0.000;
 
-    //Integrator Range
+    // Integrator Range
     private static final double TARGET_I_MAX = 0.05;
     private static final double TARGET_I_MIN = -1 * TARGET_I_MAX;
     private static final double DRIVE_I_MAX  = 0.1;
     private static final double DRIVE_I_MIN  = -1 * DRIVE_I_MAX;
 
-	//Variables
-    private boolean crabFirstTime        = true;
-    private boolean swerveFirstTime      = true;
-    private boolean rotateFirstTime      = true;
-    private boolean adjustFirstTime      = true;
-    private int     count                = 0;
-    private double  encoderTarget        = 0;
-    private double  swerveEncoderTarget  = 0;
-    private double  targetOrientation    = 0;
-    private double  autoSwerveStartAngle = 0;
+	// Variables
+    private boolean crabFirstTime         = true;
+    private boolean swerveFirstTime       = true;
+    private boolean rotateFirstTime       = true;
+    private boolean adjustFirstTime       = true;
+    private int     count                 = 0;
+    private double  encoderTarget         = 0;
+    private double  swerveEncoderTarget   = 0;
+    private double  targetOrientation     = 0;
+    private double  autoSwerveStartAngle  = 0;
     
-    //CONSTANTS
-    private final int    FAIL_DELAY             = 5;
-    private final double ticksPerFoot           = 5.65;
+    // CONSTANTS
+    private final int    FAIL_DELAY       = 5;
+    private final double ticksPerFoot     = 5.65;
 
-    //BLUE ROBOT
+    // BLUE ROBOT
     private static final double FL_OFFSET = 309.8;
     private static final double FR_OFFSET = 248.0;
     private static final double BL_OFFSET = 165.7;
     private static final double BR_OFFSET = -33.2;
 
-    //Yellow ROBOT
+    // Yellow ROBOT
     // private static final double FL_OFFSET = -151.21;
     // private static final double FR_OFFSET = -150.36;
     // private static final double BL_OFFSET =  143.73;
     // private static final double BR_OFFSET =  22.073;
 
-	//Limelight Variables
-    private int     noTargetCount       = 0;
-    private int     targetLockedCount   = 0;
-    private int     distanceLockedCount = 0;
+	// Limelight variables
+    private int     noTargetCount              = 0;
+    private int     targetLockedCount          = 0;
+    private int     distanceLockedCount        = 0;
     private long    timeOut;
-    private boolean limeLightFirstTime = true;
+    private boolean limeLightFirstTime         = true;
+
 	private static final int ON_ROTATION_COUNT = 5;
     private static final int ON_DISTANCE_COUNT = 20;
-    private static final int ON_ANGLE_COUNT  = 10;
+    private static final int ON_ANGLE_COUNT    = 10;
 
-    //Limelight
+    // Limelight
 	public boolean limeControl   = false;
 	public int     limeStatus    = 0;
         
-    //Limelight-Required Object Creation
+    // Led object creation
     private LedLights led;
 
     /**
@@ -159,29 +160,28 @@ public class Drive {
                         17, // ROTATE MOTOR ID
                         3, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                        FR_OFFSET), //Offset
+                        FR_OFFSET), // Offset
         FRONT_LEFT_WHEEL(10, // DRIVE MOTOR ID
                         11, // ROTATE MOTOR ID
                         0, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad - (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                        FL_OFFSET), //Offset
+                        FL_OFFSET), // Offset
         REAR_RIGHT_WHEEL(16, // DRIVE MOTOR ID
                         15, // ROTATE MOTOR ID
                         2, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad + (Math.PI/2)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                        BR_OFFSET), //Offset
+                        BR_OFFSET), // Offset
         REAR_LEFT_WHEEL(12, // DRIVE MOTOR ID
                         13, // ROTATE MOTOR ID
                         1, // ROTATE SENSOR ID
                         (-1 * rotateMotorAngleRad + (Math.PI)), // ROTATE MOTOR TARGET ANGLE (IN RADIANS)
-                        BL_OFFSET); //Offset
+                        BL_OFFSET); // Offset
 
         private int    driveMotorId;
         private int    rotateMotorId;
         private int    rotateSensorId;
-        private double offsetDegrees; //Inverse of the reading when wheel is physically at 0 degrees
+        private double offsetDegrees; // Inverse of the reading when wheel is physically at 0 degrees
 
-        // Each item in the enum will now have to be instantiated with a constructor with the all of the ids and the motor type constants. Look few lines above, where FRONT_RIGHT_WHEEL(int driveMotorId, MotorType driveMotorType, int rotateMotorId, int rotateSensorId, double targetRadians, double targetVoltage), REAR_LEFT_WHEEL(int driveMotorId, MotorType driveMotorType, int rotateMotorId, int rotateSensorId, double targetRadians, double targetVoltage), etc... are. These are what the constructor is for.
         private WheelProperties(int driveMotorId, int rotateMotorId, int rotateSensorId, double targetRadians, double offsetDegrees) {
             this.driveMotorId = driveMotorId;
             this.rotateMotorId = rotateMotorId;
@@ -227,17 +227,14 @@ public class Drive {
                                               WheelProperties.REAR_LEFT_WHEEL.getOffsetDegrees(),
                                               WheelProperties.REAR_LEFT_WHEEL);
     
-    /**
-     * The literal lengths and widths of the robot. Look to the swerve drive Google Doc
-     * Note: these fields are static because they must be. They are referenced in the enum, which is in and of itself, static.
-     * These measurements are in inches
-     */
+    
+    // The literal lengths and widths of the robot in inches
     private static final double robotLength = 30.125;
     private static final double robotWidth  = 18.0;
     private static final double rotateMotorAngleRad = Math.atan2(robotLength, robotWidth);
     private static final double rotateMotorAngleDeg = Math.toDegrees(rotateMotorAngleRad);
  
-    // These numbers were selected to make the angles between -180 and +180
+    // Angles each wheel will be at while the robot turns
     private static final double rotateRightFrontMotorAngle = -1 * rotateMotorAngleDeg;
     private static final double rotateLeftFrontMotorAngle = -180 + rotateMotorAngleDeg;
     private static final double rotateRightRearMotorAngle = rotateMotorAngleDeg;
@@ -247,7 +244,7 @@ public class Drive {
     /****************************************************************************************** 
     *
     *    PowerAndAngle class
-    *    Stores angle and power instead of x and y values
+    *    Stores angle and power instead of x and y values, our way of doing vectors
     * 
     ******************************************************************************************/
     public class PowerAndAngle{
@@ -281,7 +278,7 @@ public class Drive {
     * 
     ******************************************************************************************/
     public Drive() {
-        //NavX
+        // NavX
         try {
             ahrs = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
@@ -305,7 +302,7 @@ public class Drive {
         // Led lights
         led = LedLights.getInstance();
 
-        //PID Controllers
+        // PID Controllers
         rotateController = new PIDController(kP, kI, kD);
         rotateController.setTolerance(rotateToleranceDegrees);
         rotateController.enableContinuousInput(-180.0, 180.0);
@@ -324,17 +321,17 @@ public class Drive {
         driveController = new PIDController(dP, dI, dD);
         driveController.setTolerance(kLimeLightDriveTolerance);
 
-        //Inegrator Ranges
+        // Inegrator Ranges
         targetController.setIntegratorRange(TARGET_I_MIN, TARGET_I_MAX);
         driveController.setIntegratorRange(DRIVE_I_MIN, DRIVE_I_MAX);
 
         /**
          * LIMELIGHT
          */
-        //Network Table
+        // Network Table
         limelightEntries = NetworkTableInstance.getDefault().getTable("limelight");
 
-        //Network Table Entires
+        // Network Table Entires
         targetValid = limelightEntries.getEntry("tv");
         targetX     = limelightEntries.getEntry("tx");
         targetY     = limelightEntries.getEntry("ty");
@@ -347,13 +344,13 @@ public class Drive {
         /**
 		 * Limelight Modes
 		 */
-		//Force the LED's to on to start the match
+		// Force the LED's to on to start the match
 		ledMode.setNumber(0);
-		//Set limelight mode to vision processor
+		// Set limelight mode to vision processor
 		cameraMode.setNumber(0);
-		//Sets limelight streaming mode to Standard (The primary camera and the secondary camera are displayed side by side)
+		// Sets limelight streaming mode to Standard (The primary camera and the secondary camera are displayed side by side)
 		stream.setNumber(0);
-		//Sets limelight pipeline to 0 (ON_TARMAC)
+		// Sets limelight pipeline to 0 (ON_TARMAC)
 		pipeline.setNumber(0);
     }
 
@@ -372,7 +369,7 @@ public class Drive {
         double rotateX;
         double rotateY;
 
-        //If field drive is active then the crab drive values are shifted based on gyro reading
+        // If field drive is active then the crab drive values are shifted based on gyro reading
         if (fieldDriveEnabled) {
             double crabPower = Math.sqrt((crabX * crabX) + (crabY * crabY));
             double crabAngle = Math.toDegrees(Math.atan2(crabX, crabY));
@@ -397,8 +394,8 @@ public class Drive {
         swervePower = Math.sqrt((swerveX * swerveX) + (swerveY * swerveY));
         swerveAngle = Math.toDegrees(Math.atan2(swerveX, swerveY));
 
-        //If we are rotating CCW, and we are not crab driving, then the robot will flip the wheel angles and powers
-        //This keeps the wheels in the same position when turning both ways, making small rotations easier
+        // If we are rotating CCW, and we are not crab driving, then the robot will flip the wheel angles and powers
+        // This keeps the wheels in the same position when turning both ways, making small rotations easier
         if ((rotatePower < 0) && (crabX == 0 && crabY == 0)) {
             swervePower *= -1;
             swerveAngle += 180;
@@ -477,14 +474,14 @@ public class Drive {
     public int autoCrabDrive(double distance, double targetHeading, double power) {
         double encoderCurrent = getAverageEncoder(); //Average of 4 wheels
 
-        //First time through initializes target values
+        // First time through initializes target values
         if (crabFirstTime == true) {
             crabFirstTime = false;
             targetOrientation = ahrs.getYaw();
             encoderTarget = encoderCurrent + (ticksPerFoot * distance);
         }
 
-        //Halves speed within 3 feet of target, if total distance is at least 5 feet
+        // Halves speed within 3 feet of target, if total distance is at least 5 feet
         if ((encoderCurrent + (3 * ticksPerFoot) > encoderTarget) && distance > 5) {
             power = power / 2;
         }
@@ -498,11 +495,11 @@ public class Drive {
             return Robot.DONE;
         }
         
-        //Adjusts wheel angles
+        // Adjusts wheel angles
         orientationError = autoCrabDriveController.calculate(ahrs.getYaw(), targetOrientation); 
         teleopSwerve(x, y, orientationError, false, false); 
 
-        //Checks if target distance has been reached, then ends function if so
+        // Checks if target distance has been reached, then ends function if so
         if (encoderCurrent >= encoderTarget) {
             crabFirstTime = true;
             stopWheels();
@@ -524,10 +521,10 @@ public class Drive {
      * @return status
      */
     public int autoSwerve(double distance, double startHeading, double endOrientation, double power) {
-        double encoderCurrent = getAverageEncoder(); //Average of 4 wheels
-        double ticksPerDegree = 7/45;
+        double encoderCurrent = getAverageEncoder(); // Average of 4 wheels
+        double ticksPerDegree = 7.0/45;
 
-        //First time through initializes target values
+        // First time through initializes target values
         if (swerveFirstTime == true) {
             swerveFirstTime = false;
             autoSwerveStartAngle = ahrs.getYaw();
@@ -536,7 +533,7 @@ public class Drive {
 
         double orientationChange = ahrs.getYaw() - autoSwerveStartAngle;
 
-        //Finds our x and y power based off the heading we want to go
+        // Finds our x and y power based off the heading we want to go
         double x = power * Math.sin(Math.toRadians(startHeading - orientationChange));
         double y = power * Math.cos(Math.toRadians(startHeading - orientationChange));
         x = MathUtil.clamp(x, -0.3, 0.3);
@@ -548,14 +545,12 @@ public class Drive {
             return Robot.DONE;
         }
         
-        //Adjusts wheel angles
+        // Adjusts wheel angles
         double orientationError = autoSwerveController.calculate(ahrs.getYaw(), endOrientation);
         orientationError = MathUtil.clamp(orientationError, -0.4, 0.4);
         teleopSwerve(x, y, orientationError, false, false);
 
-        //System.out.println("Current: " + encoderCurrent + " Target: " + swerveEncoderTarget);
-
-        //Checks if target distance has been reached, then ends function if so
+        // Checks if target distance has been reached, then ends function if so
         if (encoderCurrent >= swerveEncoderTarget && autoSwerveController.atSetpoint()) {
             swerveFirstTime = true;
             stopWheels();
@@ -607,7 +602,7 @@ public class Drive {
         if (rotateFirstTime == true) {
             rotateFirstTime = false;
             count = 0;
-            timeOut = currentMs + 2500; //Makes the time out 2.5 seconds
+            timeOut = currentMs + 2500; // Makes the time out 2.5 seconds
         }
 
         if (currentMs > timeOut) {
@@ -622,7 +617,6 @@ public class Drive {
 		// Rotate
         rotateError = rotateController.calculate(ahrs.getYaw(), degrees);
         rotateError = MathUtil.clamp(rotateError, -0.5, 0.5);
-        //System.out.println(rotateError + " " + ahrs.getYaw());
 		teleopRotate(rotateError);
 
 		// CHECK: Routine Complete
@@ -656,16 +650,16 @@ public class Drive {
     public void circle(double radiusFeet) {
         double radius = radiusFeet*12;
 
-        //Finds angle of the radius to each wheel, used to find the angle the wheels need to go to
+        // Finds angle of the radius to each wheel, used to find the angle the wheels need to go to
         double innerAngle = Math.toDegrees(Math.atan2(robotWidth/2, radius - (robotLength/2)));
         double outerAngle = Math.toDegrees(Math.atan2(robotWidth/2, radius + (robotLength/2)));
 
-        //The distance that each wheel is from the center of the circle is found with the pythagorean theorem
+        // The distance that each wheel is from the center of the circle is found with the pythagorean theorem
         double innerDist = Math.pow(   Math.pow((robotWidth/2), 2) + Math.pow(radius - robotLength/2, 2),    0.5);
         double outerDist = Math.pow(   Math.pow((robotWidth/2), 2) + Math.pow(radius + robotLength/2, 2),    0.5);
 
-        //The ratio between the inner and outer speeds is equal to the ratio of their distances
-        double outerSpeed = 0.25; //Sets basis for speed of turning
+        // The ratio between the inner and outer speeds is equal to the ratio of their distances
+        double outerSpeed = 0.25; // Sets basis for speed of turning
         double innerSpeed = outerSpeed * (innerDist/outerDist);
 
         frontLeftWheel.rotateAndDrive(innerAngle + 90, innerSpeed, false);
@@ -704,7 +698,7 @@ public class Drive {
         if (adjustFirstTime == true) {
             adjustFirstTime = false;
             count = 0;
-            timeOut = currentMs + 2500; //Originally 500ms
+            timeOut = currentMs + 2500; // Originally 500ms
         }
 
         if (currentMs > timeOut) {
@@ -722,7 +716,7 @@ public class Drive {
         int BR = rearRightWheel.rotateAndDrive(degrees, 0, false);
         int BL = rearLeftWheel.rotateAndDrive(degrees, 0, false);
 
-        //Checks if all wheels are at target angle
+        // Checks if all wheels are at target angle
         if (FR == Robot.DONE && FL == Robot.DONE && BR == Robot.DONE && BL == Robot.DONE) {
             stopWheels();
             adjustFirstTime = true;
@@ -741,19 +735,19 @@ public class Drive {
     * 
     ******************************************************************************************/
     private double getAverageEncoder(){
-        //Encoder value get statements
+        // Getting encoder values
         double frontRight = frontRightWheel.getEncoderValue();
         double frontLeft  = frontLeftWheel.getEncoderValue();
         double backRight  = rearRightWheel.getEncoderValue();
         double backLeft   = rearLeftWheel.getEncoderValue();
 
-        //Creates a DoubleStream
+        // Creates a DoubleStream
         DoubleStream stream = DoubleStream.of(frontRight, frontLeft, backRight, backLeft);
 
-        //Averages the DoubleStream and converts to a double
+        // Averages the DoubleStream and converts to a double
         double average = stream.average().getAsDouble();
         
-        //Returns the average
+        // Returns the average
         return average;
     }
 
@@ -790,20 +784,18 @@ public class Drive {
         // Variables
 		double limelightRotatePower = 0;
         double limelightDrivePower  = 0;
-        long   currentMs = System.currentTimeMillis(); //Gets the current time
+        long   currentMs = System.currentTimeMillis(); // Gets the current time
 
         // Constants
         final int  TIME_OUT_SEC   = 3;
         final long TIME_OUT_MSEC = TIME_OUT_SEC * 1000;
-        final double TY_HIGH =  9.5; //5.85
+        final double TY_HIGH =  9.5;
         final double TY_AUTO =  5.65;
-        //final double TY_SAFE = -7.20;
 
         // Sets the required pipeline
         changePipeline(pipeline);
 
 		if (limeLightFirstTime == true) {
-            // Sets limeLightFirstTime to false
             limeLightFirstTime = false;
 
             // Resets the variables for tracking targets
@@ -813,7 +805,6 @@ public class Drive {
             
             // Sets and displays the forced time out
 			timeOut = currentMs + TIME_OUT_MSEC;
-            //System.out.println("Limelight timeOut " + TIME_OUT_SEC + " seconds");
             
             // Turns the limelight on
             changeledMode(LEDState.ON);
@@ -830,8 +821,6 @@ public class Drive {
         double ty = get_ty();
         //System.out.println("ty: " + ty);
 		// Target Area (0% of image to 100% of image) [Basic way to determine distance]
-        //double ta = get_ta();
-        //System.out.println("ta: " + ta);
 
 		if (tv < 1.0) {
             stopWheels();
@@ -871,7 +860,6 @@ public class Drive {
         // Calculate Rotate power
 		limelightRotatePower = targetController.calculate(tx, 0.0);
         limelightRotatePower = MathUtil.clamp(limelightRotatePower, -0.50, 0.50);
-		//teleopRotate(-1 * limelightRotatePower, true);
 		//System.out.println("Pid out: " + limelightCalculatedPower);
 
         if (isTeleOp == true) {
@@ -955,10 +943,6 @@ public class Drive {
             // Prints the timeout
             System.out.println("timeout " + tx + " Target Acquired " + tv);
 
-            // Turns LED's off
-            //changeledMode(LEDState.OFF);
-
-            // Returns the error code for failure
 			return Robot.DONE;
         }
         
@@ -1002,8 +986,8 @@ public class Drive {
      * @param pipelineName
      */
     public void changePipeline(TargetPipeline pipelineName) {
-        //Makes it a bit easier to change pipelines
-        if (pipelineName == TargetPipeline.ON_TARMAC) { //Line 1000
+        // Makes it a bit easier to change pipelines
+        if (pipelineName == TargetPipeline.ON_TARMAC) { 
             // Configures the limelight for on tarmac targeting
             pipeline.setNumber(0);
         }
@@ -1013,7 +997,7 @@ public class Drive {
         }
         else if (pipelineName == TargetPipeline.CAMERA) {
             // Cinfigures the limelight to be a camera
-            pipeline.setNumber(2);
+            pipeline.setNumber(2); // Line 1000
         }
         else {
             // Configures the limelight to do nothing
@@ -1026,7 +1010,7 @@ public class Drive {
      * @param state
      */
     public void changeledMode(LEDState mode) {
-        //Makes it easier to change the LED mode
+        // Makes it easier to change the LED mode
         if (mode == LEDState.ON) {
             // Sets limelight to on
             ledMode.setNumber(0);
@@ -1088,5 +1072,4 @@ public class Drive {
         System.out.println("tx: " + get_tx());
     }
 }
-
 // End of the Drive Class

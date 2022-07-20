@@ -54,7 +54,6 @@ public class LedLights {
 	 */
 	public void teamColors() {
 		// Sparkle blue on gold
-		//ledController.set(.53).
 		ledController.set(0.41);
 		errorCodeDisplayed = false;
 	}
@@ -121,8 +120,6 @@ public class LedLights {
 	 * SHOOTER
 	 */
 	public void shooterReady() {
-		// Heart Beat Red
-		//ledController.set(-0.25);
 		shooterOnTarget = true;
 		errorCodeDisplayed = true;
 	}
@@ -137,31 +134,25 @@ public class LedLights {
 	 * LIMELIGHT ERROR CODES
 	 */
 	public void limelightFinished() {
-		// Solid Green
-		//ledController.set(0.77);
 		limelightOnTarget = true;
 		errorCodeDisplayed = true;
 	}
 
 	public void limelightAdjusting() {
-		// Solid Yellow
-		ledController.set(0.69);
 		limelightOnTarget = false;
 		errorCodeDisplayed = true;
 	}
 
 	public void limelightNoValidTarget() {
-		// Solid Red
-		//ledController.set(0.61);
 		limelightNoTarget = true;
 		limelightOnTarget = false;
 		errorCodeDisplayed = true;
 	}
 	
-	//Green        - shooter up to speed and limelight targeted
-	//Yellow       - shooter up to speed, but limelight not targeted
-	//Red          - shooter not up to speed
-	//Red flashing - limelight and shooter are both off	
+	// Green        - shooter up to speed and limelight targeted
+	// Yellow       - shooter up to speed, but limelight not targeted
+	// Red          - shooter not up to speed
+	// Red flashing - limelight and shooter are both off	
 	public void updateShooter() {
 		if (shooterOnTarget && limelightOnTarget) {
 			// Solid Green
@@ -169,11 +160,11 @@ public class LedLights {
 		}
 		else if (shooterOnTarget && limelightNoTarget) {
 			// Solid Yellow
-			ledController.set(0.69);//-0.85
+			ledController.set(0.69);
 		}
 		else if (shooterOnTarget) {
 			// Solid Yellow
-			ledController.set(0.69);//0.73
+			ledController.set(0.69);
 		}
 		else if (!shooterOnTarget && limelightNoTarget) {
 			// Strobe Red
@@ -246,5 +237,4 @@ public class LedLights {
 	}
 
 }
-
 // End of the Ledligths Class

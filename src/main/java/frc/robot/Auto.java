@@ -10,14 +10,14 @@ import frc.robot.Shooter.ShootLocation;
 
 public class Auto {
     // Object creation
-    Drive   drive;
-    Grabber grabber;
-    Shooter shooter;
+    Drive         drive;
+    Grabber       grabber;
+    Shooter       shooter;
     CargoTracking cargoTracking;
-    LedLights led;
+    LedLights     led;
 
     // Step Variables
-    private int step = 1;
+    private int step      = 1;
     private int shootStep = 1;
     private int cargoStep = 1;
 
@@ -29,7 +29,6 @@ public class Auto {
     
     // Variables
     private long   autoDelayTargetMs = 0;
-    //private int    noTargetCount     = 0;
     private double cargoHeading      = 0;
 
     /**
@@ -61,7 +60,7 @@ public class Auto {
         }
 
         // Ensures that the values aren't too high
-        delayMs = (long)MathUtil.clamp((double)delayMs, 0, 6000);
+        delayMs = (long) MathUtil.clamp((double) delayMs, 0, 6000);
     
 		if (firstTime == true) {
 			firstTime = false;
@@ -83,7 +82,7 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 4:
-                status = drive.autoCrabDrive(3.5, 0, 0.2); //DO NOT ADJUST!
+                status = drive.autoCrabDrive(3.5, 0, 0.2); 
                 break;
             case 5:
                 status = drive.autoAdjustWheels(180);
@@ -99,7 +98,7 @@ public class Auto {
                 status = drive.autoCrabDrive(4.0, 0);
                 break;
             default:
-                //Finished routine
+                // Finished routine
                 step = 1;
                 firstTime = true;
 
@@ -139,7 +138,7 @@ public class Auto {
         }
 
         // Ensures that the values aren't too high
-        delayMs = (long)MathUtil.clamp((double)delayMs, 0, 6000);
+        delayMs = (long) MathUtil.clamp((double) delayMs, 0, 6000);
 
 		if (firstTime == true) {
 			firstTime = false;
@@ -161,7 +160,7 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 4:
-                status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
+                status = drive.autoCrabDrive(3.0, 0, 0.2); 
                 break;
             case 5:
                 status = drive.autoAdjustWheels(180);
@@ -177,7 +176,7 @@ public class Auto {
                 status = drive.autoCrabDrive(4.0, 0);
                 break;
             default:
-                //Finished routine
+                // Finished routine
                 step = 1;
                 firstTime = true;
 
@@ -217,7 +216,7 @@ public class Auto {
         }
 
         // Ensures that the values aren't too high
-        delayMs = (long)MathUtil.clamp((double)delayMs, 0, 6000);
+        delayMs = (long) MathUtil.clamp((double) delayMs, 0, 6000);
 
 		if (firstTime == true) {
 			firstTime = false;
@@ -239,7 +238,7 @@ public class Auto {
                 status = drive.autoAdjustWheels(0);
                 break;
             case 4:
-                status = drive.autoCrabDrive(3.0, 0, 0.2); //DO NOT ADJUST!
+                status = drive.autoCrabDrive(3.0, 0, 0.2); 
                 break;
             case 5:
                 status = drive.autoAdjustWheels(180);
@@ -251,23 +250,6 @@ public class Auto {
             case 7:
                 status = autoShoot(ShootLocation.HIGH_SHOT, 4);
                 break;
-            // case 8:
-            //     step = 12;
-            //     status = Robot.DONE;
-            //     break;
-            // case 9:
-            //     status = drive.autoRotate(50);
-            //     break;
-            // case 10:
-            //     status = drive.autoCrabDrive(7.0, 90, 0.5);
-            //     break;
-            // case 11:
-            //     grabber.setGrabberMotor(GrabberDirection.INTAKE);
-            //     status = drive.autoCrabDrive(2.15, 0, 0.2);
-            //     break;
-            // case 12:
-            //     status = autoShoot(ShootLocation.AUTO_RING, 2);
-            //     break;
             case 8:
                 grabber.grabberRetract();
                 status = Robot.DONE;
@@ -279,14 +261,14 @@ public class Auto {
                 status = drive.autoCrabDrive(2.5, 0);
                 break;
             default:
-                //Finished routine
+                // Finished routine
                 step = 1;
                 firstTime = true;
 
                 // Led lights turn Gold
                 led.autoModeFinished();
 
-                //Stops applicable motors
+                // Stops applicable motors
                 grabber.setGrabberMotor(GrabberDirection.OFF);
                 grabber.grabberDeploy();
                 shooter.disableShooter();
@@ -330,19 +312,12 @@ public class Auto {
 
         switch(shootStep) {
             case 1:
-                // Starts speeding up shooter and targeting
-                shooter.shooterControl(location);
-                drive.limelightPIDTargeting(location, targetingLocation, false);
-                led.autoMode(); // Led lights turn Aqua
-                status = Robot.DONE;
-                break;
-            case 2:
-                // Starts speeding up shooter and targeting
+                // Targets robot while speeding up shooter
                 shooter.shooterControl(location);
                 status = drive.limelightPIDTargeting(location, targetingLocation, false);
                 break;
-            case 3:
-                // Continues speeding up shooter and targeting until shooter is at correct RPM
+            case 2:
+                // Continues speeding up shooter until it is at correct RPM
                 shooter.shooterControl(location);
                 if (isShooterReady == true) {
                     status = Robot.DONE;
@@ -351,7 +326,7 @@ public class Auto {
                     status = Robot.CONT;
                 }
                 break;
-            case 4:
+            case 3:
                 // Retracts the shooter pistons to fire balls
                 shooter.openShooter();
                 grabber.releaseBalls();
@@ -470,10 +445,6 @@ public class Auto {
             return Robot.DONE;
         }
         return Robot.CONT;
-    }
-
-    public void resetFirstTime() {
-        delayFirstTime = true;
     }
 }
 
