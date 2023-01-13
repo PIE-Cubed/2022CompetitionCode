@@ -996,7 +996,7 @@ public class Drive {
             pipeline.setNumber(1);
         }
         else if (pipelineName == TargetPipeline.CAMERA) {
-            // Cinfigures the limelight to be a camera
+            // Configures the limelight to be a drive camera
             pipeline.setNumber(2); // Line 1000
         }
         else {
@@ -1012,15 +1012,15 @@ public class Drive {
     public void changeledMode(LEDState mode) {
         // Makes it easier to change the LED mode
         if (mode == LEDState.ON) {
-            // Sets limelight to on
-            ledMode.setNumber(0);
+            // Sets LED's to on
+            ledMode.setNumber(3);
         }
         else if (mode == LEDState.OFF) {
-            // Sets limelight to on
+            // Sets LED's to off
             ledMode.setNumber(1);
         }
         else {
-            // Sets limelight to on
+            // Sets LED's to the pipeline default
             ledMode.setNumber(0);
         }
     }
